@@ -13,7 +13,6 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class College {
     @Id
     @GeneratedValue
