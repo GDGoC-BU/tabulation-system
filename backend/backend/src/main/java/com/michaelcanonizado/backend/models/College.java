@@ -1,12 +1,19 @@
 package com.michaelcanonizado.backend.models;
 
-import jakarta.persistence.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class College {
     @Id
     @GeneratedValue
@@ -17,4 +24,9 @@ public class College {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    public College(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
 }
