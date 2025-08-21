@@ -23,7 +23,7 @@ public class College {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Candidate> candidates = new ArrayList<>();
 
     public College(String code, String name) {

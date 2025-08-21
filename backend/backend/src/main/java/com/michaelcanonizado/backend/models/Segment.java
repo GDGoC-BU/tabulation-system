@@ -20,7 +20,7 @@ public class Segment {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Criterion> criteria = new ArrayList<>();
 
 
@@ -28,7 +28,7 @@ public class Segment {
     with their details. Exclude list from getter and expose a
     separate getter stream to extract the actual candidate data:
     getQualifiedCandidate() */
-    @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> qualifiedCandidates = new ArrayList<>();
 

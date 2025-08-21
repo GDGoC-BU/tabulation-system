@@ -28,4 +28,9 @@ public class CandidateSegmentQualification {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "segment_id", nullable = false)
     private Segment segment;
+
+    public CandidateSegmentQualification(Segment segment, Candidate candidate) {
+        this.segment = segment;
+        this.candidate = candidate;
+    }
 }
