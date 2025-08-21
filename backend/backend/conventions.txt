@@ -1,5 +1,5 @@
 Backend:
-- packages should be in plural
+- packages should be in plural and sub classes are singular
 
 
 Database:
