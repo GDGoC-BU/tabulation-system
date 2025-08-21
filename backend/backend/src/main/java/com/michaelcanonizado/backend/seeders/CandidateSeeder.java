@@ -6,8 +6,6 @@ import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.models.Gender;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
