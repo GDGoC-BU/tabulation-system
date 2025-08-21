@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.UUID;
 
 @Entity
@@ -28,7 +27,7 @@ public class Candidate {
     private String lastName;
 
     @Column(nullable = false)
-    private String gender;
+    private Gender gender;
 
     @Column(nullable = false)
     private int age;
@@ -37,7 +36,7 @@ public class Candidate {
     @JoinColumn(name = "college_id", nullable = false)
     private College college;
 
-    public Candidate(int candidateNumber, String firstName, String lastName, String gender, int age, College college) {
+    public Candidate(int candidateNumber, String firstName, String lastName, Gender gender, int age, College college) {
         this.candidateNumber = candidateNumber;
         this.firstName = firstName;
         this.lastName = lastName;
