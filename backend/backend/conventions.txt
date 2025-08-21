@@ -2,6 +2,7 @@ Database:
 - JPA entities should be singular
 - attribute names should be in camelCase and should be kept minimal
 - Primary keys should be named "id" not "tableId"
+- Primary keys should be only of type UUID to keep types consistent
 - Have bidirectional mapping to foreign tables
 - Specify @Column annotation for all attributes
 - @Entity, @NoArgsConstructor(access = AccessLevel.PROTECTED), @Getter, and @Setter should be base annotations for entities. Don't use @Data
