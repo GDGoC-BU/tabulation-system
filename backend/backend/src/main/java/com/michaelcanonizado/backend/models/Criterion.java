@@ -24,4 +24,10 @@ public class Criterion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "segment_id", nullable = false)
     private Segment segment;
+
+    public Criterion(String name, int maxScore, Segment segment) {
+        this.name = name;
+        this.maxScore = maxScore;
+        this.segment = segment;
+    }
 }
