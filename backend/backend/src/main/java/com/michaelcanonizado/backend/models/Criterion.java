@@ -15,10 +15,10 @@ public class Criterion {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private int maxScore;
 
     @ManyToOne(fetch = FetchType.LAZY)
