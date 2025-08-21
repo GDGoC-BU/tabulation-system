@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.seeders;
 
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,14 +13,10 @@ import java.util.Arrays;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 class CollegeItem {
     String code;
     String name;
-
-    CollegeItem(String code, String name) {
-        this.code = code;
-        this.name = name;
-    }
 }
 
 @Component
