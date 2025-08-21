@@ -51,8 +51,7 @@ public class CollegeSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         colleges.forEach(collegeItem -> {
-            College college = new College(collegeItem.getCode(), collegeItem.getName());
-            repository.save(college);
+            repository.save(new College(collegeItem.getCode(), collegeItem.getName()));
         });
     }
 }
