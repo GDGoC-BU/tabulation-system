@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -20,6 +21,7 @@ class SegmentItem {
 }
 
 @Component
+@Order(2)
 public class SegmentSeeder implements CommandLineRunner {
     private final SegmentRepository repository;
 

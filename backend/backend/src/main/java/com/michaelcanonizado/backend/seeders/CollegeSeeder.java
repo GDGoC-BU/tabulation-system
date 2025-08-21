@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.repositories.CollegeRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -22,6 +23,7 @@ class CollegeItem {
 }
 
 @Component
+@Order(1)
 public class CollegeSeeder implements CommandLineRunner {
     private final CollegeRepository repository;
 
