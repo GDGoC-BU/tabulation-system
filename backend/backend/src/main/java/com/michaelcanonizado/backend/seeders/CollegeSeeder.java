@@ -12,34 +12,27 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-class CollegeItem {
-    String code;
-    String name;
-}
-
 @Component
 @Order(1)
 public class CollegeSeeder implements CommandLineRunner {
     private final CollegeRepository repository;
 
-    private final List<CollegeItem> colleges = Arrays.asList(
-            new CollegeItem("BUCAF", "Bicol University College of AF"),
-            new CollegeItem("BUCAL", "Bicol University College of Arts and Letters"),
-            new CollegeItem("BUCBEM", "Bicol University College of Business, Economics, and Management"),
-            new CollegeItem("BUCE", "Bicol University College of Education"),
-            new CollegeItem("BUCENG", "Bicol University College of Engineering"),
-            new CollegeItem("BUCIT", "Bicol University College of Industrial Technology"),
-            new CollegeItem("BUCN", "Bicol University College of Nursing"),
-            new CollegeItem("BUCS", "Bicol University College of Science"),
-            new CollegeItem("BUCSSP", "Bicol University College of Social Sciences and Philosophy"),
-            new CollegeItem("BUGC", "Bicol University Guinobatan/Gubat Campuss"),
-            new CollegeItem("BUIDeA", "Bicol University College of Architecture"),
-            new CollegeItem("BUIPESR", "Bicol University IPSER"),
-            new CollegeItem("BUJMRIGD", "Bicol University JMRIGD"),
-            new CollegeItem("BUPC", "Bicol University Polangui Campus"),
-            new CollegeItem("BUTC", "Bicol University Tobaco Campus")
+    private final List<College> colleges = Arrays.asList(
+            new College("BUCAF", "Bicol University College of AF"),
+            new College("BUCAL", "Bicol University College of Arts and Letters"),
+            new College("BUCBEM", "Bicol University College of Business, Economics, and Management"),
+            new College("BUCE", "Bicol University College of Education"),
+            new College("BUCENG", "Bicol University College of Engineering"),
+            new College("BUCIT", "Bicol University College of Industrial Technology"),
+            new College("BUCN", "Bicol University College of Nursing"),
+            new College("BUCS", "Bicol University College of Science"),
+            new College("BUCSSP", "Bicol University College of Social Sciences and Philosophy"),
+            new College("BUGC", "Bicol University Guinobatan/Gubat Campuss"),
+            new College("BUIDeA", "Bicol University College of Architecture"),
+            new College("BUIPESR", "Bicol University IPSER"),
+            new College("BUJMRIGD", "Bicol University JMRIGD"),
+            new College("BUPC", "Bicol University Polangui Campus"),
+            new College("BUTC", "Bicol University Tobaco Campus")
     );
 
     @Autowired
@@ -49,8 +42,6 @@ public class CollegeSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        colleges.forEach(collegeItem -> {
-            repository.save(new College(collegeItem.getCode(), collegeItem.getName()));
-        });
+        colleges.forEach(repository::save);
     }
 }

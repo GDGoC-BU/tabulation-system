@@ -13,15 +13,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
-
-@Getter
-@AllArgsConstructor
-class CandidateItem {
-    private String username;
-    private String passwordHash;
-}
 
 @Component
 @Order(5)

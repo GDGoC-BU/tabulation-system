@@ -12,23 +12,16 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-class JudgeItem {
-    private String username;
-    private String passwordHash;
-}
-
 @Component
 @Order(4)
 public class JudgeSeeder implements CommandLineRunner {
     private final JudgeRepository repository;
 
-    private final List<JudgeItem> judges = Arrays.asList(
-            new JudgeItem("judge1","1*************"),
-            new JudgeItem("judge2","2*************"),
-            new JudgeItem("judge3","3*************"),
-            new JudgeItem("judge4","4*************")
+    private final List<Judge> judges = Arrays.asList(
+            new Judge("judge1","1*************"),
+            new Judge("judge2","2*************"),
+            new Judge("judge3","3*************"),
+            new Judge("judge4","4*************")
     );
 
     @Autowired
@@ -38,8 +31,6 @@ public class JudgeSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        judges.forEach(judgeItem -> {
-            repository.save(new Judge(judgeItem.getUsername(), judgeItem.getPasswordHash()));
-        });
+        judges.forEach(repository::save);
     }
 }

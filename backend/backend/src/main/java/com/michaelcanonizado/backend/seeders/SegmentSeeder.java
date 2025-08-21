@@ -12,22 +12,16 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-class SegmentItem {
-    String name;
-}
-
 @Component
 @Order(2)
 public class SegmentSeeder implements CommandLineRunner {
     private final SegmentRepository repository;
 
-    private final List<SegmentItem> segments = Arrays.asList(
-            new SegmentItem("Swimwear"),
-            new SegmentItem("Formal Attire"),
-            new SegmentItem("Question and Answer"),
-            new SegmentItem("Final Round")
+    private final List<Segment> segments = Arrays.asList(
+            new Segment("Swimwear"),
+            new Segment("Formal Attire"),
+            new Segment("Question and Answer"),
+            new Segment("Final Round")
     );
 
     @Autowired
@@ -37,8 +31,6 @@ public class SegmentSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        segments.forEach(segmentItem -> {
-            repository.save(new Segment(segmentItem.getName()));
-        });
+        segments.forEach(repository::save);
     }
 }
