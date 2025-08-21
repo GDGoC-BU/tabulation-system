@@ -19,6 +19,7 @@ import java.util.UUID;
 public class Judge extends Auditable {
     @Id
     @GeneratedValue
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Column(nullable = false, unique = true)
