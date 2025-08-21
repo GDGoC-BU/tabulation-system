@@ -21,18 +21,18 @@ public class Segment {
     private String name;
 
     @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Criteria> criteria = new ArrayList<>();
+    private List<Criterion> criteria = new ArrayList<>();
 
     public Segment(String name) {
         this.name = name;
     }
 
-    public void addCriteria(Criteria criterion) {
+    public void addCriteria(Criterion criterion) {
         criteria.add(criterion);
         criterion.setSegment(this);
     }
 
-    public void removeCriteria(Criteria criterion) {
+    public void removeCriteria(Criterion criterion) {
         criteria.remove(criterion);
         criterion.setSegment(null);
     }

@@ -9,7 +9,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public class Criteria {
+public class Criterion {
     @Id
     @GeneratedValue
     @Setter(AccessLevel.NONE)
