@@ -3,6 +3,8 @@ package com.michaelcanonizado.backend.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -24,6 +26,9 @@ public class Criterion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "segment_id", nullable = false)
     private Segment segment;
+
+    @OneToMany(mappedBy = "criterion", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Score> scores = new ArrayList<>();
 
     public Criterion(String name, int maxScore, Segment segment) {
         this.name = name;

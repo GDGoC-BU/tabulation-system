@@ -44,9 +44,12 @@ public class Candidate extends Auditable{
     with their details. Exclude list from getter and expose a
     separate getter stream to extract the actual segment data:
     getQualifiedSegments() */
-    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> qualifiedSegments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Score> scores = new ArrayList<>();
 
     public Candidate(int candidateNumber, String firstName, String lastName, Gender gender, int age, College college) {
         this.candidateNumber = candidateNumber;

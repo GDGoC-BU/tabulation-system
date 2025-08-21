@@ -10,6 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -33,6 +35,9 @@ public class Judge extends Auditable {
 
     @Column(nullable = true)
     private Instant lastSeenAt;
+
+    @OneToMany(mappedBy = "judge", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Score> scores  = new ArrayList<>();
 
     public Judge(String username, String passwordHash) {
         this.username = username;
