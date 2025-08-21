@@ -1,11 +1,10 @@
 package com.michaelcanonizado.backend.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -24,8 +23,21 @@ public class College {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Candidate> candidates = new ArrayList<>();
+
     public College(String code, String name) {
         this.code = code;
         this.name = name;
+    }
+
+    public void addCandidate(Candidate candidate) {
+        candidates.add(candidate);
+        candidate.setCollege(this);
+    }
+
+    public void removeCandidate(Candidate candidate) {
+        candidates.remove(candidate);
+        candidate.setCollege(null);
     }
 }

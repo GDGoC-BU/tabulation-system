@@ -6,3 +6,4 @@ Database:
 - Specify @Column annotation for all attributes
 - @Entity, @NoArgsConstructor(access = AccessLevel.PROTECTED), @Getter, and @Setter should be base annotations for entities. Don't use @Data
 - To test for instances equality, don't use Object.equals() and instead compare the business keys: Object1.getId().equals(Object2.getId())
+- Add helper methods on the weak entity if using bidirectional mapping
