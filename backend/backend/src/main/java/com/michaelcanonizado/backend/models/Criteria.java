@@ -4,14 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Data
 @NoArgsConstructor
-public class Segment {
+public class Criteria {
     @Id
     @GeneratedValue
     private UUID id;
@@ -19,10 +17,10 @@ public class Segment {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Criteria> criterias = new ArrayList<>();
+    @Column(nullable = false, unique = true)
+    private int maxScore;
 
-    public Segment(String name) {
-        this.name = name;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "segment_id", nullable = false)
+    private Segment segment;
 }
