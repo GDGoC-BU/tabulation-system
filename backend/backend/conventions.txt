@@ -1,3 +1,7 @@
+Backend:
+- packages should be in plural
+
+
 Database:
 - JPA entities should be singular
 - attribute names should be in camelCase and should be kept minimal
