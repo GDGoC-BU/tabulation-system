@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public class Candidate {
+public class Candidate extends Auditable{
     @Id
     @GeneratedValue
     @Setter(AccessLevel.NONE)
