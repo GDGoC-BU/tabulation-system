@@ -31,16 +31,16 @@ public class CriterionSeeder implements CommandLineRunner {
     private final SegmentRepository segmentRepository;
 
     private final List<CriterionItem> criteria = Arrays.asList(
-            new CriterionItem("Beauty of Figure", 0, "Swimwear"),
-            new CriterionItem("Stage Presence", 0, "Swimwear"),
-            new CriterionItem("Poise and Personality", 0, "Swimwear"),
-            new CriterionItem("Attire and Carriage", 0, "Formal Attire"),
-            new CriterionItem("Stage Presence", 0, "Formal Attire"),
-            new CriterionItem("Poise and Bearing", 0, "Formal Attire"),
-            new CriterionItem("Intelligence", 0, "Question and Answer"),
-            new CriterionItem("Poise and Personality", 0, "Question and Answer"),
-            new CriterionItem("Intelligence and Wit", 0, "Final Round"),
-            new CriterionItem("Poise, Confidence, and Personality", 0, "Final Round")
+            new CriterionItem("Beauty of Figure", 5, "Swimwear"),
+            new CriterionItem("Stage Presence", 5, "Swimwear"),
+            new CriterionItem("Poise and Personality", 5, "Swimwear"),
+            new CriterionItem("Attire and Carriage", 5, "Formal Attire"),
+            new CriterionItem("Stage Presence", 5, "Formal Attire"),
+            new CriterionItem("Poise and Bearing", 5, "Formal Attire"),
+            new CriterionItem("Intelligence", 5, "Question and Answer"),
+            new CriterionItem("Poise and Personality", 5, "Question and Answer"),
+            new CriterionItem("Intelligence and Wit", 5, "Final Round"),
+            new CriterionItem("Poise, Confidence, and Personality", 5, "Final Round")
     );
 
     @Autowired
