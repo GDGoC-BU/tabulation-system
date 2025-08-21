@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -36,6 +39,14 @@ public class Candidate extends Auditable{
     @JoinColumn(name = "college_id", nullable = false)
     private College college;
 
+    /* Temporary list. Still need the real Segment object
+    with their details. Exclude list from getter and expose a
+    separate getter stream to extract the actual segment data:
+    getQualifiedSegments() */
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Getter(AccessLevel.NONE)
+    private List<CandidateSegmentQualification> qualifiedSegments = new ArrayList<>();
+
     public Candidate(int candidateNumber, String firstName, String lastName, Gender gender, int age, College college) {
         this.candidateNumber = candidateNumber;
         this.firstName = firstName;
@@ -43,5 +54,17 @@ public class Candidate extends Auditable{
         this.gender = gender;
         this.age = age;
         this.college = college;
+    }
+
+    public void addQualifiedCandidate(CandidateSegmentQualification candidateSegmentQualification) {
+        qualifiedSegments.add(candidateSegmentQualification);
+        candidateSegmentQualification.setCandidate(this);
+    }
+    public void removeQualifiedCandidate(CandidateSegmentQualification candidateSegmentQualification) {
+        qualifiedSegments.remove(candidateSegmentQualification);
+        candidateSegmentQualification.setCandidate(null);
+    }
+    public List<Segment> getQualifiedSegments() {
+        return qualifiedSegments.stream().map((CandidateSegmentQualification::getSegment)).toList();
     }
 }
