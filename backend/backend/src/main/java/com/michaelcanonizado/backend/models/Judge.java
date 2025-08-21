@@ -28,7 +28,7 @@ public class Judge extends Auditable {
     @Column(nullable = false, unique = true)
     private String passwordHash;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private boolean isOnline = false;
 
     @Column(nullable = true)
