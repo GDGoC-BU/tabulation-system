@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,6 +24,7 @@ public class College {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Candidate> candidates = new ArrayList<>();
 

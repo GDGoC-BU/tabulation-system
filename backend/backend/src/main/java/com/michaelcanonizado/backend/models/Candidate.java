@@ -1,5 +1,7 @@
 package com.michaelcanonizado.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,6 +38,7 @@ public class Candidate extends Auditable{
     @Column(nullable = false)
     private int age;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id", nullable = false)
     private College college;
@@ -44,10 +47,12 @@ public class Candidate extends Auditable{
     with their details. Exclude list from getter and expose a
     separate getter stream to extract the actual segment data:
     getQualifiedSegments() */
+    @JsonManagedReference
     @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> qualifiedSegments = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> scores = new ArrayList<>();
 

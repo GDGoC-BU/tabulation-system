@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,6 +20,8 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Judge extends Account {
+    /* ADD HELPER METHODS TO ADD AND REMOVE SCORES */
+    @JsonManagedReference
     @OneToMany(mappedBy = "judge", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> scores  = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class Segment {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Criterion> criteria = new ArrayList<>();
 
@@ -28,6 +30,7 @@ public class Segment {
     with their details. Exclude list from getter and expose a
     separate getter stream to extract the actual candidate data:
     getQualifiedCandidate() */
+    @JsonManagedReference
     @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> qualifiedCandidates = new ArrayList<>();
