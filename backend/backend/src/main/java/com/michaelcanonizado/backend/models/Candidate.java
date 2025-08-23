@@ -73,6 +73,7 @@ public class Candidate extends Auditable{
         qualifiedSegments.remove(candidateSegmentQualification);
         candidateSegmentQualification.setCandidate(null);
     }
+    /* TEST THIS. I DON'T THINK THIS IS NECESSARY BECAUSE JPA ALREADY LOADS THE RELATIONSHIP */
     public List<Segment> getQualifiedSegments() {
         return qualifiedSegments.stream().map((CandidateSegmentQualification::getSegment)).toList();
     }
