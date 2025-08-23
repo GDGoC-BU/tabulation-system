@@ -24,6 +24,6 @@ Git Commits
 - Types...
 - Examples:
   - feat(backend/repository): add CandidateRepository
-  - fix(backend/models): add @Enumerated(EnumType.STRING) to Manager.role to show enums as strings
+  - fix(backend/models): add @Enumerated(EnumType.STRING) to Manager.role to show enum role as string
   - chore(backend/pom.xml): add spring-security
   - docs(README): add features section
