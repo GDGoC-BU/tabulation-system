@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.controllers;
 
+import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.services.CollegeService;

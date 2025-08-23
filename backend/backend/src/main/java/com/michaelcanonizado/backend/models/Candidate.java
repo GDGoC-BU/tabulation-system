@@ -23,7 +23,7 @@ public class Candidate extends Auditable{
     private UUID id;
 
     @Column(nullable = false)
-    private int candidateNumber;
+    private int number;
 
     @Column(nullable = false)
     private String firstName;
@@ -56,8 +56,8 @@ public class Candidate extends Auditable{
     @OneToMany(mappedBy = "candidate", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> scores = new ArrayList<>();
 
-    public Candidate(int candidateNumber, String firstName, String lastName, Gender gender, int age, College college) {
-        this.candidateNumber = candidateNumber;
+    public Candidate(int number, String firstName, String lastName, Gender gender, int age, College college) {
+        this.number = number;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;

@@ -1,10 +1,12 @@
 package com.michaelcanonizado.backend.mapper;
 
+import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.College;
+import com.michaelcanonizado.backend.models.Gender;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-23T19:20:06+0800",
+    date = "2025-08-23T20:02:03+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -50,10 +52,7 @@ public class CollegeMapperImpl implements CollegeMapper {
 
         College college = new College( code, name );
 
-        List<Candidate> list = collegeDetailedDTO.candidates();
-        if ( list != null ) {
-            college.setCandidates( new ArrayList<Candidate>( list ) );
-        }
+        college.setCandidates( candidateSummaryDTOListToCandidateList( collegeDetailedDTO.candidates() ) );
 
         return college;
     }
@@ -103,18 +102,89 @@ public class CollegeMapperImpl implements CollegeMapper {
         UUID id = null;
         String code = null;
         String name = null;
-        List<Candidate> candidates = null;
+        List<CandidateSummaryDTO> candidates = null;
 
         id = college.getId();
         code = college.getCode();
         name = college.getName();
-        List<Candidate> list = college.getCandidates();
-        if ( list != null ) {
-            candidates = new ArrayList<Candidate>( list );
-        }
+        candidates = candidateListToCandidateSummaryDTOList( college.getCandidates() );
 
         CollegeDetailedDTO collegeDetailedDTO = new CollegeDetailedDTO( id, code, name, candidates );
 
         return collegeDetailedDTO;
+    }
+
+    protected Candidate candidateSummaryDTOToCandidate(CandidateSummaryDTO candidateSummaryDTO) {
+        if ( candidateSummaryDTO == null ) {
+            return null;
+        }
+
+        int number = 0;
+        String firstName = null;
+        String lastName = null;
+        Gender gender = null;
+        int age = 0;
+
+        number = candidateSummaryDTO.number();
+        firstName = candidateSummaryDTO.firstName();
+        lastName = candidateSummaryDTO.lastName();
+        gender = candidateSummaryDTO.gender();
+        age = candidateSummaryDTO.age();
+
+        College college = null;
+
+        Candidate candidate = new Candidate( number, firstName, lastName, gender, age, college );
+
+        return candidate;
+    }
+
+    protected List<Candidate> candidateSummaryDTOListToCandidateList(List<CandidateSummaryDTO> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<Candidate> list1 = new ArrayList<Candidate>( list.size() );
+        for ( CandidateSummaryDTO candidateSummaryDTO : list ) {
+            list1.add( candidateSummaryDTOToCandidate( candidateSummaryDTO ) );
+        }
+
+        return list1;
+    }
+
+    protected CandidateSummaryDTO candidateToCandidateSummaryDTO(Candidate candidate) {
+        if ( candidate == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        int number = 0;
+        String firstName = null;
+        String lastName = null;
+        Gender gender = null;
+        int age = 0;
+
+        id = candidate.getId();
+        number = candidate.getNumber();
+        firstName = candidate.getFirstName();
+        lastName = candidate.getLastName();
+        gender = candidate.getGender();
+        age = candidate.getAge();
+
+        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, gender, age );
+
+        return candidateSummaryDTO;
+    }
+
+    protected List<CandidateSummaryDTO> candidateListToCandidateSummaryDTOList(List<Candidate> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<CandidateSummaryDTO> list1 = new ArrayList<CandidateSummaryDTO>( list.size() );
+        for ( Candidate candidate : list ) {
+            list1.add( candidateToCandidateSummaryDTO( candidate ) );
+        }
+
+        return list1;
     }
 }

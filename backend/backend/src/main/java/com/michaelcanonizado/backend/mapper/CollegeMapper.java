@@ -9,7 +9,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface CollegeMapper {
     College toEntity(CollegeCreateDTO collegeCreateDTO);
-    
     College toEntity(CollegeDetailedDTO collegeDetailedDTO);
     College toEntity(CollegeSummaryDTO collegeSummaryDTO);
     CollegeSummaryDTO toSummaryDTO(College college);
