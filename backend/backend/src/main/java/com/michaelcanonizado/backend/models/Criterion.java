@@ -39,4 +39,14 @@ public class Criterion {
         this.maxScore = maxScore;
         this.segment = segment;
     }
+
+
+    public void addScore(Score score) {
+        scores.add(score);
+        score.setCriterion(this);
+    }
+    public void removeScore(Score score) {
+        scores.remove(score);
+        score.setCriterion(null);
+    }
 }
