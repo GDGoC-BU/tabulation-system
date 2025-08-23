@@ -14,13 +14,12 @@ Database:
 - Add helper methods on the weak entity if using bidirectional mapping
 
 
-Git Commits
+Commits
 - Use Angular Commit Convention ("type(scope): message")
 - Message should be descriptive, and succinct
 - Commits should be done per logical unit change not per file, and commits should not be micro or huge. 
 - Ideally, tasks should be done in one go, but if a task requires adding a change that is not just specific to that task, then commit that change first, then commit the task. This can be prevented by just working on a general problem at once before tackling another one, especially if the next task requires depends on another feature. 
-	- Wrong:
-		- feat(frontend/)
+- 
 - Types:
 	- feat: a new feature for the user or app. Even new classes/components that introduces a feature
 	- docs: anything documentation related. READMEs and comments for example
@@ -32,9 +31,13 @@ Git Commits
   - For the most part, it should be categorized by package and state the file/s being modified in the message
   - If global relative to a layer (frontend/backend), scope should be layer/file (E.g: backend/pom.xml)
   - If global relative to the whole project, just state the file (E.g: README)
+  - If multiple scopes are somewhat equally affected, they can be grouped. 
+    - If the sub scopes are within the same layer, list them inside brackets: (backend/[controllers,service])
+    - If the sub scopes are not within the layer, list them separetly with spaces (though this should be avoided as much as possible, if a change spans different layers, then it you must scope down and commit them separately): Pfrontend/profile, backend/controllers)
 - Types...
 - Examples:
   - feat(backend/repository): add CandidateRepository
   - fix(backend/models): add @Enumerated(EnumType.STRING) to Manager.role to show enum role as string
   - chore(backend/pom.xml): add spring-security
   - docs(README): add features section
+  - docs(conventions): add more commit rules
