@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 status.value(),
                 status.getReasonPhrase(),
-                exception.getCode(),
+                exception.getErrorCode(),
                 exception.getMessage(),
                 request.getRequestURI()
         );

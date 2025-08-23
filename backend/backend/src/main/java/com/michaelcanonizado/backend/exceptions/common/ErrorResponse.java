@@ -11,7 +11,7 @@ public class ErrorResponse {
     private int status;
 
     /* HTTP status phrase: E.g: Not Found, Ok, Internal Server Error */
-    private String error;
+    private String statusPhrase;
 
     /* Machine-readable identifier for an error.
        Can be used to programmatically handle the errors, especially in the
@@ -19,7 +19,7 @@ public class ErrorResponse {
        error type, this can be used to identify exactly what entity threw the
        error.
        E.g: COLLEGE_NOT_FOUND, CANDIDATE_ALREADY_EXIST, INTERNAL_ERROR */
-    private Code code;
+    private ErrorCode errorCode;
 
     /* More detailed message of the error. Passed by the Caller */
     private String message;
@@ -30,10 +30,10 @@ public class ErrorResponse {
     /* When the error occurred */
     private ZonedDateTime timestamp;
 
-    public ErrorResponse(int status, String error, Code code, String message, String path) {
+    public ErrorResponse(int status, String statusPhrase, ErrorCode errorCode, String message, String path) {
         this.status = status;
-        this.error = error;
-        this.code = code;
+        this.statusPhrase = statusPhrase;
+        this.errorCode = errorCode;
         this.message = message;
         this.path = path;
         this.timestamp = ZonedDateTime.now(ZoneId.of("Asia/Manila"));
