@@ -28,4 +28,13 @@ public class Judge extends Account {
     public Judge(String username, String passwordHash) {
         super(username, passwordHash);
     }
+
+    public void addScore(Score score) {
+        scores.add(score);
+        score.setJudge(this);
+    }
+    public void removeScore(Score score) {
+        scores.remove(score);
+        score.setJudge(null);
+    }
 }
