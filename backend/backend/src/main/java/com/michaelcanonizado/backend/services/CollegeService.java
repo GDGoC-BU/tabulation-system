@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CollegeService {
@@ -21,5 +22,10 @@ public class CollegeService {
         return repository.findAll().stream().map(college -> {
             return mapper.toSummaryDTO(college);
         }).toList();
+    }
+
+    public College findById(UUID id) {
+        /* Add exception to thrown when college is not present */
+        return repository.findById(id).get();
     }
 }
