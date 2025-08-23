@@ -1,5 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
+import com.michaelcanonizado.backend.mapper.CollegeMapper;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +13,12 @@ import java.util.List;
 public class CollegeService {
     @Autowired
     private CollegeRepository repository;
+    @Autowired
+    private CollegeMapper mapper;
 
-    public List<College> getColleges() {
-        return repository.findAll();
+    public List<CollegeSummaryDTO> getColleges() {
+        return repository.findAll().stream().map(college -> {
+            return mapper.toSummaryDTO(college);
+        }).toList();
     }
 }

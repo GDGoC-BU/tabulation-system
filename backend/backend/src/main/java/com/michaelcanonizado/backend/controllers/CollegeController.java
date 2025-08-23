@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.controllers;
 
+import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.services.CollegeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,8 @@ public class CollegeController {
     private CollegeService service;
 
     @GetMapping("/colleges")
-    public ResponseEntity<List<College>> getColleges() {
-        List<College> colleges = service.getColleges();
+    public ResponseEntity<List<CollegeSummaryDTO>> getColleges() {
+        List<CollegeSummaryDTO> colleges = service.getColleges();
         return new ResponseEntity<>(colleges, HttpStatus.OK);
     }
 }
