@@ -56,6 +56,7 @@ public class Segment {
         qualifiedCandidates.remove(candidateSegmentQualification);
         candidateSegmentQualification.setSegment(null);
     }
+    /* TEST THIS. I DON'T THINK THIS IS NECESSARY BECAUSE JPA ALREADY LOADS THE RELATIONSHIP */
     public List<Candidate> getQualifiedCandidates() {
         return qualifiedCandidates.stream().map((CandidateSegmentQualification::getCandidate)).toList();
     }
