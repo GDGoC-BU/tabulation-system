@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
@@ -33,5 +34,10 @@ public class SegmentService {
         return repository.findAll().stream().map(segment -> {
             return mapper.toSummaryDTO(segment);
         }).toList();
+    }
+
+    public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
+        Segment segment = mapper.toEntity(segmentCreateDTO);
+        return mapper.toDetailedDTO(repository.save(segment));
     }
 }
