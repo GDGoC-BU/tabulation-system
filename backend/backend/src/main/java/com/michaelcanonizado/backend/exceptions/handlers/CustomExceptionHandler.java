@@ -1,19 +1,17 @@
-package com.michaelcanonizado.backend.exceptions.common;
+package com.michaelcanonizado.backend.exceptions.handlers;
 
+import com.michaelcanonizado.backend.exceptions.common.ErrorResponse;
 import com.michaelcanonizado.backend.exceptions.entity.EntityAlreadyExistException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.io.IOException;
-
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class CustomExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception, HttpServletRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
@@ -50,20 +48,6 @@ public class GlobalExceptionHandler {
                 status.value(),
                 status.getReasonPhrase(),
                 exception.getErrorCode(),
-                exception.getMessage(),
-                request.getRequestURI()
-        );
-        return new ResponseEntity<>(response, status);
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleEntityRequestInvalidBodyException(HttpMessageNotReadableException exception, HttpServletRequest request) throws IOException {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-
-        ErrorResponse response = new ErrorResponse(
-                status.value(),
-                status.getReasonPhrase(),
-                ErrorCode.INVALID_REQUEST_BODY,
                 exception.getMessage(),
                 request.getRequestURI()
         );
