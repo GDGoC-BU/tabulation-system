@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.exceptions.common;
 
+import com.michaelcanonizado.backend.exceptions.entity.EntityAlreadyExistException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
+    @ExceptionHandler(EntityAlreadyExistException.class)
+    public ResponseEntity<ErrorResponse> handleEntityAlreadyExistException(EntityAlreadyExistException exception, HttpServletRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
 
         ErrorResponse response = new ErrorResponse(
