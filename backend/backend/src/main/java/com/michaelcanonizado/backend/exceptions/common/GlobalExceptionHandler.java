@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityAlreadyExistException.class)
     public ResponseEntity<ErrorResponse> handleEntityAlreadyExistException(EntityAlreadyExistException exception, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
+        HttpStatus status = HttpStatus.CONFLICT;
 
         ErrorResponse response = new ErrorResponse(
                 status.value(),
