@@ -40,11 +40,11 @@ public class Segment {
         this.name = name;
     }
 
-    public void addCriteria(Criterion criterion) {
+    public void addCriterion(Criterion criterion) {
         criteria.add(criterion);
         criterion.setSegment(this);
     }
-    public void removeCriteria(Criterion criterion) {
+    public void removeCriterion(Criterion criterion) {
         criteria.remove(criterion);
         criterion.setSegment(null);
     }

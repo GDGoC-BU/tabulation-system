@@ -54,7 +54,7 @@ public class CriterionSeeder implements CommandLineRunner {
         segments.forEach(segment -> {
             criteria.forEach(criterionItem -> {
                 if (segment.getName().equals(criterionItem.getSegment())) {
-                    segment.addCriteria(new Criterion(criterionItem.getName(), criterionItem.getMaxScore(), segment));
+                    segment.addCriterion(new Criterion(criterionItem.getName(), criterionItem.getMaxScore(), segment));
                 }
             });
             segmentRepository.save(segment);

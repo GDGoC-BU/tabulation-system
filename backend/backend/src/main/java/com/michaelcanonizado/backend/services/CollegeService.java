@@ -44,7 +44,7 @@ public class CollegeService {
     public CollegeSummaryDTO updateCollege(UUID id, CollegeSummaryDTO collegeSummaryDTO) {
         if (!id.equals(collegeSummaryDTO.id())) {
             throw new EntityMismatchException(
-                    "Path id " + id + " and College.id " + collegeSummaryDTO.id() + " doesn't match.",
+                    "Path id " + id + " and Body.id " + collegeSummaryDTO.id() + " doesn't match.",
                     ErrorCode.COLLEGE_MISMATCH
             );
         }
