@@ -56,25 +56,38 @@ public class SegmentService {
             );
         }
 
+        /* Segment fully controls and manages the Criteria.
+           Any modification(add, update, or delete) to the criteria
+           will be done through Segment. The state of the list will
+           be reflected in the database. */
+
+        /* Get existing Entity */
         Segment segment = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Segment of id " + id + " doesn't exist.", ErrorCode.SEGMENT_NOT_FOUND);
         });
 
+        /* Update main attributes */
         segment.setName(segmentSummaryDTO.name());
 
+        /* Convert existing Criteria to a lookup  */
         Map<UUID, Criterion> criteriaLookup = segment.getCriteria()
                 .stream()
                 .collect(Collectors.toMap(Criterion::getId, criterion -> criterion));
 
+        /* Clear existing Segment's criteria (already backed up in lookup) */
         segment.getCriteria().clear();
 
+        /* Iterate through the Criteria from DTO and copy to existing Segment */
         for (CriterionSummaryDTO criterionSummaryDTO : segmentSummaryDTO.criteria()) {
+            /* If Criterion from DTO already exist in the saved Segment, just copy it */
             if (criterionSummaryDTO.id() != null && criteriaLookup.containsKey(criterionSummaryDTO.id())) {
                 Criterion criterion = criteriaLookup.get(criterionSummaryDTO.id());
                 criterion.setName(criterionSummaryDTO.name());
                 criterion.setMaxScore(criterionSummaryDTO.maxScore());
                 segment.addCriterion(criterion);
-            } else {
+            }
+            /* Else if a new Criterion is added, create a new Criterion */
+            else {
                 Criterion criterion = new Criterion(
                         criterionSummaryDTO.name(),
                         criterionSummaryDTO.maxScore(),
