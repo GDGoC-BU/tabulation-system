@@ -51,7 +51,7 @@ public class SegmentService {
         if (!repository.existsById(id)) {
             throw new EntityMismatchException(
                     "Path id " + id + " and Body.id " + segmentSummaryDTO.id() + " doesn't match.",
-                    ErrorCode.SEGMENT_NOT_FOUND
+                    ErrorCode.SEGMENT_MISMATCH
             );
         }
 
