@@ -55,4 +55,18 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(response, status);
     }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleEntityRequestInvalidBodyException(HttpMessageNotReadableException exception, HttpServletRequest request) throws IOException {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                ErrorCode.INVALID_REQUEST_BODY,
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
 }
