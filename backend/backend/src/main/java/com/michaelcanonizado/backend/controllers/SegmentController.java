@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
 import com.michaelcanonizado.backend.services.SegmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -22,5 +24,11 @@ public class SegmentController {
     public ResponseEntity<SegmentDetailedDTO> getSegment(@PathVariable UUID id) {
         SegmentDetailedDTO segment = service.getSegment(id);
         return new ResponseEntity<>(segment, HttpStatus.OK);
+    }
+
+    @GetMapping("/segments")
+    public ResponseEntity<List<SegmentSummaryDTO>> getSegments() {
+        List<SegmentSummaryDTO> segments = service.getSegments();
+        return new ResponseEntity<>(segments, HttpStatus.OK);
     }
 }

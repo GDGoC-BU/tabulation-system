@@ -58,7 +58,7 @@ public class Segment {
         candidateSegmentQualifications.remove(candidateSegmentQualification);
         candidateSegmentQualification.setSegment(null);
     }
-    
+
     /* Infer the actual candidate data from the associative table */
     public List<Candidate> getQualifiedCandidates() {
         return candidateSegmentQualifications

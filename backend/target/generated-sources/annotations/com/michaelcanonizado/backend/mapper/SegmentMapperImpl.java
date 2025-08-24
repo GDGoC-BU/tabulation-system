@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-24T20:00:22+0800",
+    date = "2025-08-24T20:15:45+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -50,6 +50,8 @@ public class SegmentMapperImpl implements SegmentMapper {
 
         Segment segment = new Segment( name );
 
+        segment.setCriteria( criterionSummaryDTOListToCriterionList( segmentSummaryDTO.criteria() ) );
+
         return segment;
     }
 
@@ -61,11 +63,13 @@ public class SegmentMapperImpl implements SegmentMapper {
 
         UUID id = null;
         String name = null;
+        List<CriterionSummaryDTO> criteria = null;
 
         id = segment.getId();
         name = segment.getName();
+        criteria = criterionListToCriterionSummaryDTOList( segment.getCriteria() );
 
-        SegmentSummaryDTO segmentSummaryDTO = new SegmentSummaryDTO( id, name );
+        SegmentSummaryDTO segmentSummaryDTO = new SegmentSummaryDTO( id, name, criteria );
 
         return segmentSummaryDTO;
     }
@@ -89,6 +93,68 @@ public class SegmentMapperImpl implements SegmentMapper {
         SegmentDetailedDTO segmentDetailedDTO = new SegmentDetailedDTO( id, name, criteria, qualifiedCandidates );
 
         return segmentDetailedDTO;
+    }
+
+    protected Criterion criterionSummaryDTOToCriterion(CriterionSummaryDTO criterionSummaryDTO) {
+        if ( criterionSummaryDTO == null ) {
+            return null;
+        }
+
+        String name = null;
+        int maxScore = 0;
+
+        name = criterionSummaryDTO.name();
+        maxScore = criterionSummaryDTO.maxScore();
+
+        Segment segment = null;
+
+        Criterion criterion = new Criterion( name, maxScore, segment );
+
+        return criterion;
+    }
+
+    protected List<Criterion> criterionSummaryDTOListToCriterionList(List<CriterionSummaryDTO> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<Criterion> list1 = new ArrayList<Criterion>( list.size() );
+        for ( CriterionSummaryDTO criterionSummaryDTO : list ) {
+            list1.add( criterionSummaryDTOToCriterion( criterionSummaryDTO ) );
+        }
+
+        return list1;
+    }
+
+    protected CriterionSummaryDTO criterionToCriterionSummaryDTO(Criterion criterion) {
+        if ( criterion == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        String name = null;
+        int maxScore = 0;
+
+        id = criterion.getId();
+        name = criterion.getName();
+        maxScore = criterion.getMaxScore();
+
+        CriterionSummaryDTO criterionSummaryDTO = new CriterionSummaryDTO( id, name, maxScore );
+
+        return criterionSummaryDTO;
+    }
+
+    protected List<CriterionSummaryDTO> criterionListToCriterionSummaryDTOList(List<Criterion> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<CriterionSummaryDTO> list1 = new ArrayList<CriterionSummaryDTO>( list.size() );
+        for ( Criterion criterion : list ) {
+            list1.add( criterionToCriterionSummaryDTO( criterion ) );
+        }
+
+        return list1;
     }
 
     protected CandidateSummaryDTO candidateToCandidateSummaryDTO(Candidate candidate) {
@@ -123,37 +189,6 @@ public class SegmentMapperImpl implements SegmentMapper {
         List<CandidateSummaryDTO> list1 = new ArrayList<CandidateSummaryDTO>( list.size() );
         for ( Candidate candidate : list ) {
             list1.add( candidateToCandidateSummaryDTO( candidate ) );
-        }
-
-        return list1;
-    }
-
-    protected CriterionSummaryDTO criterionToCriterionSummaryDTO(Criterion criterion) {
-        if ( criterion == null ) {
-            return null;
-        }
-
-        UUID id = null;
-        String name = null;
-        int maxScore = 0;
-
-        id = criterion.getId();
-        name = criterion.getName();
-        maxScore = criterion.getMaxScore();
-
-        CriterionSummaryDTO criterionSummaryDTO = new CriterionSummaryDTO( id, name, maxScore );
-
-        return criterionSummaryDTO;
-    }
-
-    protected List<CriterionSummaryDTO> criterionListToCriterionSummaryDTOList(List<Criterion> list) {
-        if ( list == null ) {
-            return null;
-        }
-
-        List<CriterionSummaryDTO> list1 = new ArrayList<CriterionSummaryDTO>( list.size() );
-        for ( Criterion criterion : list ) {
-            list1.add( criterionToCriterionSummaryDTO( criterion ) );
         }
 
         return list1;
