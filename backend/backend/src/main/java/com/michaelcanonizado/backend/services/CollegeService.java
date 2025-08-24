@@ -28,6 +28,13 @@ public class CollegeService {
         }).toList();
     }
 
+    public CollegeDetailedDTO getCollege(UUID id) {
+        College college = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("College not found!", ErrorCode.COLLEGE_NOT_FOUND);
+        });
+        return mapper.toDetailedDTO(college);
+    }
+
     public CollegeDetailedDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
         College college = repository.save(mapper.toEntity(collegeCreateDTO));
         return mapper.toDetailedDTO(college);

@@ -25,6 +25,12 @@ public class CollegeController {
         return new ResponseEntity<>(colleges, HttpStatus.OK);
     }
 
+    @GetMapping("/colleges/{id}")
+    public ResponseEntity<CollegeDetailedDTO> getCollege(@PathVariable UUID id) {
+        CollegeDetailedDTO college = service.getCollege(id);
+        return new ResponseEntity<>(college, HttpStatus.OK);
+    }
+
     @PostMapping("/colleges")
     public ResponseEntity<CollegeDetailedDTO> addCollege(@RequestBody CollegeCreateDTO collegeCreateDTO) {
         CollegeDetailedDTO college = service.addCollege(collegeCreateDTO);
