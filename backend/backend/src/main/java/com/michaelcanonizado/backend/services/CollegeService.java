@@ -1,5 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
+import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
@@ -23,6 +25,11 @@ public class CollegeService {
         return repository.findAll().stream().map(college -> {
             return mapper.toSummaryDTO(college);
         }).toList();
+    }
+
+    public CollegeDetailedDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
+        College college = repository.save(mapper.toEntity(collegeCreateDTO));
+        return mapper.toDetailedDTO(college);
     }
 
     public College findById(UUID id) {
