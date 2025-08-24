@@ -9,6 +9,7 @@ import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mapper.CollegeMapper;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,15 @@ public class CollegeService {
         });
         mapper.updateEntityFromDTO(college, collegeSummaryDTO);
         return mapper.toSummaryDTO(repository.save(college));
+    }
+
+    @Transactional
+    public void deleteCollege(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Deletion failed! College of id " + id + " not found.", ErrorCode.COLLEGE_NOT_FOUND);
+        }
+
+        repository.deleteById(id);
     }
 
     public College findById(UUID id) {

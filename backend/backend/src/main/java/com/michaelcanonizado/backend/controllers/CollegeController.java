@@ -42,4 +42,10 @@ public class CollegeController {
         CollegeSummaryDTO college = service.updateCollege(id, collegeSummaryDTO);
         return new ResponseEntity<>(college, HttpStatus.OK);
     }
+
+    @DeleteMapping("/colleges/{id}")
+    public ResponseEntity<Void> deleteCollege(@PathVariable UUID id) {
+        service.deleteCollege(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
