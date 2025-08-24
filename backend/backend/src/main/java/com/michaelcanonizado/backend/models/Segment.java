@@ -22,16 +22,17 @@ public class Segment {
     private String name;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "segment", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Criterion> criteria = new ArrayList<>();
 
 
-    /* Temporary list. Still need the real Candidate object
-    with their details. Exclude list from getter and expose a
-    separate getter stream to extract the actual candidate data:
-    getQualifiedCandidate() */
+    /* Temporary list. CandidateSegmentQualifications is just an
+    associative table for the many-to-many relationship of Candidates
+    and Segments. We still need the real Candidate object with their
+    details. Exclude list from getter and expose a separate getter
+    stream to extract the actual candidate data: getQualifiedCandidates() */
     @JsonManagedReference
-    @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "segment", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
 
@@ -57,7 +58,8 @@ public class Segment {
         candidateSegmentQualifications.remove(candidateSegmentQualification);
         candidateSegmentQualification.setSegment(null);
     }
-    /* TEST THIS. I DON'T THINK THIS IS NECESSARY BECAUSE JPA ALREADY LOADS THE RELATIONSHIP */
+    
+    /* Infer the actual candidate data from the associative table */
     public List<Candidate> getQualifiedCandidates() {
         return candidateSegmentQualifications
                 .stream()

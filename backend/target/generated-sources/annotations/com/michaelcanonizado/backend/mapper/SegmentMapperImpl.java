@@ -5,7 +5,9 @@ import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
+import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.Criterion;
+import com.michaelcanonizado.backend.models.Gender;
 import com.michaelcanonizado.backend.models.Segment;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-24T19:26:15+0800",
+    date = "2025-08-24T20:00:22+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -74,19 +76,56 @@ public class SegmentMapperImpl implements SegmentMapper {
             return null;
         }
 
+        List<CandidateSummaryDTO> qualifiedCandidates = null;
         UUID id = null;
         String name = null;
         List<CriterionSummaryDTO> criteria = null;
 
+        qualifiedCandidates = candidateListToCandidateSummaryDTOList( segment.getQualifiedCandidates() );
         id = segment.getId();
         name = segment.getName();
         criteria = criterionListToCriterionSummaryDTOList( segment.getCriteria() );
 
-        List<CandidateSummaryDTO> qualifiedCandidates = null;
-
         SegmentDetailedDTO segmentDetailedDTO = new SegmentDetailedDTO( id, name, criteria, qualifiedCandidates );
 
         return segmentDetailedDTO;
+    }
+
+    protected CandidateSummaryDTO candidateToCandidateSummaryDTO(Candidate candidate) {
+        if ( candidate == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        int number = 0;
+        String firstName = null;
+        String lastName = null;
+        Gender gender = null;
+        int age = 0;
+
+        id = candidate.getId();
+        number = candidate.getNumber();
+        firstName = candidate.getFirstName();
+        lastName = candidate.getLastName();
+        gender = candidate.getGender();
+        age = candidate.getAge();
+
+        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, gender, age );
+
+        return candidateSummaryDTO;
+    }
+
+    protected List<CandidateSummaryDTO> candidateListToCandidateSummaryDTOList(List<Candidate> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<CandidateSummaryDTO> list1 = new ArrayList<CandidateSummaryDTO>( list.size() );
+        for ( Candidate candidate : list ) {
+            list1.add( candidateToCandidateSummaryDTO( candidate ) );
+        }
+
+        return list1;
     }
 
     protected CriterionSummaryDTO criterionToCriterionSummaryDTO(Criterion criterion) {

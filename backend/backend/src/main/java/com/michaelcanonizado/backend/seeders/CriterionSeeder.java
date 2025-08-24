@@ -48,7 +48,6 @@ public class CriterionSeeder implements CommandLineRunner {
         this.segmentRepository = segmentRepository;
     }
 
-    @Transactional
     @Override
     public void run(String... args) throws Exception {
         List<Segment> segments = segmentRepository.findAll();
@@ -58,6 +57,7 @@ public class CriterionSeeder implements CommandLineRunner {
                     segment.addCriteria(new Criterion(criterionItem.getName(), criterionItem.getMaxScore(), segment));
                 }
             });
+            segmentRepository.save(segment);
         });
     }
 }
