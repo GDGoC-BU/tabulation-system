@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.models.College;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CollegeMapper {
@@ -13,4 +14,6 @@ public interface CollegeMapper {
     College toEntity(CollegeSummaryDTO collegeSummaryDTO);
     CollegeSummaryDTO toSummaryDTO(College college);
     CollegeDetailedDTO toDetailedDTO(College college);
+
+    void updateEntityFromDTO(@MappingTarget College college, CollegeSummaryDTO collegeSummaryDTO);
 }

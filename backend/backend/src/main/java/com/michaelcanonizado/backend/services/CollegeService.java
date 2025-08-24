@@ -4,6 +4,7 @@ import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mapper.CollegeMapper;
 import com.michaelcanonizado.backend.models.College;
@@ -30,6 +31,21 @@ public class CollegeService {
     public CollegeDetailedDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
         College college = repository.save(mapper.toEntity(collegeCreateDTO));
         return mapper.toDetailedDTO(college);
+    }
+
+    public CollegeSummaryDTO updateCollege(UUID id, CollegeSummaryDTO collegeSummaryDTO) {
+        if (!id.equals(collegeSummaryDTO.id())) {
+            throw new EntityMismatchException(
+                    "Path id " + id + " and College.id " + collegeSummaryDTO.id() + " doesn't match.",
+                    ErrorCode.COLLEGE_MISMATCH
+            );
+        }
+
+        College college = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("College of id " + id + " doesn't exist.", ErrorCode.COLLEGE_NOT_FOUND);
+        });
+        mapper.updateEntityFromDTO(college, collegeSummaryDTO);
+        return mapper.toSummaryDTO(repository.save(college));
     }
 
     public College findById(UUID id) {

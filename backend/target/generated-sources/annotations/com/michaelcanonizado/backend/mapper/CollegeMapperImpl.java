@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-23T22:02:56+0800",
+    date = "2025-08-24T15:26:34+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -112,6 +112,16 @@ public class CollegeMapperImpl implements CollegeMapper {
         CollegeDetailedDTO collegeDetailedDTO = new CollegeDetailedDTO( id, code, name, candidates );
 
         return collegeDetailedDTO;
+    }
+
+    @Override
+    public void updateEntityFromDTO(College college, CollegeSummaryDTO collegeSummaryDTO) {
+        if ( collegeSummaryDTO == null ) {
+            return;
+        }
+
+        college.setCode( collegeSummaryDTO.code() );
+        college.setName( collegeSummaryDTO.name() );
     }
 
     protected Candidate candidateSummaryDTOToCandidate(CandidateSummaryDTO candidateSummaryDTO) {
