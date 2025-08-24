@@ -47,7 +47,6 @@ public class SegmentService {
         return mapper.toDetailedDTO(repository.save(segment));
     }
 
-    @Transactional
     public SegmentSummaryDTO updateSegment(UUID id, SegmentSummaryDTO segmentSummaryDTO) {
         if (!repository.existsById(id)) {
             throw new EntityMismatchException(

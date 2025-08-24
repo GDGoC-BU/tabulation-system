@@ -37,7 +37,7 @@ public class SegmentController {
         return new ResponseEntity<>(segment, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/segments/{id}")
+    @PutMapping("/segments/{id}")
     public ResponseEntity<SegmentSummaryDTO> updateSegment(@PathVariable UUID id, @RequestBody SegmentSummaryDTO segmentSummaryDTO) {
         SegmentSummaryDTO segment = service.updateSegment(id, segmentSummaryDTO);
         return new ResponseEntity<>(segment, HttpStatus.OK);

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-24T21:19:32+0800",
+    date = "2025-08-25T00:41:41+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -35,8 +35,6 @@ public class SegmentMapperImpl implements SegmentMapper {
 
         Segment segment = new Segment( name );
 
-        linkCriteria( segment );
-
         return segment;
     }
 
@@ -53,8 +51,6 @@ public class SegmentMapperImpl implements SegmentMapper {
         Segment segment = new Segment( name );
 
         segment.setCriteria( criterionSummaryDTOListToCriterionList( segmentSummaryDTO.criteria() ) );
-
-        linkCriteria( segment );
 
         return segment;
     }
@@ -122,8 +118,6 @@ public class SegmentMapperImpl implements SegmentMapper {
                 segment.setCriteria( list );
             }
         }
-
-        linkCriteria( segment );
     }
 
     protected Criterion criterionSummaryDTOToCriterion(CriterionSummaryDTO criterionSummaryDTO) {

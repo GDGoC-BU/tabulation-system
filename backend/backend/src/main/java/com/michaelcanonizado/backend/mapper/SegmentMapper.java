@@ -18,11 +18,4 @@ public interface SegmentMapper {
     SegmentDetailedDTO toDetailedDTO(Segment segment);
 
     void updateEntityFromDTO(@MappingTarget Segment segment, SegmentSummaryDTO segmentSummaryDTO);
-
-    @AfterMapping
-    default void linkCriteria(@MappingTarget Segment segment) {
-        if (segment.getCriteria() != null) {
-            segment.getCriteria().forEach(criterion -> criterion.setSegment(segment));
-        }
-    }
 }
