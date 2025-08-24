@@ -33,7 +33,7 @@ public class Segment {
     @JsonManagedReference
     @OneToMany(mappedBy = "segment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Getter(AccessLevel.NONE)
-    private List<CandidateSegmentQualification> qualifiedCandidates = new ArrayList<>();
+    private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
 
     public Segment(String name) {
         this.name = name;
@@ -48,16 +48,21 @@ public class Segment {
         criterion.setSegment(null);
     }
 
+    /* WRONG LOGIC. JUST SET isQualified TO FALSE. OR ADD ANOTHER HELPER METHOD */
     public void addQualifiedCandidate(CandidateSegmentQualification candidateSegmentQualification) {
-        qualifiedCandidates.add(candidateSegmentQualification);
+        candidateSegmentQualifications.add(candidateSegmentQualification);
         candidateSegmentQualification.setSegment(this);
     }
     public void removeQualifiedCandidate(CandidateSegmentQualification candidateSegmentQualification) {
-        qualifiedCandidates.remove(candidateSegmentQualification);
+        candidateSegmentQualifications.remove(candidateSegmentQualification);
         candidateSegmentQualification.setSegment(null);
     }
     /* TEST THIS. I DON'T THINK THIS IS NECESSARY BECAUSE JPA ALREADY LOADS THE RELATIONSHIP */
     public List<Candidate> getQualifiedCandidates() {
-        return qualifiedCandidates.stream().map((CandidateSegmentQualification::getCandidate)).toList();
+        return candidateSegmentQualifications
+                .stream()
+                .filter(CandidateSegmentQualification::isQualified)
+                .map((CandidateSegmentQualification::getCandidate))
+                .toList();
     }
 }
