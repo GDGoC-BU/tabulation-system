@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.controllers;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.services.SegmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,8 +39,8 @@ public class SegmentController {
     }
 
     @PutMapping("/segments/{id}")
-    public ResponseEntity<SegmentSummaryDTO> updateSegment(@PathVariable UUID id, @RequestBody SegmentSummaryDTO segmentSummaryDTO) {
-        SegmentSummaryDTO segment = service.updateSegment(id, segmentSummaryDTO);
+    public ResponseEntity<SegmentSummaryDTO> updateSegment(@PathVariable UUID id, @RequestBody SegmentUpdateDTO segmentUpdateDTO) {
+        SegmentSummaryDTO segment = service.updateSegment(id, segmentUpdateDTO);
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 }

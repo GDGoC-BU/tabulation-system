@@ -3,8 +3,8 @@ package com.michaelcanonizado.backend.mapper;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.models.Segment;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -17,5 +17,5 @@ public interface SegmentMapper {
     @Mapping(target = "qualifiedCandidates", source = "qualifiedCandidates")
     SegmentDetailedDTO toDetailedDTO(Segment segment);
 
-    void updateEntityFromDTO(@MappingTarget Segment segment, SegmentSummaryDTO segmentSummaryDTO);
+    void updateEntityFromDTO(@MappingTarget Segment segment, SegmentUpdateDTO segmentUpdateDTO);
 }

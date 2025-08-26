@@ -4,6 +4,7 @@ import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
@@ -47,55 +48,18 @@ public class SegmentService {
         return mapper.toDetailedDTO(repository.save(segment));
     }
 
-    public SegmentSummaryDTO updateSegment(UUID id, SegmentSummaryDTO segmentSummaryDTO) {
+    public SegmentSummaryDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
         if (!repository.existsById(id)) {
             throw new EntityMismatchException(
-                    "Path id " + id + " and Body.id " + segmentSummaryDTO.id() + " doesn't match.",
+                    "Path id " + id + " and Body.id " + segmentUpdateDTO.id() + " doesn't match.",
                     ErrorCode.SEGMENT_MISMATCH
             );
         }
 
-        /* Segment fully controls and manages the Criteria.
-           Any modification(add, update, or delete) to the criteria
-           will be done through Segment. The state of the list will
-           be reflected in the database. */
-
-        /* Get existing Entity */
         Segment segment = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Segment of id " + id + " doesn't exist.", ErrorCode.SEGMENT_NOT_FOUND);
         });
-
-        /* Update main attributes */
-        segment.setName(segmentSummaryDTO.name());
-
-        /* Convert existing Criteria to a lookup  */
-        Map<UUID, Criterion> criteriaLookup = segment.getCriteria()
-                .stream()
-                .collect(Collectors.toMap(Criterion::getId, criterion -> criterion));
-
-        /* Clear existing Segment's criteria (already backed up in lookup) */
-        segment.getCriteria().clear();
-
-        /* Iterate through the Criteria from DTO and copy to existing Segment */
-        for (CriterionSummaryDTO criterionSummaryDTO : segmentSummaryDTO.criteria()) {
-            /* If Criterion from DTO already exist in the saved Segment, just copy it */
-            if (criterionSummaryDTO.id() != null && criteriaLookup.containsKey(criterionSummaryDTO.id())) {
-                Criterion criterion = criteriaLookup.get(criterionSummaryDTO.id());
-                criterion.setName(criterionSummaryDTO.name());
-                criterion.setMaxScore(criterionSummaryDTO.maxScore());
-                segment.addCriterion(criterion);
-            }
-            /* Else if a new Criterion is added, create a new Criterion */
-            else {
-                Criterion criterion = new Criterion(
-                        criterionSummaryDTO.name(),
-                        criterionSummaryDTO.maxScore(),
-                        segment
-                );
-                segment.addCriterion(criterion);
-            }
-        }
-
+        mapper.updateEntityFromDTO(segment, segmentUpdateDTO);
         return mapper.toSummaryDTO(repository.save(segment));
     }
 }

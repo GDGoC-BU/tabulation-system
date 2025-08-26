@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.Criterion;
 import com.michaelcanonizado.backend.models.Gender;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-25T00:41:41+0800",
+    date = "2025-08-26T20:24:46+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -96,28 +97,12 @@ public class SegmentMapperImpl implements SegmentMapper {
     }
 
     @Override
-    public void updateEntityFromDTO(Segment segment, SegmentSummaryDTO segmentSummaryDTO) {
-        if ( segmentSummaryDTO == null ) {
+    public void updateEntityFromDTO(Segment segment, SegmentUpdateDTO segmentUpdateDTO) {
+        if ( segmentUpdateDTO == null ) {
             return;
         }
 
-        segment.setName( segmentSummaryDTO.name() );
-        if ( segment.getCriteria() != null ) {
-            List<Criterion> list = criterionSummaryDTOListToCriterionList( segmentSummaryDTO.criteria() );
-            if ( list != null ) {
-                segment.getCriteria().clear();
-                segment.getCriteria().addAll( list );
-            }
-            else {
-                segment.setCriteria( null );
-            }
-        }
-        else {
-            List<Criterion> list = criterionSummaryDTOListToCriterionList( segmentSummaryDTO.criteria() );
-            if ( list != null ) {
-                segment.setCriteria( list );
-            }
-        }
+        segment.setName( segmentUpdateDTO.name() );
     }
 
     protected Criterion criterionSummaryDTOToCriterion(CriterionSummaryDTO criterionSummaryDTO) {
