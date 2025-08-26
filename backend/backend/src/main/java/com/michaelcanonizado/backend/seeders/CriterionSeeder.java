@@ -29,6 +29,7 @@ class CriterionItem {
 @Order(3)
 public class CriterionSeeder implements CommandLineRunner {
     private final SegmentRepository segmentRepository;
+    private final CriterionRepository criterionRepository;
 
     private final List<CriterionItem> criteria = Arrays.asList(
             new CriterionItem("Beauty of Figure", 5, "Swimwear"),
@@ -44,20 +45,26 @@ public class CriterionSeeder implements CommandLineRunner {
     );
 
     @Autowired
-    public CriterionSeeder(SegmentRepository segmentRepository) {
+    public CriterionSeeder(SegmentRepository segmentRepository, CriterionRepository criterionRepository) {
         this.segmentRepository = segmentRepository;
+        this.criterionRepository = criterionRepository;
     }
 
     @Override
     public void run(String... args) throws Exception {
         List<Segment> segments = segmentRepository.findAll();
+
         segments.forEach(segment -> {
             criteria.forEach(criterionItem -> {
                 if (segment.getName().equals(criterionItem.getSegment())) {
-                    segment.addCriterion(new Criterion(criterionItem.getName(), criterionItem.getMaxScore(), segment));
+                    Criterion criterion = new Criterion(
+                            criterionItem.getName(),
+                            criterionItem.getMaxScore(),
+                            segment
+                    );
+                    criterionRepository.save(criterion);
                 }
             });
-            segmentRepository.save(segment);
         });
     }
 }

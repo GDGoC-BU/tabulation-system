@@ -33,10 +33,10 @@ public class CandidateSegmentQualificationSeeder implements CommandLineRunner {
         List<Segment> segments = segmentRepository.findAll();
 
         candidates.forEach(candidate -> {
-            csqRepository.save(new CandidateSegmentQualification(segments.get(0), candidate));
-            csqRepository.save(new CandidateSegmentQualification(segments.get(1), candidate));
-            csqRepository.save(new CandidateSegmentQualification(segments.get(2), candidate));
-            csqRepository.save(new CandidateSegmentQualification(segments.get(3), candidate));
+            segments.forEach(segment -> {
+                CandidateSegmentQualification csq = new CandidateSegmentQualification(segment, candidate);
+                csqRepository.save(csq);
+            });
         });
     }
 }

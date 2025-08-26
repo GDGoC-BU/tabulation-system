@@ -36,10 +36,10 @@ public class ScoreSeeder implements CommandLineRunner {
 
         candidates.forEach(candidate -> {
             criteria.forEach(criterion -> {
-                scoreRepository.save(new Score(criterion.getMaxScore(), judges.get(0), candidate, criterion));
-                scoreRepository.save(new Score(criterion.getMaxScore(), judges.get(1), candidate, criterion));
-                scoreRepository.save(new Score(criterion.getMaxScore(), judges.get(2), candidate, criterion));
-                scoreRepository.save(new Score(criterion.getMaxScore(), judges.get(3), candidate, criterion));
+                judges.forEach(judge -> {
+                    Score score = new Score(criterion.getMaxScore(), judge, candidate, criterion);
+                    scoreRepository.save(score);
+                });
             });
         });
     }

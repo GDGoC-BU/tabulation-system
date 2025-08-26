@@ -43,4 +43,10 @@ public class SegmentController {
         SegmentSummaryDTO segment = service.updateSegment(id, segmentUpdateDTO);
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
+
+    @DeleteMapping("/segments/{id}")
+    public ResponseEntity<Void> deleteSegment(@PathVariable UUID id) {
+        service.deleteSegment(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

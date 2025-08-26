@@ -57,4 +57,12 @@ public class SegmentService {
         mapper.updateEntityFromDTO(segment, segmentUpdateDTO);
         return mapper.toSummaryDTO(repository.save(segment));
     }
+
+    public void deleteSegment(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Deletion failed! Segment of id " + id + " not found.", ErrorCode.SEGMENT_NOT_FOUND);
+        }
+
+        repository.deleteById(id);
+    }
 }
