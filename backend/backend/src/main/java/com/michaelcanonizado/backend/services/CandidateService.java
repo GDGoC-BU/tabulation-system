@@ -11,6 +11,8 @@ import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,5 +32,14 @@ public class CandidateService {
             return new EntityNotFoundException("Candidate not found!", ErrorCode.CANDIDATE_NOT_FOUND);
         });
         return mapper.toSummaryDTO(candidate);
+    }
+
+    public List<CandidateSummaryDTO> getCandidates() {
+        List<Candidate> candidates = repository.findAll();
+        return candidates
+                .stream()
+                .sorted(Comparator.comparing(Candidate::getNumber))
+                .map(mapper::toSummaryDTO)
+                .toList();
     }
 }
