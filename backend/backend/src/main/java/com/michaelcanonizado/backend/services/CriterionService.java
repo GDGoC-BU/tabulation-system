@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.services;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionCreateDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CriterionMapper;
 import com.michaelcanonizado.backend.models.Criterion;
@@ -35,6 +36,22 @@ public class CriterionService {
         });
 
         Criterion criterion = new Criterion(name, maxScore, segment);
+        return mapper.toSummaryDTO(criterionRepository.save(criterion));
+    }
+
+    public CriterionSummaryDTO updateCriterion(UUID id, CriterionSummaryDTO criterionSummaryDTO) {
+        if (!id.equals(criterionSummaryDTO.id())) {
+            throw new EntityMismatchException(
+                    "Path id " + id + " and Body.id " + criterionSummaryDTO.id() + " doesn't match.",
+                    ErrorCode.CRITERION_MISMATCH
+            );
+        }
+
+        Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Criterion of id " + id + " doesn't exist.", ErrorCode.CRITERION_NOT_FOUND);
+        });
+
+        mapper.updateEntityFromDTO(criterion, criterionSummaryDTO);
         return mapper.toSummaryDTO(criterionRepository.save(criterion));
     }
 }
