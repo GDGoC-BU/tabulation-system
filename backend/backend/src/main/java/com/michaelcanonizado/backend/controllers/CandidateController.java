@@ -35,4 +35,10 @@ public class CandidateController {
         List<CandidateSummaryDTO> candidates = service.getCandidates();
         return new ResponseEntity<>(candidates, HttpStatus.OK);
     }
+
+    @PutMapping("/candidates/{id}")
+    public ResponseEntity<CandidateSummaryDTO> updateCadidate(@PathVariable UUID id, @RequestBody CandidateSummaryDTO candidateSummaryDTO) {
+        CandidateSummaryDTO candidate = service.updateCandidate(id, candidateSummaryDTO);
+        return new ResponseEntity<>(candidate, HttpStatus.OK);
+    }
 }

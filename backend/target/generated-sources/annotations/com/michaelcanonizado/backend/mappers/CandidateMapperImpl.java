@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-26T20:30:19+0800",
+    date = "2025-08-26T23:53:50+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -70,5 +70,18 @@ public class CandidateMapperImpl implements CandidateMapper {
         CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, gender, age );
 
         return candidateSummaryDTO;
+    }
+
+    @Override
+    public void updateEntityFromDTO(Candidate candidate, CandidateSummaryDTO candidateSummaryDTO) {
+        if ( candidateSummaryDTO == null ) {
+            return;
+        }
+
+        candidate.setNumber( candidateSummaryDTO.number() );
+        candidate.setFirstName( candidateSummaryDTO.firstName() );
+        candidate.setLastName( candidateSummaryDTO.lastName() );
+        candidate.setGender( candidateSummaryDTO.gender() );
+        candidate.setAge( candidateSummaryDTO.age() );
     }
 }

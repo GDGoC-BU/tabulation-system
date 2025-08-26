@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.services;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CandidateMapper;
 import com.michaelcanonizado.backend.models.Candidate;
@@ -41,5 +42,21 @@ public class CandidateService {
                 .sorted(Comparator.comparing(Candidate::getNumber))
                 .map(mapper::toSummaryDTO)
                 .toList();
+    }
+
+    public CandidateSummaryDTO updateCandidate(UUID id, CandidateSummaryDTO candidateSummaryDTO) {
+        if (!id.equals(candidateSummaryDTO.id())) {
+            throw new EntityMismatchException(
+                    "Path id " + id + " and Body.id " + candidateSummaryDTO.id() + " doesn't match.",
+                    ErrorCode.CANDIDATE_MISMATCH
+            );
+        }
+
+        Candidate candidate = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Candidate of id " + id + " doesn't exist.", ErrorCode.CANDIDATE_NOT_FOUND);
+        });
+
+        mapper.updateEntityFromDTO(candidate, candidateSummaryDTO);
+        return mapper.toSummaryDTO(repository.save(candidate));
     }
 }
