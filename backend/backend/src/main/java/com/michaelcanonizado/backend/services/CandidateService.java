@@ -7,8 +7,12 @@ import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CandidateMapper;
 import com.michaelcanonizado.backend.models.Candidate;
+import com.michaelcanonizado.backend.models.CandidateSegmentQualification;
 import com.michaelcanonizado.backend.models.College;
+import com.michaelcanonizado.backend.models.Segment;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
+import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationRepository;
+import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,24 +23,41 @@ import java.util.UUID;
 @Service
 public class CandidateService {
     @Autowired
-    private CandidateRepository repository;
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private CandidateSegmentQualificationRepository csqRepository;
+
+    @Autowired
+    private SegmentRepository segmentRepository;
+
     @Autowired
     private CandidateMapper mapper;
 
-    public void addCandidate(CandidateCreateDTO candidateCreateDTO) {
+    public CandidateSummaryDTO addCandidate(CandidateCreateDTO candidateCreateDTO) {
+        /* Load DTO to Entity */
         Candidate candidate = mapper.toEntity(candidateCreateDTO);
-        repository.save(candidate);
+
+        /* Get available segments and qualify
+           the new candidate to each segment */
+        List<Segment> segments = segmentRepository.findAll();
+        segments.forEach(segment -> {
+            csqRepository.save(new CandidateSegmentQualification(segment, candidate));
+        });
+
+        /* Save candidate to database */
+        return mapper.toSummaryDTO(candidateRepository.save(candidate));
     }
 
     public CandidateSummaryDTO getCandidate(UUID id) {
-        Candidate candidate = repository.findById(id).orElseThrow(() -> {
+        Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Candidate not found!", ErrorCode.CANDIDATE_NOT_FOUND);
         });
         return mapper.toSummaryDTO(candidate);
     }
 
     public List<CandidateSummaryDTO> getCandidates() {
-        List<Candidate> candidates = repository.findAll();
+        List<Candidate> candidates = candidateRepository.findAll();
         return candidates
                 .stream()
                 .sorted(Comparator.comparing(Candidate::getNumber))
@@ -52,20 +73,20 @@ public class CandidateService {
             );
         }
 
-        Candidate candidate = repository.findById(id).orElseThrow(() -> {
+        Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Candidate of id " + id + " doesn't exist.", ErrorCode.CANDIDATE_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(candidate, candidateSummaryDTO);
-        return mapper.toSummaryDTO(repository.save(candidate));
+        return mapper.toSummaryDTO(candidateRepository.save(candidate));
     }
 
     public void deleteCandidate(UUID id) {
-        Candidate candidate = repository.findById(id).orElseThrow(() -> {
+        Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Candidate of id " + id + " doesn't exist.", ErrorCode.CANDIDATE_NOT_FOUND);
         });
         College college = candidate.getCollege();
         college.removeCandidate(candidate);
-        repository.delete(candidate);
+        candidateRepository.delete(candidate);
     }
 }

@@ -19,9 +19,9 @@ public class CandidateController {
     private CandidateService service;
 
     @PostMapping("/candidates")
-    public ResponseEntity<Void> addCandidate(@RequestBody CandidateCreateDTO candidateCreateDTO) {
-        service.addCandidate(candidateCreateDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<CandidateSummaryDTO> addCandidate(@RequestBody CandidateCreateDTO candidateCreateDTO) {
+        CandidateSummaryDTO candidate = service.addCandidate(candidateCreateDTO);
+        return new ResponseEntity<>(candidate, HttpStatus.CREATED);
     }
 
     @GetMapping("/candidates/{id}")
