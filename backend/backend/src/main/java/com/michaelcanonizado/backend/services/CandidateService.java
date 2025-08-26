@@ -37,16 +37,17 @@ public class CandidateService {
     public CandidateSummaryDTO addCandidate(CandidateCreateDTO candidateCreateDTO) {
         /* Load DTO to Entity */
         Candidate candidate = mapper.toEntity(candidateCreateDTO);
+        Candidate savedCandidate = candidateRepository.save(candidate);
 
         /* Get available segments and qualify
            the new candidate to each segment */
         List<Segment> segments = segmentRepository.findAll();
         segments.forEach(segment -> {
-            csqRepository.save(new CandidateSegmentQualification(segment, candidate));
+            csqRepository.save(new CandidateSegmentQualification(segment, savedCandidate));
         });
 
         /* Save candidate to database */
-        return mapper.toSummaryDTO(candidateRepository.save(candidate));
+        return mapper.toSummaryDTO(savedCandidate);
     }
 
     public CandidateSummaryDTO getCandidate(UUID id) {
