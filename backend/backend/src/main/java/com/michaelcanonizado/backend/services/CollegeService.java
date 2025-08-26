@@ -6,7 +6,7 @@ import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
-import com.michaelcanonizado.backend.mapper.CollegeMapper;
+import com.michaelcanonizado.backend.mappers.CollegeMapper;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
 import jakarta.transaction.Transactional;

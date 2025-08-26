@@ -1,4 +1,4 @@
-package com.michaelcanonizado.backend.mapper;
+package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;

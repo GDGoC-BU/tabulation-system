@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
-import com.michaelcanonizado.backend.mapper.CandidateMapper;
+import com.michaelcanonizado.backend.mappers.CandidateMapper;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import org.springframework.beans.factory.annotation.Autowired;

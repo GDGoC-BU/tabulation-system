@@ -1,4 +1,4 @@
-package com.michaelcanonizado.backend.mapper;
+package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-24T21:19:32+0800",
+    date = "2025-08-26T20:30:19+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
