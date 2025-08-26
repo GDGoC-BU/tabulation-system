@@ -28,4 +28,10 @@ public class CriterionController {
         CriterionSummaryDTO criterion = service.updateCriterion(id, criterionSummaryDTO);
         return new ResponseEntity<>(criterion, HttpStatus.OK);
     }
+
+    @DeleteMapping("/criteria/{id}")
+    public ResponseEntity<Void> deleteCriterion(@PathVariable UUID id) {
+        service.deleteCriterion(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

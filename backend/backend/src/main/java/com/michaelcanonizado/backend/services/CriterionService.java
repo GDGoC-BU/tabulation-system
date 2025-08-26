@@ -54,4 +54,16 @@ public class CriterionService {
         mapper.updateEntityFromDTO(criterion, criterionSummaryDTO);
         return mapper.toSummaryDTO(criterionRepository.save(criterion));
     }
+
+    public void deleteCriterion(UUID id) {
+        Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Deletion failed! Criterion of id " + id + " doesn't exist.", ErrorCode.CRITERION_NOT_FOUND);
+        });
+
+        System.out.println("-------------------");
+        Segment segment = criterion.getSegment();
+        segment.removeCriterion(criterion);
+        criterionRepository.delete(criterion);
+        System.out.println("-------------------");
+    }
 }
