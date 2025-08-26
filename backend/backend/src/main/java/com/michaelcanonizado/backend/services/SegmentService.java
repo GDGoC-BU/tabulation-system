@@ -8,7 +8,11 @@ import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.SegmentMapper;
+import com.michaelcanonizado.backend.models.Candidate;
+import com.michaelcanonizado.backend.models.CandidateSegmentQualification;
 import com.michaelcanonizado.backend.models.Segment;
+import com.michaelcanonizado.backend.repositories.CandidateRepository;
+import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,13 +23,34 @@ import java.util.UUID;
 @Service
 public class SegmentService {
     @Autowired
-    private SegmentRepository repository;
+    private SegmentRepository segmentRepository;
+
+    @Autowired
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private CandidateSegmentQualificationRepository csqRepository;
 
     @Autowired
     private SegmentMapper mapper;
 
+    public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
+        /* Load DTO to entity */
+        Segment segment = mapper.toEntity(segmentCreateDTO);
+        Segment savedSegment = segmentRepository.save(segment);
+
+        /* Get current candidates and qualify them to the new segment */
+        List<Candidate> candidates = candidateRepository.findAll();
+        candidates.forEach(candidate -> {
+            csqRepository.save(new CandidateSegmentQualification(savedSegment, candidate));
+        });
+
+        /* Save candidate to database */
+        return mapper.toDetailedDTO(savedSegment);
+    }
+
     public SegmentDetailedDTO getSegment(UUID id) {
-        Segment segment = repository.findById(id).orElseThrow(() -> {
+        Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Segment of id " + " not found!", ErrorCode.SEGMENT_NOT_FOUND);
         });
 
@@ -33,14 +58,9 @@ public class SegmentService {
     }
 
     public List<SegmentSummaryDTO> getSegments() {
-        return repository.findAll().stream().map(segment -> {
+        return segmentRepository.findAll().stream().map(segment -> {
             return mapper.toSummaryDTO(segment);
         }).toList();
-    }
-
-    public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
-        Segment segment = mapper.toEntity(segmentCreateDTO);
-        return mapper.toDetailedDTO(repository.save(segment));
     }
 
     public SegmentSummaryDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
@@ -51,18 +71,18 @@ public class SegmentService {
             );
         }
 
-        Segment segment = repository.findById(id).orElseThrow(() -> {
+        Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Segment of id " + id + " doesn't exist.", ErrorCode.SEGMENT_NOT_FOUND);
         });
         mapper.updateEntityFromDTO(segment, segmentUpdateDTO);
-        return mapper.toSummaryDTO(repository.save(segment));
+        return mapper.toSummaryDTO(segmentRepository.save(segment));
     }
 
     public void deleteSegment(UUID id) {
-        if (!repository.existsById(id)) {
+        if (!segmentRepository.existsById(id)) {
             throw new EntityNotFoundException("Deletion failed! Segment of id " + id + " not found.", ErrorCode.SEGMENT_NOT_FOUND);
         }
 
-        repository.deleteById(id);
+        segmentRepository.deleteById(id);
     }
 }
