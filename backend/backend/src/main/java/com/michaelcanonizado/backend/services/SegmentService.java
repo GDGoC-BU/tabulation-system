@@ -44,7 +44,7 @@ public class SegmentService {
     }
 
     public SegmentSummaryDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
-        if (!repository.existsById(id)) {
+        if (!id.equals(segmentUpdateDTO.id())) {
             throw new EntityMismatchException(
                     "Path id " + id + " and Body.id " + segmentUpdateDTO.id() + " doesn't match.",
                     ErrorCode.SEGMENT_MISMATCH
