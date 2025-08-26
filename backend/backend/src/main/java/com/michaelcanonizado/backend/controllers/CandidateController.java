@@ -37,8 +37,14 @@ public class CandidateController {
     }
 
     @PutMapping("/candidates/{id}")
-    public ResponseEntity<CandidateSummaryDTO> updateCadidate(@PathVariable UUID id, @RequestBody CandidateSummaryDTO candidateSummaryDTO) {
+    public ResponseEntity<CandidateSummaryDTO> updateCandidate(@PathVariable UUID id, @RequestBody CandidateSummaryDTO candidateSummaryDTO) {
         CandidateSummaryDTO candidate = service.updateCandidate(id, candidateSummaryDTO);
         return new ResponseEntity<>(candidate, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/candidates/{id}")
+    public  ResponseEntity<Void> deleteCandidate(@PathVariable UUID id) {
+        service.deleteCandidate(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

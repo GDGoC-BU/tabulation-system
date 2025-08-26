@@ -59,4 +59,13 @@ public class CandidateService {
         mapper.updateEntityFromDTO(candidate, candidateSummaryDTO);
         return mapper.toSummaryDTO(repository.save(candidate));
     }
+
+    public void deleteCandidate(UUID id) {
+        Candidate candidate = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Candidate of id " + id + " doesn't exist.", ErrorCode.CANDIDATE_NOT_FOUND);
+        });
+        College college = candidate.getCollege();
+        college.removeCandidate(candidate);
+        repository.delete(candidate);
+    }
 }
