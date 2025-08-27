@@ -20,6 +20,12 @@ public class SegmentController {
     @Autowired
     private SegmentService service;
 
+    @PostMapping("/segments")
+    public ResponseEntity<SegmentDetailedDTO> addSegment(@RequestBody SegmentCreateDTO segmentCreateDTO) {
+        SegmentDetailedDTO segment = service.addSegment(segmentCreateDTO);
+        return new ResponseEntity<>(segment, HttpStatus.CREATED);
+    }
+
     @GetMapping("/segments/{id}")
     public ResponseEntity<SegmentDetailedDTO> getSegment(@PathVariable UUID id) {
         SegmentDetailedDTO segment = service.getSegment(id);
@@ -30,12 +36,6 @@ public class SegmentController {
     public ResponseEntity<List<SegmentSummaryDTO>> getSegments() {
         List<SegmentSummaryDTO> segments = service.getSegments();
         return new ResponseEntity<>(segments, HttpStatus.OK);
-    }
-
-    @PostMapping("/segments")
-    public ResponseEntity<SegmentDetailedDTO> addSegment(@RequestBody SegmentCreateDTO segmentCreateDTO) {
-        SegmentDetailedDTO segment = service.addSegment(segmentCreateDTO);
-        return new ResponseEntity<>(segment, HttpStatus.CREATED);
     }
 
     @PutMapping("/segments/{id}")

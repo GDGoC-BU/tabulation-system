@@ -69,16 +69,10 @@ public class SegmentService {
 
     @Transactional
     public SegmentSummaryDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
-        if (!id.equals(segmentUpdateDTO.id())) {
-            throw new EntityMismatchException(
-                    "Path id " + id + " and Body.id " + segmentUpdateDTO.id() + " doesn't match.",
-                    ErrorCode.SEGMENT_MISMATCH
-            );
-        }
-
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Segment of id " + id + " doesn't exist.", ErrorCode.SEGMENT_NOT_FOUND);
         });
+
         mapper.updateEntityFromDTO(segment, segmentUpdateDTO);
         return mapper.toSummaryDTO(segmentRepository.save(segment));
     }
