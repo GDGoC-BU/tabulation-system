@@ -16,6 +16,7 @@ import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationR
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class SegmentService {
     @Autowired
     private SegmentMapper mapper;
 
+    @Transactional
     public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
         /* Load DTO to entity */
         Segment segment = mapper.toEntity(segmentCreateDTO);
@@ -49,6 +51,7 @@ public class SegmentService {
         return mapper.toDetailedDTO(savedSegment);
     }
 
+    @Transactional
     public SegmentDetailedDTO getSegment(UUID id) {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Segment of id " + " not found!", ErrorCode.SEGMENT_NOT_FOUND);
@@ -57,12 +60,14 @@ public class SegmentService {
         return mapper.toDetailedDTO(segment);
     }
 
+    @Transactional
     public List<SegmentSummaryDTO> getSegments() {
         return segmentRepository.findAll().stream().map(segment -> {
             return mapper.toSummaryDTO(segment);
         }).toList();
     }
 
+    @Transactional
     public SegmentSummaryDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
         if (!id.equals(segmentUpdateDTO.id())) {
             throw new EntityMismatchException(

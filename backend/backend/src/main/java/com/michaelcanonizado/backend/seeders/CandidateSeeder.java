@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class CandidateSeeder implements CommandLineRunner {
         this.collegeRepository = collegeRepository;
     }
 
+    @Transactional
     @Override
     public void run(String... args) throws Exception {
         List<College> colleges =  collegeRepository.findAll();
@@ -34,6 +36,5 @@ public class CandidateSeeder implements CommandLineRunner {
             candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), Gender.FEMALE, 20, college));
             candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), Gender.MALE, 20, college));
         }
-
     }
 }

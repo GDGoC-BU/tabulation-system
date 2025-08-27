@@ -25,7 +25,12 @@ public class College {
     private String name;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "college", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(
+            mappedBy = "college",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Candidate> candidates = new ArrayList<>();
 
     public College(String code, String name) {

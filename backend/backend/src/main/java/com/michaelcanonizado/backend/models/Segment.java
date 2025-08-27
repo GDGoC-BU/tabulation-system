@@ -22,7 +22,12 @@ public class Segment {
     private String name;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "segment", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "segment",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Criterion> criteria = new ArrayList<>();
 
 
@@ -32,7 +37,12 @@ public class Segment {
     details. Exclude list from getter and expose a separate getter
     stream to extract the actual candidate data: getQualifiedCandidates() */
     @JsonManagedReference
-    @OneToMany(mappedBy = "segment", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "segment",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
 
@@ -49,7 +59,6 @@ public class Segment {
         criterion.setSegment(null);
     }
 
-    /* WRONG LOGIC. JUST SET isQualified TO FALSE. OR ADD ANOTHER HELPER METHOD */
     public void addCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
         candidateSegmentQualifications.add(candidateSegmentQualification);
         candidateSegmentQualification.setSegment(this);

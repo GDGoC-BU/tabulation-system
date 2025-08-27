@@ -22,7 +22,12 @@ import java.util.UUID;
 public class Judge extends Account {
     /* ADD HELPER METHODS TO ADD AND REMOVE SCORES */
     @JsonManagedReference
-    @OneToMany(mappedBy = "judge", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "judge",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Score> scores  = new ArrayList<>();
 
     public Judge(String username, String passwordHash) {

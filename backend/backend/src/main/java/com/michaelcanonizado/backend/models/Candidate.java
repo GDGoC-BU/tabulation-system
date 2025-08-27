@@ -39,7 +39,9 @@ public class Candidate extends Auditable{
     private int age;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "college_id", nullable = false)
     private College college;
 
@@ -48,12 +50,22 @@ public class Candidate extends Auditable{
     separate getter stream to extract the actual segment data:
     getQualifiedSegments() */
     @JsonManagedReference
-    @OneToMany(mappedBy = "candidate", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "candidate",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> qualifiedSegments = new ArrayList<>();
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "candidate", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "candidate",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Score> scores = new ArrayList<>();
 
     public Candidate(int number, String firstName, String lastName, Gender gender, int age, College college) {

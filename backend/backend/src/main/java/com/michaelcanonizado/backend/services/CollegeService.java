@@ -9,9 +9,9 @@ import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CollegeMapper;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,12 +23,13 @@ public class CollegeService {
     @Autowired
     private CollegeMapper mapper;
 
-    public List<CollegeSummaryDTO> getColleges() {
-        return repository.findAll().stream().map(college -> {
-            return mapper.toSummaryDTO(college);
-        }).toList();
+    @Transactional
+    public CollegeDetailedDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
+        College college = repository.save(mapper.toEntity(collegeCreateDTO));
+        return mapper.toDetailedDTO(college);
     }
 
+    @Transactional
     public CollegeDetailedDTO getCollege(UUID id) {
         College college = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("College not found!", ErrorCode.COLLEGE_NOT_FOUND);
@@ -36,9 +37,10 @@ public class CollegeService {
         return mapper.toDetailedDTO(college);
     }
 
-    public CollegeDetailedDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
-        College college = repository.save(mapper.toEntity(collegeCreateDTO));
-        return mapper.toDetailedDTO(college);
+    public List<CollegeSummaryDTO> getColleges() {
+        return repository.findAll().stream().map(college -> {
+            return mapper.toSummaryDTO(college);
+        }).toList();
     }
 
     public CollegeSummaryDTO updateCollege(UUID id, CollegeSummaryDTO collegeSummaryDTO) {
@@ -56,7 +58,6 @@ public class CollegeService {
         return mapper.toSummaryDTO(repository.save(college));
     }
 
-    @Transactional
     public void deleteCollege(UUID id) {
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Deletion failed! College of id " + id + " not found.", ErrorCode.COLLEGE_NOT_FOUND);

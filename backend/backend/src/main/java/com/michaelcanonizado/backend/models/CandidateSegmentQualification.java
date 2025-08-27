@@ -23,12 +23,16 @@ public class CandidateSegmentQualification {
     private boolean isQualified = true;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "candidate_id", nullable = false)
     private Candidate candidate;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "segment_id", nullable = false)
     private Segment segment;
 

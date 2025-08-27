@@ -12,6 +12,7 @@ import com.michaelcanonizado.backend.repositories.CriterionRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -55,15 +56,14 @@ public class CriterionService {
         return mapper.toSummaryDTO(criterionRepository.save(criterion));
     }
 
+    @Transactional
     public void deleteCriterion(UUID id) {
         Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Deletion failed! Criterion of id " + id + " doesn't exist.", ErrorCode.CRITERION_NOT_FOUND);
         });
 
-        System.out.println("-------------------");
         Segment segment = criterion.getSegment();
         segment.removeCriterion(criterion);
         criterionRepository.delete(criterion);
-        System.out.println("-------------------");
     }
 }

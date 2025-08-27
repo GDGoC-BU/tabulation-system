@@ -26,12 +26,19 @@ public class Criterion {
     private int maxScore;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "segment_id", nullable = false)
     private Segment segment;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "criterion", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "criterion",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<Score> scores = new ArrayList<>();
 
     public Criterion(String name, int maxScore, Segment segment) {
@@ -39,7 +46,6 @@ public class Criterion {
         this.maxScore = maxScore;
         this.segment = segment;
     }
-
 
     public void addScore(Score score) {
         scores.add(score);

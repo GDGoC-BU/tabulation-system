@@ -5,7 +5,6 @@ import com.michaelcanonizado.backend.models.Segment;
 import com.michaelcanonizado.backend.repositories.CriterionRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hibernate.Hibernate;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +50,7 @@ public class CriterionSeeder implements CommandLineRunner {
         this.criterionRepository = criterionRepository;
     }
 
+    @Transactional
     @Override
     public void run(String... args) throws Exception {
         List<Segment> segments = segmentRepository.findAll();

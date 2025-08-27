@@ -15,6 +15,7 @@ import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationR
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -82,6 +83,7 @@ public class CandidateService {
         return mapper.toSummaryDTO(candidateRepository.save(candidate));
     }
 
+    @Transactional
     public void deleteCandidate(UUID id) {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Candidate of id " + id + " doesn't exist.", ErrorCode.CANDIDATE_NOT_FOUND);
