@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
+import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.JudgeMapper;
@@ -42,5 +43,14 @@ public class JudgeService {
                     return mapper.toSummaryDTO(judge);
                 })
                 .toList();
+    }
+
+    public JudgeSummaryDTO updateJudge(UUID id, JudgeUpdateDTO judgeUpdateDTO) {
+        Judge judge = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Judge not found!", ErrorCode.JUDGE_NOT_FOUND);
+        });
+
+        mapper.updateEntityFromDTO(judge, judgeUpdateDTO);
+        return mapper.toSummaryDTO(repository.save(judge));
     }
 }
