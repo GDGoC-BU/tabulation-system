@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.controllers;
 import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
+import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.services.CollegeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,8 +39,8 @@ public class CollegeController {
     }
 
     @PutMapping("/colleges/{id}")
-    public ResponseEntity<CollegeSummaryDTO> updateCollege(@PathVariable UUID id, @RequestBody CollegeSummaryDTO collegeSummaryDTO) {
-        CollegeSummaryDTO college = service.updateCollege(id, collegeSummaryDTO);
+    public ResponseEntity<CollegeSummaryDTO> updateCollege(@PathVariable UUID id, @RequestBody CollegeUpdateDTO collegeUpdateDTO) {
+        CollegeSummaryDTO college = service.updateCollege(id, collegeUpdateDTO);
         return new ResponseEntity<>(college, HttpStatus.OK);
     }
 

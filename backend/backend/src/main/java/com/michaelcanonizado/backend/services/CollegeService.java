@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.services;
 import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
+import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
@@ -43,18 +44,11 @@ public class CollegeService {
         }).toList();
     }
 
-    public CollegeSummaryDTO updateCollege(UUID id, CollegeSummaryDTO collegeSummaryDTO) {
-        if (!id.equals(collegeSummaryDTO.id())) {
-            throw new EntityMismatchException(
-                    "Path id " + id + " and Body.id " + collegeSummaryDTO.id() + " doesn't match.",
-                    ErrorCode.COLLEGE_MISMATCH
-            );
-        }
-
+    public CollegeSummaryDTO updateCollege(UUID id, CollegeUpdateDTO collegeUpdateDTO) {
         College college = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("College of id " + id + " doesn't exist.", ErrorCode.COLLEGE_NOT_FOUND);
         });
-        mapper.updateEntityFromDTO(college, collegeSummaryDTO);
+        mapper.updateEntityFromDTO(college, collegeUpdateDTO);
         return mapper.toSummaryDTO(repository.save(college));
     }
 

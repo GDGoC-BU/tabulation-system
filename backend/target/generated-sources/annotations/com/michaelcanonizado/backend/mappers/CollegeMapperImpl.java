@@ -4,6 +4,7 @@ import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
+import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.models.Gender;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-27T19:56:05+0800",
+    date = "2025-08-27T20:43:51+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -115,13 +116,13 @@ public class CollegeMapperImpl implements CollegeMapper {
     }
 
     @Override
-    public void updateEntityFromDTO(College college, CollegeSummaryDTO collegeSummaryDTO) {
-        if ( collegeSummaryDTO == null ) {
+    public void updateEntityFromDTO(College college, CollegeUpdateDTO collegeUpdateDTO) {
+        if ( collegeUpdateDTO == null ) {
             return;
         }
 
-        college.setCode( collegeSummaryDTO.code() );
-        college.setName( collegeSummaryDTO.name() );
+        college.setCode( collegeUpdateDTO.code() );
+        college.setName( collegeUpdateDTO.name() );
     }
 
     protected Candidate candidateSummaryDTOToCandidate(CandidateSummaryDTO candidateSummaryDTO) {
