@@ -23,7 +23,10 @@ public class JudgeService {
     private JudgeMapper mapper;
 
     public JudgeSummaryDTO addJudge(JudgeCreateDTO judgeCreateDTO) {
-        Judge judge = repository.save(mapper.toEntity(judgeCreateDTO));
+        /* Add authentication! Password needs to be hashed:
+           JudgeCreateDTO.password -> Judge.passwordHash */
+        Judge judge = new Judge(judgeCreateDTO.username(), judgeCreateDTO.password());
+        Judge savedJudge = repository.save(judge);
         return mapper.toSummaryDTO(judge);
     }
 

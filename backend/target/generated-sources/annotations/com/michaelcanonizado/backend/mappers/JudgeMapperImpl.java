@@ -11,11 +11,28 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-27T19:53:49+0800",
+    date = "2025-08-27T20:04:06+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
 public class JudgeMapperImpl implements JudgeMapper {
+
+    @Override
+    public Judge toEntity(JudgeCreateDTO judgeCreateDTO) {
+        if ( judgeCreateDTO == null ) {
+            return null;
+        }
+
+        String username = null;
+
+        username = judgeCreateDTO.username();
+
+        String passwordHash = null;
+
+        Judge judge = new Judge( username, passwordHash );
+
+        return judge;
+    }
 
     @Override
     public Judge toEntity(JudgeSummaryDTO judgeSummaryDTO) {
@@ -32,25 +49,6 @@ public class JudgeMapperImpl implements JudgeMapper {
         Judge judge = new Judge( username, passwordHash );
 
         judge.setLastSeenAt( judgeSummaryDTO.lastSeenAt() );
-
-        return judge;
-    }
-
-    @Override
-    public Judge toEntity(JudgeCreateDTO judgeCreateDTO) {
-        if ( judgeCreateDTO == null ) {
-            return null;
-        }
-
-        String username = null;
-
-        username = judgeCreateDTO.username();
-
-        String passwordHash = null;
-
-        Judge judge = new Judge( username, passwordHash );
-
-        judge.setLastSeenAt( judgeCreateDTO.lastSeenAt() );
 
         return judge;
     }
