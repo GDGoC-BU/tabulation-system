@@ -1,6 +1,8 @@
 package com.michaelcanonizado.backend.mappers;
 
+import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
+import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.models.Judge;
 import java.time.Instant;
 import java.util.UUID;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-26T20:30:18+0800",
+    date = "2025-08-27T19:53:49+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -30,6 +32,25 @@ public class JudgeMapperImpl implements JudgeMapper {
         Judge judge = new Judge( username, passwordHash );
 
         judge.setLastSeenAt( judgeSummaryDTO.lastSeenAt() );
+
+        return judge;
+    }
+
+    @Override
+    public Judge toEntity(JudgeCreateDTO judgeCreateDTO) {
+        if ( judgeCreateDTO == null ) {
+            return null;
+        }
+
+        String username = null;
+
+        username = judgeCreateDTO.username();
+
+        String passwordHash = null;
+
+        Judge judge = new Judge( username, passwordHash );
+
+        judge.setLastSeenAt( judgeCreateDTO.lastSeenAt() );
 
         return judge;
     }
@@ -57,5 +78,14 @@ public class JudgeMapperImpl implements JudgeMapper {
         JudgeSummaryDTO judgeSummaryDTO = new JudgeSummaryDTO( id, username, isOnline, lastSeenAt, createdAt, updatedAt );
 
         return judgeSummaryDTO;
+    }
+
+    @Override
+    public void updateEntityFromDTO(Judge judge, JudgeUpdateDTO judgeUpdateDTO) {
+        if ( judgeUpdateDTO == null ) {
+            return;
+        }
+
+        judge.setUsername( judgeUpdateDTO.username() );
     }
 }

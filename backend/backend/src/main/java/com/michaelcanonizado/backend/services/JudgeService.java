@@ -53,4 +53,11 @@ public class JudgeService {
         mapper.updateEntityFromDTO(judge, judgeUpdateDTO);
         return mapper.toSummaryDTO(repository.save(judge));
     }
+
+    public void deleteJudge(UUID id) {
+        Judge judge = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Judge not found!", ErrorCode.JUDGE_NOT_FOUND);
+        });
+        repository.delete(judge);
+    }
 }

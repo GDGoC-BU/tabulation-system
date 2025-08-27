@@ -42,4 +42,10 @@ public class JudgeController {
         JudgeSummaryDTO judge = service.updateJudge(id, judgeUpdateDTO);
         return new ResponseEntity<>(judge, HttpStatus.OK);
     }
+
+    @DeleteMapping("/judges/{id}")
+    private ResponseEntity<Void> deleteJudge(@PathVariable UUID id) {
+        service.deleteJudge(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
