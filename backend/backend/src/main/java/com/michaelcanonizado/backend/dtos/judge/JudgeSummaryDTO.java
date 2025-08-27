@@ -5,10 +5,6 @@ import java.util.UUID;
 
 public record JudgeSummaryDTO(
         UUID id,
-        String username,
-        boolean isOnline,
-        Instant lastSeenAt,
-        Instant createdAt,
-        Instant updatedAt
+        String username
 ) {
 }

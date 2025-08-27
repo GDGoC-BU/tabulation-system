@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
-import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
+import com.michaelcanonizado.backend.dtos.judge.JudgeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.services.JudgeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,26 +20,26 @@ public class JudgeController {
     private JudgeService service;
 
     @PostMapping("/judges")
-    private ResponseEntity<JudgeSummaryDTO> addJudge(@RequestBody JudgeCreateDTO judgeCreateDTO) {
-        JudgeSummaryDTO judge = service.addJudge(judgeCreateDTO);
+    private ResponseEntity<JudgeDetailedDTO> addJudge(@RequestBody JudgeCreateDTO judgeCreateDTO) {
+        JudgeDetailedDTO judge = service.addJudge(judgeCreateDTO);
         return new ResponseEntity<>(judge, HttpStatus.CREATED);
     }
 
     @GetMapping("/judges/{id}")
-    private ResponseEntity<JudgeSummaryDTO> getJudge(@PathVariable UUID id) {
-        JudgeSummaryDTO judge = service.getJudge(id);
+    private ResponseEntity<JudgeDetailedDTO> getJudge(@PathVariable UUID id) {
+        JudgeDetailedDTO judge = service.getJudge(id);
         return new ResponseEntity<>(judge, HttpStatus.OK);
     }
 
     @GetMapping("/judges")
-    private ResponseEntity<List<JudgeSummaryDTO>> getJudges() {
-        List<JudgeSummaryDTO> judges = service.getJudges();
+    private ResponseEntity<List<JudgeDetailedDTO>> getJudges() {
+        List<JudgeDetailedDTO> judges = service.getJudges();
         return new ResponseEntity<>(judges, HttpStatus.OK);
     }
 
     @PutMapping("/judges/{id}")
-    private ResponseEntity<JudgeSummaryDTO> getJudge(@PathVariable UUID id, @RequestBody JudgeUpdateDTO judgeUpdateDTO) {
-        JudgeSummaryDTO judge = service.updateJudge(id, judgeUpdateDTO);
+    private ResponseEntity<JudgeDetailedDTO> getJudge(@PathVariable UUID id, @RequestBody JudgeUpdateDTO judgeUpdateDTO) {
+        JudgeDetailedDTO judge = service.updateJudge(id, judgeUpdateDTO);
         return new ResponseEntity<>(judge, HttpStatus.OK);
     }
 
