@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
+import com.michaelcanonizado.backend.dtos.criterion.CriterionUpdateDTO;
 import com.michaelcanonizado.backend.models.Criterion;
 import com.michaelcanonizado.backend.models.Segment;
 import java.util.UUID;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-27T19:56:04+0800",
+    date = "2025-08-27T20:45:53+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -54,12 +55,12 @@ public class CriterionMapperImpl implements CriterionMapper {
     }
 
     @Override
-    public void updateEntityFromDTO(Criterion criterion, CriterionSummaryDTO criterionSummaryDTO) {
-        if ( criterionSummaryDTO == null ) {
+    public void updateEntityFromDTO(Criterion criterion, CriterionUpdateDTO criterionUpdateDTO) {
+        if ( criterionUpdateDTO == null ) {
             return;
         }
 
-        criterion.setName( criterionSummaryDTO.name() );
-        criterion.setMaxScore( criterionSummaryDTO.maxScore() );
+        criterion.setName( criterionUpdateDTO.name() );
+        criterion.setMaxScore( criterionUpdateDTO.maxScore() );
     }
 }

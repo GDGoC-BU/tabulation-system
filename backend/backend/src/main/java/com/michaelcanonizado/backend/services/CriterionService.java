@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.dtos.criterion.CriterionCreateDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
+import com.michaelcanonizado.backend.dtos.criterion.CriterionUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
@@ -40,19 +41,12 @@ public class CriterionService {
         return mapper.toSummaryDTO(criterionRepository.save(criterion));
     }
 
-    public CriterionSummaryDTO updateCriterion(UUID id, CriterionSummaryDTO criterionSummaryDTO) {
-        if (!id.equals(criterionSummaryDTO.id())) {
-            throw new EntityMismatchException(
-                    "Path id " + id + " and Body.id " + criterionSummaryDTO.id() + " doesn't match.",
-                    ErrorCode.CRITERION_MISMATCH
-            );
-        }
-
+    public CriterionSummaryDTO updateCriterion(UUID id, CriterionUpdateDTO criterionUpdateDTO) {
         Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Criterion of id " + id + " doesn't exist.", ErrorCode.CRITERION_NOT_FOUND);
         });
 
-        mapper.updateEntityFromDTO(criterion, criterionSummaryDTO);
+        mapper.updateEntityFromDTO(criterion, criterionUpdateDTO);
         return mapper.toSummaryDTO(criterionRepository.save(criterion));
     }
 

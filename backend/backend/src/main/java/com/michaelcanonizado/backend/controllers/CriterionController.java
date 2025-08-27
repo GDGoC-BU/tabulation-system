@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.criterion.CriterionCreateDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
+import com.michaelcanonizado.backend.dtos.criterion.CriterionUpdateDTO;
 import com.michaelcanonizado.backend.services.CriterionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,8 @@ public class CriterionController {
     }
 
     @PutMapping("/criteria/{id}")
-    public ResponseEntity<CriterionSummaryDTO> updateCriterion(@PathVariable UUID id, @RequestBody CriterionSummaryDTO criterionSummaryDTO) {
-        CriterionSummaryDTO criterion = service.updateCriterion(id, criterionSummaryDTO);
+    public ResponseEntity<CriterionSummaryDTO> updateCriterion(@PathVariable UUID id, @RequestBody CriterionUpdateDTO criterionUpdateDTO) {
+        CriterionSummaryDTO criterion = service.updateCriterion(id, criterionUpdateDTO);
         return new ResponseEntity<>(criterion, HttpStatus.OK);
     }
 
