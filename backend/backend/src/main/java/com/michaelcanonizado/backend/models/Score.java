@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Score {
     @Id
     @GeneratedValue
-    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Column(nullable = false)
