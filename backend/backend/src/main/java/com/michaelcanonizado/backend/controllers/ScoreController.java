@@ -22,9 +22,16 @@ public class ScoreController {
     public ResponseEntity<List<ScoreSummaryDTO>> getScores(
             @RequestParam(required = false) UUID judgeId,
             @RequestParam(required = false) UUID candidateId,
-            @RequestParam(required = false) UUID criterionId
+            @RequestParam(required = false) UUID criterionId,
+            @RequestParam(required = false) UUID segmentId
+
     ) {
-        List<ScoreSummaryDTO> scores = service.getScores(judgeId, candidateId, criterionId);
+        List<ScoreSummaryDTO> scores = service.getScores(
+                judgeId,
+                candidateId,
+                criterionId,
+                segmentId
+        );
         return new ResponseEntity<>(scores, HttpStatus.OK);
     }
 

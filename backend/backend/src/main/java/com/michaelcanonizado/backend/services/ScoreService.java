@@ -23,12 +23,13 @@ public class ScoreService {
     @Autowired
     private ScoreMapper mapper;
 
-    public List<ScoreSummaryDTO> getScores(UUID judgeId, UUID candidateId, UUID criterionId) {
+    public List<ScoreSummaryDTO> getScores(UUID judgeId, UUID candidateId, UUID criterionId, UUID segmentId) {
         return repository.findAll(
                 Specification.allOf(
                         ScoreSpecification.hasJudge(judgeId),
                         ScoreSpecification.hasCandidate(candidateId),
-                        ScoreSpecification.hasCriterion(criterionId)
+                        ScoreSpecification.hasCriterion(criterionId),
+                        ScoreSpecification.hasSegment(segmentId)
                 )
         ).stream().map(score -> {
             return mapper.toSummaryDTO(score);
