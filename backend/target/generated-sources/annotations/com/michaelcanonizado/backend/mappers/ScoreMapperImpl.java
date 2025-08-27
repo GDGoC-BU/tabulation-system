@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-27T21:37:26+0800",
+    date = "2025-08-28T00:10:20+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -21,11 +21,11 @@ public class ScoreMapperImpl implements ScoreMapper {
             return null;
         }
 
+        UUID id = null;
         int value = 0;
 
+        id = score.getId();
         value = score.getValue();
-
-        UUID id = null;
 
         ScoreSummaryDTO scoreSummaryDTO = new ScoreSummaryDTO( id, value );
 
