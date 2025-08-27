@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
+import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.services.CandidateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,8 +38,8 @@ public class CandidateController {
     }
 
     @PutMapping("/candidates/{id}")
-    public ResponseEntity<CandidateSummaryDTO> updateCandidate(@PathVariable UUID id, @RequestBody CandidateSummaryDTO candidateSummaryDTO) {
-        CandidateSummaryDTO candidate = service.updateCandidate(id, candidateSummaryDTO);
+    public ResponseEntity<CandidateSummaryDTO> updateCandidate(@PathVariable UUID id, @RequestBody CandidateUpdateDTO candidateUpdateDTO) {
+        CandidateSummaryDTO candidate = service.updateCandidate(id, candidateUpdateDTO);
         return new ResponseEntity<>(candidate, HttpStatus.OK);
     }
 

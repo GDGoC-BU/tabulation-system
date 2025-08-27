@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
+import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.services.CollegeService;
 import org.mapstruct.Mapper;
@@ -14,5 +15,5 @@ public interface CandidateMapper {
     Candidate toEntity(CandidateCreateDTO candidateCreateDTO);
     CandidateSummaryDTO toSummaryDTO(Candidate candidate);
 
-    void updateEntityFromDTO(@MappingTarget Candidate candidate, CandidateSummaryDTO candidateSummaryDTO);
+    void updateEntityFromDTO(@MappingTarget Candidate candidate, CandidateUpdateDTO candidateUpdateDTO);
 }

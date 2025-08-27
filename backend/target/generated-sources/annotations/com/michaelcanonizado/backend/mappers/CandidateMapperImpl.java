@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
+import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.models.Gender;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-27T19:56:05+0800",
+    date = "2025-08-27T20:40:06+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -73,15 +74,15 @@ public class CandidateMapperImpl implements CandidateMapper {
     }
 
     @Override
-    public void updateEntityFromDTO(Candidate candidate, CandidateSummaryDTO candidateSummaryDTO) {
-        if ( candidateSummaryDTO == null ) {
+    public void updateEntityFromDTO(Candidate candidate, CandidateUpdateDTO candidateUpdateDTO) {
+        if ( candidateUpdateDTO == null ) {
             return;
         }
 
-        candidate.setNumber( candidateSummaryDTO.number() );
-        candidate.setFirstName( candidateSummaryDTO.firstName() );
-        candidate.setLastName( candidateSummaryDTO.lastName() );
-        candidate.setGender( candidateSummaryDTO.gender() );
-        candidate.setAge( candidateSummaryDTO.age() );
+        candidate.setNumber( candidateUpdateDTO.number() );
+        candidate.setFirstName( candidateUpdateDTO.firstName() );
+        candidate.setLastName( candidateUpdateDTO.lastName() );
+        candidate.setGender( candidateUpdateDTO.gender() );
+        candidate.setAge( candidateUpdateDTO.age() );
     }
 }
