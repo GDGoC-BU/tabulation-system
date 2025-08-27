@@ -1,4 +1,7 @@
 package com.michaelcanonizado.backend.dtos.college;
 
-public record CollegeCreateDTO(String code, String name) {
+public record CollegeCreateDTO(
+        String code,
+        String name
+) {
 }
