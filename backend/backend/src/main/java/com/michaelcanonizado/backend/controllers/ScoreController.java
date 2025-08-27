@@ -7,11 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -19,6 +17,16 @@ import java.util.UUID;
 public class ScoreController {
     @Autowired
     private ScoreService service;
+
+    @GetMapping("/scores")
+    public ResponseEntity<List<ScoreSummaryDTO>> getScores(
+            @RequestParam(required = false) UUID judgeId,
+            @RequestParam(required = false) UUID candidateId,
+            @RequestParam(required = false) UUID criterionId
+    ) {
+        List<ScoreSummaryDTO> scores = service.getScores(judgeId, candidateId, criterionId);
+        return new ResponseEntity<>(scores, HttpStatus.OK);
+    }
 
     @PutMapping("/scores/{id}")
     private ResponseEntity<ScoreSummaryDTO> updateScore(@PathVariable UUID id, @RequestBody ScoreUpdateDTO scoreUpdateDTO) {
