@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -27,5 +28,11 @@ public class JudgeController {
     private ResponseEntity<JudgeSummaryDTO> getJudge(@PathVariable UUID id) {
         JudgeSummaryDTO judge = service.getJudge(id);
         return new ResponseEntity<>(judge, HttpStatus.OK);
+    }
+
+    @GetMapping("/judges")
+    private ResponseEntity<List<JudgeSummaryDTO>> getJudges() {
+        List<JudgeSummaryDTO> judges = service.getJudges();
+        return new ResponseEntity<>(judges, HttpStatus.OK);
     }
 }

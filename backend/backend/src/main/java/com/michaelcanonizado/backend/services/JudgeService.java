@@ -10,6 +10,7 @@ import com.michaelcanonizado.backend.repositories.JudgeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,5 +32,15 @@ public class JudgeService {
         });
 
         return mapper.toSummaryDTO(judge);
+    }
+
+    public List<JudgeSummaryDTO> getJudges() {
+        return repository
+                .findAll()
+                .stream()
+                .map(judge -> {
+                    return mapper.toSummaryDTO(judge);
+                })
+                .toList();
     }
 }
