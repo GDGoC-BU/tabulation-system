@@ -50,11 +50,11 @@ public class Segment {
     }
 
     /* WRONG LOGIC. JUST SET isQualified TO FALSE. OR ADD ANOTHER HELPER METHOD */
-    public void addQualifiedCandidate(CandidateSegmentQualification candidateSegmentQualification) {
+    public void addCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
         candidateSegmentQualifications.add(candidateSegmentQualification);
         candidateSegmentQualification.setSegment(this);
     }
-    public void removeQualifiedCandidate(CandidateSegmentQualification candidateSegmentQualification) {
+    public void removeCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
         candidateSegmentQualifications.remove(candidateSegmentQualification);
         candidateSegmentQualification.setSegment(null);
     }

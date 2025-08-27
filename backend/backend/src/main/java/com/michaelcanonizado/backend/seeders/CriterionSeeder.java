@@ -62,9 +62,11 @@ public class CriterionSeeder implements CommandLineRunner {
                             criterionItem.getMaxScore(),
                             segment
                     );
+                    segment.addCriterion(criterion);
                     criterionRepository.save(criterion);
                 }
             });
+            segmentRepository.save(segment);
         });
     }
 }

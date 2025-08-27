@@ -65,11 +65,11 @@ public class Candidate extends Auditable{
         this.college = college;
     }
 
-    public void addQualifiedCandidate(CandidateSegmentQualification candidateSegmentQualification) {
+    public void addCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
         qualifiedSegments.add(candidateSegmentQualification);
         candidateSegmentQualification.setCandidate(this);
     }
-    public void removeQualifiedCandidate(CandidateSegmentQualification candidateSegmentQualification) {
+    public void removeCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
         qualifiedSegments.remove(candidateSegmentQualification);
         candidateSegmentQualification.setCandidate(null);
     }
