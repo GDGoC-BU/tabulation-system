@@ -11,8 +11,6 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-@Setter
 @Table(
         uniqueConstraints = @UniqueConstraint(
         columnNames = {
@@ -22,6 +20,8 @@ import java.util.UUID;
         }
 )
 )
+@Getter
+@Setter
 public class Score {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

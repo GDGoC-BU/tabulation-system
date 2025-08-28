@@ -11,6 +11,14 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {
+                        "candidate_id",
+                        "segment_id"
+                }
+        )
+)
 @Getter
 @Setter
 public class CandidateSegmentQualification {
