@@ -24,7 +24,8 @@ import java.util.UUID;
 )
 public class Score {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     private UUID id;
 

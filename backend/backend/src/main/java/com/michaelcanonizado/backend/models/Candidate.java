@@ -20,6 +20,7 @@ import java.util.UUID;
 public class Candidate extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     private UUID id;
 

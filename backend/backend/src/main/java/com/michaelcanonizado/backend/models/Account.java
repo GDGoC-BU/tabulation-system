@@ -1,9 +1,6 @@
 package com.michaelcanonizado.backend.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
@@ -15,7 +12,8 @@ import java.util.UUID;
 @Setter
 public class Account extends Auditable {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     private UUID id;
 

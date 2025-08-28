@@ -14,7 +14,8 @@ import java.util.UUID;
 @Setter
 public class College {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     private UUID id;
 
