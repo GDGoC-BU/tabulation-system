@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.services.CollegeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +21,10 @@ public class CollegeController {
     @Autowired
     private CollegeService service;
 
-    @GetMapping("/colleges")
-    public ResponseEntity<List<CollegeSummaryDTO>> getColleges() {
-        List<CollegeSummaryDTO> colleges = service.getColleges();
-        return new ResponseEntity<>(colleges, HttpStatus.OK);
+    @PostMapping("/colleges")
+    public ResponseEntity<CollegeDetailedDTO> addCollege(@RequestBody @Valid CollegeCreateDTO collegeCreateDTO) {
+        CollegeDetailedDTO college = service.addCollege(collegeCreateDTO);
+        return new ResponseEntity<>(college, HttpStatus.CREATED);
     }
 
     @GetMapping("/colleges/{id}")
@@ -32,14 +33,14 @@ public class CollegeController {
         return new ResponseEntity<>(college, HttpStatus.OK);
     }
 
-    @PostMapping("/colleges")
-    public ResponseEntity<CollegeDetailedDTO> addCollege(@RequestBody CollegeCreateDTO collegeCreateDTO) {
-        CollegeDetailedDTO college = service.addCollege(collegeCreateDTO);
-        return new ResponseEntity<>(college, HttpStatus.CREATED);
+    @GetMapping("/colleges")
+    public ResponseEntity<List<CollegeSummaryDTO>> getColleges() {
+        List<CollegeSummaryDTO> colleges = service.getColleges();
+        return new ResponseEntity<>(colleges, HttpStatus.OK);
     }
 
     @PutMapping("/colleges/{id}")
-    public ResponseEntity<CollegeSummaryDTO> updateCollege(@PathVariable UUID id, @RequestBody CollegeUpdateDTO collegeUpdateDTO) {
+    public ResponseEntity<CollegeSummaryDTO> updateCollege(@PathVariable UUID id, @RequestBody @Valid CollegeUpdateDTO collegeUpdateDTO) {
         CollegeSummaryDTO college = service.updateCollege(id, collegeUpdateDTO);
         return new ResponseEntity<>(college, HttpStatus.OK);
     }
