@@ -4,10 +4,15 @@ import com.michaelcanonizado.backend.dtos.score.ScoreSummaryDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.models.Score;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {CriterionMapper.class})
 public interface ScoreMapper {
+    @Mapping(target = "judgeId", source = "judge.id")
+    @Mapping(target = "candidateId", source = "candidate.id")
+    @Mapping(target = "criterion", source = "criterion")
+    @Mapping(target = "segmentId", source = "criterion.segment.id")
     ScoreSummaryDTO toSummaryDTO(Score score);
 
     void updateEntityFromDTO(@MappingTarget Score score, ScoreUpdateDTO scoreUpdateDTO);
