@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.controllers;
 import com.michaelcanonizado.backend.dtos.score.ScoreSummaryDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.services.ScoreService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class ScoreController {
     }
 
     @PutMapping("/scores/{id}")
-    private ResponseEntity<ScoreSummaryDTO> updateScore(@PathVariable UUID id, @RequestBody ScoreUpdateDTO scoreUpdateDTO) {
+    private ResponseEntity<ScoreSummaryDTO> updateScore(@PathVariable UUID id, @RequestBody @Valid ScoreUpdateDTO scoreUpdateDTO) {
         ScoreSummaryDTO score = service.updateScore(id, scoreUpdateDTO);
         return new ResponseEntity<>(score, HttpStatus.OK);
     }
