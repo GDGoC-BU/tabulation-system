@@ -4,6 +4,7 @@ import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.services.JudgeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class JudgeController {
     private JudgeService service;
 
     @PostMapping("/judges")
-    private ResponseEntity<JudgeDetailedDTO> addJudge(@RequestBody JudgeCreateDTO judgeCreateDTO) {
+    private ResponseEntity<JudgeDetailedDTO> addJudge(@RequestBody @Valid JudgeCreateDTO judgeCreateDTO) {
         JudgeDetailedDTO judge = service.addJudge(judgeCreateDTO);
         return new ResponseEntity<>(judge, HttpStatus.CREATED);
     }
@@ -38,7 +39,7 @@ public class JudgeController {
     }
 
     @PutMapping("/judges/{id}")
-    private ResponseEntity<JudgeDetailedDTO> getJudge(@PathVariable UUID id, @RequestBody JudgeUpdateDTO judgeUpdateDTO) {
+    private ResponseEntity<JudgeDetailedDTO> getJudge(@PathVariable UUID id, @RequestBody @Valid JudgeUpdateDTO judgeUpdateDTO) {
         JudgeDetailedDTO judge = service.updateJudge(id, judgeUpdateDTO);
         return new ResponseEntity<>(judge, HttpStatus.OK);
     }
