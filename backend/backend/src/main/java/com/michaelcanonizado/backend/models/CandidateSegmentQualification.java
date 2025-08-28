@@ -33,6 +33,7 @@ public class CandidateSegmentQualification {
 
     @JsonBackReference
     @ManyToOne(
+            optional = false,
             fetch = FetchType.LAZY
     )
     @JoinColumn(name = "candidate_id", nullable = false)
@@ -40,6 +41,7 @@ public class CandidateSegmentQualification {
 
     @JsonBackReference
     @ManyToOne(
+            optional = false,
             fetch = FetchType.LAZY
     )
     @JoinColumn(name = "segment_id", nullable = false)

@@ -28,6 +28,7 @@ public class Criterion {
 
     @JsonBackReference
     @ManyToOne(
+            optional = false,
             fetch = FetchType.LAZY
     )
     @JoinColumn(name = "segment_id", nullable = false)

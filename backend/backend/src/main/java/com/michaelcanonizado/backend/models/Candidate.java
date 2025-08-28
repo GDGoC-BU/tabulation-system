@@ -42,6 +42,7 @@ public class Candidate extends Auditable{
 
     @JsonBackReference
     @ManyToOne(
+            optional = false,
             fetch = FetchType.LAZY
     )
     @JoinColumn(name = "college_id", nullable = false)
