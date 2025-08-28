@@ -1,14 +1,27 @@
 package com.michaelcanonizado.backend.dtos.candidate;
 
 import com.michaelcanonizado.backend.models.Gender;
-
-import java.util.UUID;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CandidateUpdateDTO(
+        @NotNull(message = "required")
+        @Min(value = 1, message = ">= 1")
         int number,
+
+        @NotBlank(message = "required")
         String firstName,
+
+        @NotBlank(message = "required")
         String lastName,
+
+        @NotNull(message = "required")
         Gender gender,
+
+        @NotNull(message = "required")
+        @Min(value = 0, message = ">= 0")
         int age
 ) {
 }

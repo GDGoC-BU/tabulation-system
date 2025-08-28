@@ -4,6 +4,7 @@ import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.services.CandidateService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class CandidateController {
     private CandidateService service;
 
     @PostMapping("/candidates")
-    public ResponseEntity<CandidateSummaryDTO> addCandidate(@RequestBody CandidateCreateDTO candidateCreateDTO) {
+    public ResponseEntity<CandidateSummaryDTO> addCandidate(@RequestBody @Valid CandidateCreateDTO candidateCreateDTO) {
         CandidateSummaryDTO candidate = service.addCandidate(candidateCreateDTO);
         return new ResponseEntity<>(candidate, HttpStatus.CREATED);
     }
@@ -38,7 +39,7 @@ public class CandidateController {
     }
 
     @PutMapping("/candidates/{id}")
-    public ResponseEntity<CandidateSummaryDTO> updateCandidate(@PathVariable UUID id, @RequestBody CandidateUpdateDTO candidateUpdateDTO) {
+    public ResponseEntity<CandidateSummaryDTO> updateCandidate(@PathVariable UUID id, @RequestBody @Valid CandidateUpdateDTO candidateUpdateDTO) {
         CandidateSummaryDTO candidate = service.updateCandidate(id, candidateUpdateDTO);
         return new ResponseEntity<>(candidate, HttpStatus.OK);
     }
