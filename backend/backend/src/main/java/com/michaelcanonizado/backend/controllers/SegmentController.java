@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.services.SegmentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class SegmentController {
     private SegmentService service;
 
     @PostMapping("/segments")
-    public ResponseEntity<SegmentDetailedDTO> addSegment(@RequestBody SegmentCreateDTO segmentCreateDTO) {
+    public ResponseEntity<SegmentDetailedDTO> addSegment(@RequestBody @Valid SegmentCreateDTO segmentCreateDTO) {
         SegmentDetailedDTO segment = service.addSegment(segmentCreateDTO);
         return new ResponseEntity<>(segment, HttpStatus.CREATED);
     }
@@ -39,7 +40,7 @@ public class SegmentController {
     }
 
     @PutMapping("/segments/{id}")
-    public ResponseEntity<SegmentSummaryDTO> updateSegment(@PathVariable UUID id, @RequestBody SegmentUpdateDTO segmentUpdateDTO) {
+    public ResponseEntity<SegmentSummaryDTO> updateSegment(@PathVariable UUID id, @RequestBody @Valid SegmentUpdateDTO segmentUpdateDTO) {
         SegmentSummaryDTO segment = service.updateSegment(id, segmentUpdateDTO);
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
