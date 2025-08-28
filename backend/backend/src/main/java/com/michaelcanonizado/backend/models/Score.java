@@ -13,6 +13,15 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
+@Table(
+        uniqueConstraints = @UniqueConstraint(
+        columnNames = {
+                "judge_id",
+                "candidate_id",
+                "criterion_id"
+        }
+)
+)
 public class Score {
     @Id
     @GeneratedValue
