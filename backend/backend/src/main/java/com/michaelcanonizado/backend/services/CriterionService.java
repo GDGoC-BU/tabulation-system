@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,11 +52,14 @@ public class CriterionService {
         /* Pre-generate the scores for the new criterion */
         List<Candidate> candidates = candidateRepository.findAll();
         List<Judge> judges = judgeRepository.findAll();
+        List<Score> newScores = new ArrayList<>();
         candidates.forEach(candidate -> {
             judges.forEach(judge -> {
-                scoreRepository.save(new Score(0, judge, candidate, savedCriterion));
+                newScores.add(new Score(0, judge, candidate, savedCriterion));
             });
         });
+        /* Batch save to minimize insert queries */
+        scoreRepository.saveAll(newScores);
 
         return mapper.toSummaryDTO(savedCriterion);
     }

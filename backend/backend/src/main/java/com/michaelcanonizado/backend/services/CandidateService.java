@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +41,7 @@ public class CandidateService {
     @Autowired
     private CandidateMapper mapper;
 
+    @Transactional
     public CandidateSummaryDTO addCandidate(CandidateCreateDTO candidateCreateDTO) {
         /* Load DTO to Entity */
         Candidate candidate = mapper.toEntity(candidateCreateDTO);
@@ -48,18 +50,24 @@ public class CandidateService {
         /* Get available segments and qualify
            the new candidate to each segment */
         List<Segment> segments = segmentRepository.findAll();
+        List<CandidateSegmentQualification> newCSQs = new ArrayList<>();
         segments.forEach(segment -> {
-            csqRepository.save(new CandidateSegmentQualification(segment, savedCandidate));
+            newCSQs.add(new CandidateSegmentQualification(segment, savedCandidate));
         });
+        /* Batch save to minimize insert queries */
+        csqRepository.saveAll(newCSQs);
 
         /* Pre-generate the scores for the new candidate */
         List<Judge> judges = judgeRepository.findAll();
         List<Criterion> criteria = criterionRepository.findAll();
+        List<Score> newScores = new ArrayList<>();
         judges.forEach(judge -> {
             criteria.forEach(criterion -> {
-                scoreRepository.save(new Score(0, judge, savedCandidate, criterion));
+                newScores.add(new Score(0, judge, savedCandidate, criterion));
             });
         });
+        /* Batch save to minimize insert queries */
+        scoreRepository.saveAll(newScores);
 
         /* Save candidate to database */
         return mapper.toSummaryDTO(savedCandidate);

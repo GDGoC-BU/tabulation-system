@@ -17,6 +17,7 @@ import com.michaelcanonizado.backend.repositories.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,11 +47,14 @@ public class JudgeService {
         /* Pre-generate the scores for the new judge */
         List<Candidate> candidates = candidateRepository.findAll();
         List<Criterion> criteria = criterionRepository.findAll();
+        List<Score> newScores = new ArrayList<>();
         candidates.forEach(candidate -> {
             criteria.forEach(criterion -> {
-                scoreRepository.save(new Score(0, savedJudge, candidate, criterion));
+                newScores.add(new Score(0, savedJudge, candidate, criterion));
             });
         });
+        /* Batch save to minimize insert queries */
+        scoreRepository.saveAll(newScores);
 
         return mapper.toDetailedDTO(savedJudge);
     }
