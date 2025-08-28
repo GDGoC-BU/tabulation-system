@@ -7,13 +7,8 @@ import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CandidateMapper;
-import com.michaelcanonizado.backend.models.Candidate;
-import com.michaelcanonizado.backend.models.CandidateSegmentQualification;
-import com.michaelcanonizado.backend.models.College;
-import com.michaelcanonizado.backend.models.Segment;
-import com.michaelcanonizado.backend.repositories.CandidateRepository;
-import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationRepository;
-import com.michaelcanonizado.backend.repositories.SegmentRepository;
+import com.michaelcanonizado.backend.models.*;
+import com.michaelcanonizado.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +29,15 @@ public class CandidateService {
     private SegmentRepository segmentRepository;
 
     @Autowired
+    private JudgeRepository judgeRepository;
+
+    @Autowired
+    private CriterionRepository criterionRepository;
+
+    @Autowired
+    private ScoreRepository scoreRepository;
+
+    @Autowired
     private CandidateMapper mapper;
 
     public CandidateSummaryDTO addCandidate(CandidateCreateDTO candidateCreateDTO) {
@@ -46,6 +50,15 @@ public class CandidateService {
         List<Segment> segments = segmentRepository.findAll();
         segments.forEach(segment -> {
             csqRepository.save(new CandidateSegmentQualification(segment, savedCandidate));
+        });
+
+        /* Pre-generate the scores for the new candidate */
+        List<Judge> judges = judgeRepository.findAll();
+        List<Criterion> criteria = criterionRepository.findAll();
+        judges.forEach(judge -> {
+            criteria.forEach(criterion -> {
+                scoreRepository.save(new Score(0, judge, savedCandidate, criterion));
+            });
         });
 
         /* Save candidate to database */
