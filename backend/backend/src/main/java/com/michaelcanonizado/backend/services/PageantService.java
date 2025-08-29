@@ -20,4 +20,9 @@ public class PageantService {
         Pageant pageant = repository.save(mapper.toEntity(pageantCreateDTO));
         return mapper.toSummary(pageant);
     }
+
+    public PageantSummaryDTO getCurrentPageant() {
+        Pageant pageant = repository.findAll().getFirst();
+        return mapper.toSummary(pageant);
+    }
 }

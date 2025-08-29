@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +25,11 @@ public class PageantController {
     public ResponseEntity<PageantSummaryDTO> addPageant(@RequestBody @Valid PageantCreateDTO pageantCreateDTO) {
         PageantSummaryDTO pageant = service.addPageant(pageantCreateDTO);
         return new ResponseEntity<>(pageant, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/pageants/current")
+    public ResponseEntity<PageantSummaryDTO> getCurrentPageant() {
+        PageantSummaryDTO pageant = service.getCurrentPageant();
+        return new ResponseEntity<>(pageant, HttpStatus.OK);
     }
 }
