@@ -20,7 +20,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Judge extends Account {
-    /* ADD HELPER METHODS TO ADD AND REMOVE SCORES */
     @JsonManagedReference
     @OneToMany(
             mappedBy = "judge",
