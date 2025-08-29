@@ -1,11 +1,19 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
+import com.michaelcanonizado.backend.models.SegmentStatus;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-
-import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
 
 public record SegmentUpdateDTO(
         @NotBlank(message = "required")
-        String name
+        String name,
+
+        @NotNull(message = "required")
+        @Min(value = 1, message = ">= 1")
+        int phase,
+
+        @NotNull(message = "required")
+        SegmentStatus status
 ) {
 }

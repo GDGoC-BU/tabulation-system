@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,9 +63,12 @@ public class SegmentService {
 
     @Transactional
     public List<SegmentSummaryDTO> getSegments() {
-        return segmentRepository.findAll().stream().map(segment -> {
-            return mapper.toSummaryDTO(segment);
-        }).toList();
+        return segmentRepository
+                .findAll()
+                .stream()
+                .sorted(Comparator.comparing(Segment::getPhase))
+                .map(mapper::toSummaryDTO)
+                .toList();
     }
 
     @Transactional

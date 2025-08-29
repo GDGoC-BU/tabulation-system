@@ -10,6 +10,7 @@ import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.Criterion;
 import com.michaelcanonizado.backend.models.Gender;
 import com.michaelcanonizado.backend.models.Segment;
+import com.michaelcanonizado.backend.models.SegmentStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-28T23:19:03+0800",
+    date = "2025-08-29T21:07:42+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -31,10 +32,12 @@ public class SegmentMapperImpl implements SegmentMapper {
         }
 
         String name = null;
+        int phase = 0;
 
         name = segmentCreateDTO.name();
+        phase = segmentCreateDTO.phase();
 
-        Segment segment = new Segment( name );
+        Segment segment = new Segment( name, phase );
 
         return segment;
     }
@@ -46,11 +49,14 @@ public class SegmentMapperImpl implements SegmentMapper {
         }
 
         String name = null;
+        int phase = 0;
 
         name = segmentSummaryDTO.name();
+        phase = segmentSummaryDTO.phase();
 
-        Segment segment = new Segment( name );
+        Segment segment = new Segment( name, phase );
 
+        segment.setStatus( segmentSummaryDTO.status() );
         segment.setCriteria( criterionSummaryDTOListToCriterionList( segmentSummaryDTO.criteria() ) );
 
         return segment;
@@ -64,13 +70,17 @@ public class SegmentMapperImpl implements SegmentMapper {
 
         UUID id = null;
         String name = null;
+        int phase = 0;
+        SegmentStatus status = null;
         List<CriterionSummaryDTO> criteria = null;
 
         id = segment.getId();
         name = segment.getName();
+        phase = segment.getPhase();
+        status = segment.getStatus();
         criteria = criterionListToCriterionSummaryDTOList( segment.getCriteria() );
 
-        SegmentSummaryDTO segmentSummaryDTO = new SegmentSummaryDTO( id, name, criteria );
+        SegmentSummaryDTO segmentSummaryDTO = new SegmentSummaryDTO( id, name, phase, status, criteria );
 
         return segmentSummaryDTO;
     }
@@ -84,14 +94,18 @@ public class SegmentMapperImpl implements SegmentMapper {
         List<CandidateSummaryDTO> qualifiedCandidates = null;
         UUID id = null;
         String name = null;
+        int phase = 0;
+        SegmentStatus status = null;
         List<CriterionSummaryDTO> criteria = null;
 
         qualifiedCandidates = candidateListToCandidateSummaryDTOList( segment.getQualifiedCandidates() );
         id = segment.getId();
         name = segment.getName();
+        phase = segment.getPhase();
+        status = segment.getStatus();
         criteria = criterionListToCriterionSummaryDTOList( segment.getCriteria() );
 
-        SegmentDetailedDTO segmentDetailedDTO = new SegmentDetailedDTO( id, name, criteria, qualifiedCandidates );
+        SegmentDetailedDTO segmentDetailedDTO = new SegmentDetailedDTO( id, name, phase, status, criteria, qualifiedCandidates );
 
         return segmentDetailedDTO;
     }
@@ -103,6 +117,8 @@ public class SegmentMapperImpl implements SegmentMapper {
         }
 
         segment.setName( segmentUpdateDTO.name() );
+        segment.setPhase( segmentUpdateDTO.phase() );
+        segment.setStatus( segmentUpdateDTO.status() );
     }
 
     protected Criterion criterionSummaryDTOToCriterion(CriterionSummaryDTO criterionSummaryDTO) {

@@ -22,6 +22,13 @@ public class Segment {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false)
+    private int phase;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SegmentStatus status = SegmentStatus.PENDING;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "segment",
@@ -47,8 +54,9 @@ public class Segment {
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
 
-    public Segment(String name) {
+    public Segment(String name, int phase) {
         this.name = name;
+        this.phase = phase;
     }
 
     public void addCriterion(Criterion criterion) {

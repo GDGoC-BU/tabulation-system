@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.seeders;
 
 import com.michaelcanonizado.backend.models.Segment;
+import com.michaelcanonizado.backend.models.SegmentStatus;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,10 +19,10 @@ public class SegmentSeeder implements CommandLineRunner {
     private final SegmentRepository repository;
 
     private final List<Segment> segments = Arrays.asList(
-            new Segment("Swimwear"),
-            new Segment("Formal Attire"),
-            new Segment("Question and Answer"),
-            new Segment("Final Round")
+            new Segment("Swimwear", 1),
+            new Segment("Formal Attire", 2),
+            new Segment("Question and Answer", 3),
+            new Segment("Final Round", 4)
     );
 
     @Autowired
