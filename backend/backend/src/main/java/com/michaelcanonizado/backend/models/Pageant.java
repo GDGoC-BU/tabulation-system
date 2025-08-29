@@ -25,4 +25,8 @@ public class Pageant extends Auditable{
 
     @Column(nullable = false, unique = true)
     private String title;
+
+    public Pageant(String title) {
+        this.title = title;
+    }
 }
