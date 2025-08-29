@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.pageant.PageantCreateDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.services.PageantService;
 import jakarta.validation.Valid;
@@ -10,10 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/api/v1")
@@ -30,6 +30,12 @@ public class PageantController {
     @GetMapping("/pageants/current")
     public ResponseEntity<PageantSummaryDTO> getCurrentPageant() {
         PageantSummaryDTO pageant = service.getCurrentPageant();
+        return new ResponseEntity<>(pageant, HttpStatus.OK);
+    }
+
+    @PutMapping("/pageants/{id}")
+    public ResponseEntity<PageantSummaryDTO> getCurrentPageant(@PathVariable UUID id, @RequestBody @Valid PageantUpdateDTO pageantUpdateDTO) {
+        PageantSummaryDTO pageant = service.updatePageant(id, pageantUpdateDTO);
         return new ResponseEntity<>(pageant, HttpStatus.OK);
     }
 }

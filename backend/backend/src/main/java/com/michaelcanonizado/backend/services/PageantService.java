@@ -2,11 +2,17 @@ package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.dtos.pageant.PageantCreateDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
+import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class PageantService {
@@ -24,5 +30,14 @@ public class PageantService {
     public PageantSummaryDTO getCurrentPageant() {
         Pageant pageant = repository.findAll().getFirst();
         return mapper.toSummary(pageant);
+    }
+
+    public PageantSummaryDTO updatePageant(UUID id, PageantUpdateDTO pageantUpdateDTO) {
+        Pageant pageant = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Pageant not found!", ErrorCode.PAGEANT_NOT_FOUND);
+        });
+
+        mapper.updateEntityFromDTO(pageant, pageantUpdateDTO);
+        return mapper.toSummary(repository.save(pageant));
     }
 }

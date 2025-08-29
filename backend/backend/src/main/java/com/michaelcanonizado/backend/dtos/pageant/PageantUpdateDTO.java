@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.dtos.pageant;
 
-import com.michaelcanonizado.backend.models.Gender;
+import com.michaelcanonizado.backend.models.PageantStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -9,6 +9,6 @@ public record PageantUpdateDTO(
         String title,
 
         @NotNull(message = "required")
-        Gender gender
+        PageantStatus status
 ) {
 }
