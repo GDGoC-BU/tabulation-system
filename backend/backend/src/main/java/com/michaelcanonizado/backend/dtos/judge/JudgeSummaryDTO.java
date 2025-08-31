@@ -1,6 +1,5 @@
 package com.michaelcanonizado.backend.dtos.judge;
 
-import java.time.Instant;
 import java.util.UUID;
 
 public record JudgeSummaryDTO(

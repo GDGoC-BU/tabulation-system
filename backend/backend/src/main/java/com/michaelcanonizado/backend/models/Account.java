@@ -3,7 +3,7 @@ package com.michaelcanonizado.backend.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @MappedSuperclass
@@ -27,7 +27,7 @@ public class Account extends Auditable {
     private boolean isOnline = false;
 
     @Column(nullable = true)
-    private Instant lastSeenAt;
+    private LocalDateTime lastSeenAt;
 
     public Account(String username, String passwordHash) {
         this.username = username;

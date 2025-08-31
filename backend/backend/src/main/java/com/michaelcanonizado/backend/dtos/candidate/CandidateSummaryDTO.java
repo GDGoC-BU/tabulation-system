@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.dtos.candidate;
 
 import com.michaelcanonizado.backend.models.Gender;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record CandidateSummaryDTO(
@@ -10,6 +11,8 @@ public record CandidateSummaryDTO(
         String firstName,
         String lastName,
         Gender gender,
-        int age
+        int age,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {
 }

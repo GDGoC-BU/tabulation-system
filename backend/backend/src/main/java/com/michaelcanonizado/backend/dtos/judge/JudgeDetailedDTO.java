@@ -1,14 +1,14 @@
 package com.michaelcanonizado.backend.dtos.judge;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record JudgeDetailedDTO(
         UUID id,
         String username,
         boolean isOnline,
-        Instant lastSeenAt,
-        Instant createdAt,
-        Instant updatedAt
+        LocalDateTime lastSeenAt,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {
 }
