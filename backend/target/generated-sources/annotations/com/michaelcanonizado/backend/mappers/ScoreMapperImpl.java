@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
-import com.michaelcanonizado.backend.dtos.score.ScoreSummaryDTO;
+import com.michaelcanonizado.backend.dtos.score.ScoreDetailedDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.Criterion;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-31T20:32:35+0800",
+    date = "2025-08-31T20:36:04+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -25,7 +25,7 @@ public class ScoreMapperImpl implements ScoreMapper {
     private CriterionMapper criterionMapper;
 
     @Override
-    public ScoreSummaryDTO toSummaryDTO(Score score) {
+    public ScoreDetailedDTO toDetailedDTO(Score score) {
         if ( score == null ) {
             return null;
         }
@@ -44,9 +44,9 @@ public class ScoreMapperImpl implements ScoreMapper {
         id = score.getId();
         value = score.getValue();
 
-        ScoreSummaryDTO scoreSummaryDTO = new ScoreSummaryDTO( id, value, judgeId, candidateId, segmentId, criterion );
+        ScoreDetailedDTO scoreDetailedDTO = new ScoreDetailedDTO( id, value, judgeId, candidateId, segmentId, criterion );
 
-        return scoreSummaryDTO;
+        return scoreDetailedDTO;
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 
 import java.util.UUID;
 
-public record ScoreSummaryDTO(
+public record ScoreDetailedDTO(
         UUID id,
         int value,
         UUID judgeId,

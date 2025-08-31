@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.mappers;
 
-import com.michaelcanonizado.backend.dtos.score.ScoreSummaryDTO;
+import com.michaelcanonizado.backend.dtos.score.ScoreDetailedDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.models.Score;
 import org.mapstruct.Mapper;
@@ -13,7 +13,7 @@ public interface ScoreMapper {
     @Mapping(target = "candidateId", source = "candidate.id")
     @Mapping(target = "criterion", source = "criterion")
     @Mapping(target = "segmentId", source = "criterion.segment.id")
-    ScoreSummaryDTO toSummaryDTO(Score score);
+    ScoreDetailedDTO toDetailedDTO(Score score);
 
     void updateEntityFromDTO(@MappingTarget Score score, ScoreUpdateDTO scoreUpdateDTO);
 }

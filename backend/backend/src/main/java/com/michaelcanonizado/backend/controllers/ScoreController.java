@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.controllers;
 
-import com.michaelcanonizado.backend.dtos.score.ScoreSummaryDTO;
+import com.michaelcanonizado.backend.dtos.score.ScoreDetailedDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.services.ScoreService;
 import jakarta.validation.Valid;
@@ -20,14 +20,14 @@ public class ScoreController {
     private ScoreService service;
 
     @GetMapping("/scores")
-    public ResponseEntity<List<ScoreSummaryDTO>> getScores(
+    public ResponseEntity<List<ScoreDetailedDTO>> getScores(
             @RequestParam(required = false) UUID judgeId,
             @RequestParam(required = false) UUID candidateId,
             @RequestParam(required = false) UUID criterionId,
             @RequestParam(required = false) UUID segmentId
 
     ) {
-        List<ScoreSummaryDTO> scores = service.getScores(
+        List<ScoreDetailedDTO> scores = service.getScores(
                 judgeId,
                 candidateId,
                 criterionId,
@@ -37,8 +37,8 @@ public class ScoreController {
     }
 
     @PutMapping("/scores/{id}")
-    private ResponseEntity<ScoreSummaryDTO> updateScore(@PathVariable UUID id, @RequestBody @Valid ScoreUpdateDTO scoreUpdateDTO) {
-        ScoreSummaryDTO score = service.updateScore(id, scoreUpdateDTO);
+    private ResponseEntity<ScoreDetailedDTO> updateScore(@PathVariable UUID id, @RequestBody @Valid ScoreUpdateDTO scoreUpdateDTO) {
+        ScoreDetailedDTO score = service.updateScore(id, scoreUpdateDTO);
         return new ResponseEntity<>(score, HttpStatus.OK);
     }
 }
