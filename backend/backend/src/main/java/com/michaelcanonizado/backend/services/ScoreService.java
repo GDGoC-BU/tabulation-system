@@ -5,16 +5,16 @@ import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.exceptions.entity.PageantStatusException;
+import com.michaelcanonizado.backend.exceptions.entity.SegmentStatusException;
 import com.michaelcanonizado.backend.mappers.ScoreMapper;
-import com.michaelcanonizado.backend.models.Pageant;
-import com.michaelcanonizado.backend.models.PageantStatus;
-import com.michaelcanonizado.backend.models.Score;
+import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.ScoreRepository;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +43,7 @@ public class ScoreService {
         }).toList();
     }
 
+    @Transactional
     public ScoreSummaryDTO updateScore(UUID id, ScoreUpdateDTO scoreUpdateDTO) {
         Pageant pageant = pageantRepository.findSingleton().orElseThrow(() -> {
             return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.PAGEANT_NOT_FOUND);
@@ -59,6 +60,21 @@ public class ScoreService {
         Score score = scoreRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Score not found!", ErrorCode.SCORE_NOT_FOUND);
         });
+
+        Criterion criterion = score.getCriterion();
+        if (criterion == null) {
+            throw new EntityNotFoundException("Criterion not found!", ErrorCode.CRITERION_NOT_FOUND);
+        }
+
+        Segment segment = criterion.getSegment();
+        if (segment == null) {
+            throw new EntityNotFoundException("Segment not found!", ErrorCode.SEGMENT_NOT_FOUND);
+        }
+
+        if (segment.getStatus() != SegmentStatus.ACTIVE) {
+            throw new SegmentStatusException("Segment is not ACTIVE! Can't update score.", ErrorCode.SEGMENT_FORBIDDEN);
+        }
+
 
         mapper.updateEntityFromDTO(score, scoreUpdateDTO);
         return mapper.toSummaryDTO(scoreRepository.save(score));
