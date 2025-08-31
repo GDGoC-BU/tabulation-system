@@ -61,7 +61,7 @@ public class JudgeService {
 
     public JudgeDetailedDTO getJudge(UUID id) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Judge not found!", ErrorCode.JUDGE_NOT_FOUND);
+            return new EntityNotFoundException("Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         return mapper.toDetailedDTO(judge);
@@ -79,7 +79,7 @@ public class JudgeService {
 
     public JudgeDetailedDTO updateJudge(UUID id, JudgeUpdateDTO judgeUpdateDTO) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Judge not found!", ErrorCode.JUDGE_NOT_FOUND);
+            return new EntityNotFoundException("Can't update. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(judge, judgeUpdateDTO);
@@ -88,7 +88,7 @@ public class JudgeService {
 
     public void deleteJudge(UUID id) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Judge not found!", ErrorCode.JUDGE_NOT_FOUND);
+            return new EntityNotFoundException("Can't delete. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
         judgeRepository.delete(judge);
     }

@@ -5,7 +5,6 @@ import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CollegeMapper;
 import com.michaelcanonizado.backend.models.College;
@@ -33,7 +32,7 @@ public class CollegeService {
     @Transactional
     public CollegeDetailedDTO getCollege(UUID id) {
         College college = repository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("College not found!", ErrorCode.COLLEGE_NOT_FOUND);
+            return new EntityNotFoundException("College not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
         return mapper.toDetailedDTO(college);
     }
@@ -46,7 +45,7 @@ public class CollegeService {
 
     public CollegeSummaryDTO updateCollege(UUID id, CollegeUpdateDTO collegeUpdateDTO) {
         College college = repository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("College of id " + id + " doesn't exist.", ErrorCode.COLLEGE_NOT_FOUND);
+            return new EntityNotFoundException("Can't update! College not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
         mapper.updateEntityFromDTO(college, collegeUpdateDTO);
         return mapper.toSummaryDTO(repository.save(college));
@@ -54,14 +53,13 @@ public class CollegeService {
 
     public void deleteCollege(UUID id) {
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Deletion failed! College of id " + id + " not found.", ErrorCode.COLLEGE_NOT_FOUND);
+            throw new EntityNotFoundException("Can't delete! College not found.", ErrorCode.ENTITY_NOT_FOUND);
         }
 
         repository.deleteById(id);
     }
 
     public College findById(UUID id) {
-        /* Add exception to thrown when college is not present */
-        return repository.findById(id).orElseThrow(()-> new EntityNotFoundException("College of id " + id + " not found!", ErrorCode.COLLEGE_NOT_FOUND));
+        return repository.findById(id).orElseThrow(()-> new EntityNotFoundException("College not found!", ErrorCode.ENTITY_NOT_FOUND));
     }
 }

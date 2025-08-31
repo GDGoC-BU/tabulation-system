@@ -4,7 +4,6 @@ import com.michaelcanonizado.backend.dtos.criterion.CriterionCreateDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CriterionMapper;
 import com.michaelcanonizado.backend.models.*;
@@ -43,7 +42,7 @@ public class CriterionService {
         UUID segmentId = criterionCreateDTO.segmentId();
 
         Segment segment = segmentRepository.findById(segmentId).orElseThrow(() -> {
-            return new EntityNotFoundException("Segment of id " + segmentId + " not found.", ErrorCode.SEGMENT_NOT_FOUND);
+            return new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         Criterion criterion = new Criterion(name, maxScore, segment);
@@ -66,7 +65,7 @@ public class CriterionService {
 
     public CriterionSummaryDTO updateCriterion(UUID id, CriterionUpdateDTO criterionUpdateDTO) {
         Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Criterion of id " + id + " doesn't exist.", ErrorCode.CRITERION_NOT_FOUND);
+            return new EntityNotFoundException("Can't update! Criterion not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(criterion, criterionUpdateDTO);
@@ -76,7 +75,7 @@ public class CriterionService {
     @Transactional
     public void deleteCriterion(UUID id) {
         Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Deletion failed! Criterion of id " + id + " doesn't exist.", ErrorCode.CRITERION_NOT_FOUND);
+            return new EntityNotFoundException("Can't delete! Criterion not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         Segment segment = criterion.getSegment();

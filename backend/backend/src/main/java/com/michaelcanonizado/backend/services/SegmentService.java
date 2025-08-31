@@ -5,7 +5,6 @@ import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.SegmentMapper;
 import com.michaelcanonizado.backend.models.Candidate;
@@ -55,7 +54,7 @@ public class SegmentService {
     @Transactional
     public SegmentDetailedDTO getSegment(UUID id) {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Segment of id " + " not found!", ErrorCode.SEGMENT_NOT_FOUND);
+            return new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         return mapper.toDetailedDTO(segment);
@@ -74,7 +73,7 @@ public class SegmentService {
     @Transactional
     public SegmentSummaryDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Segment of id " + id + " doesn't exist.", ErrorCode.SEGMENT_NOT_FOUND);
+            return new EntityNotFoundException("Can't update! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(segment, segmentUpdateDTO);
@@ -83,7 +82,7 @@ public class SegmentService {
 
     public void deleteSegment(UUID id) {
         if (!segmentRepository.existsById(id)) {
-            throw new EntityNotFoundException("Deletion failed! Segment of id " + id + " not found.", ErrorCode.SEGMENT_NOT_FOUND);
+            throw new EntityNotFoundException("Can't delete! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
         }
 
         segmentRepository.deleteById(id);

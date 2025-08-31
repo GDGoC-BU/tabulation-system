@@ -4,7 +4,6 @@ import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.entity.EntityMismatchException;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CandidateMapper;
 import com.michaelcanonizado.backend.models.*;
@@ -75,7 +74,7 @@ public class CandidateService {
 
     public CandidateSummaryDTO getCandidate(UUID id) {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Candidate not found!", ErrorCode.CANDIDATE_NOT_FOUND);
+            return new EntityNotFoundException("Candidate not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
         return mapper.toSummaryDTO(candidate);
     }
@@ -91,7 +90,7 @@ public class CandidateService {
 
     public CandidateSummaryDTO updateCandidate(UUID id, CandidateUpdateDTO candidateUpdateDTO) {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Candidate of id " + id + " doesn't exist.", ErrorCode.CANDIDATE_NOT_FOUND);
+            return new EntityNotFoundException("Can't update! Candidate not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(candidate, candidateUpdateDTO);
@@ -101,7 +100,7 @@ public class CandidateService {
     @Transactional
     public void deleteCandidate(UUID id) {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Candidate of id " + id + " doesn't exist.", ErrorCode.CANDIDATE_NOT_FOUND);
+            return new EntityNotFoundException("Can't delete! Candidate not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
         College college = candidate.getCollege();
         college.removeCandidate(candidate);

@@ -9,7 +9,6 @@ import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +24,7 @@ public class PageantService {
 
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         if (repository.existsBy()) {
-            throw new EntityAlreadyExistException("A pageant already exist! Only one is allowed.", ErrorCode.PAGEANT_ALREADY_EXIST);
+            throw new EntityAlreadyExistException("A pageant already exist! Only one is allowed.", ErrorCode.ENTITY_ALREADY_EXIST);
         }
 
         Pageant pageant = repository.save(mapper.toEntity(pageantCreateDTO));
@@ -34,7 +33,7 @@ public class PageantService {
 
     public PageantSummaryDTO getCurrentPageant() {
         Pageant pageant = repository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.PAGEANT_NOT_FOUND);
+            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         return mapper.toSummary(pageant);
@@ -42,7 +41,7 @@ public class PageantService {
 
     public PageantSummaryDTO updatePageant(UUID id, PageantUpdateDTO pageantUpdateDTO) {
         Pageant pageant = repository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.PAGEANT_NOT_FOUND);
+            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(pageant, pageantUpdateDTO);

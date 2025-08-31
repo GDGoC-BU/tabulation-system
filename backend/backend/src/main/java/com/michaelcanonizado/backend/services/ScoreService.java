@@ -46,7 +46,7 @@ public class ScoreService {
     @Transactional
     public ScoreSummaryDTO updateScore(UUID id, ScoreUpdateDTO scoreUpdateDTO) {
         Pageant pageant = pageantRepository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.PAGEANT_NOT_FOUND);
+            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         if (pageant.getStatus() == PageantStatus.CLOSED) {
@@ -58,23 +58,22 @@ public class ScoreService {
         }
 
         Score score = scoreRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Score not found!", ErrorCode.SCORE_NOT_FOUND);
+            return new EntityNotFoundException("Score not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         Criterion criterion = score.getCriterion();
         if (criterion == null) {
-            throw new EntityNotFoundException("Criterion not found!", ErrorCode.CRITERION_NOT_FOUND);
+            throw new EntityNotFoundException("Criterion not found!", ErrorCode.ENTITY_NOT_FOUND);
         }
 
         Segment segment = criterion.getSegment();
         if (segment == null) {
-            throw new EntityNotFoundException("Segment not found!", ErrorCode.SEGMENT_NOT_FOUND);
+            throw new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
         }
 
         if (segment.getStatus() != SegmentStatus.ACTIVE) {
-            throw new SegmentStatusException("Segment is not ACTIVE! Can't update score.", ErrorCode.SEGMENT_FORBIDDEN);
+            throw new SegmentStatusException("Segment is not ACTIVE! Can't update score.", ErrorCode.SEGMENT_NOT_ACTIVE);
         }
-
 
         mapper.updateEntityFromDTO(score, scoreUpdateDTO);
         return mapper.toSummaryDTO(scoreRepository.save(score));
