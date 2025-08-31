@@ -1,7 +1,8 @@
 package com.michaelcanonizado.backend.models;
 
 public enum PageantStatus {
-    CLOSED,
+    PREPARATION,
     ONGOING,
     FINALIZING,
+    CLOSED,
 }

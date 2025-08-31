@@ -9,6 +9,8 @@ public record PageantSummaryDTO(
         UUID id,
         String title,
         PageantStatus status,
+        LocalDateTime startedAt,
+        LocalDateTime endedAt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -21,10 +22,16 @@ public class Pageant extends Auditable {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PageantStatus status = PageantStatus.CLOSED;
+    private PageantStatus status = PageantStatus.PREPARATION;
 
     @Column(nullable = false, unique = true)
     private String title;
+
+    @Column(nullable = true)
+    private LocalDateTime startedAt;
+
+    @Column(nullable = true)
+    private LocalDateTime endedAt;
 
     public Pageant(String title) {
         this.title = title;

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-31T20:32:35+0800",
+    date = "2025-08-31T21:20:05+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -46,6 +46,8 @@ public class PageantMapperImpl implements PageantMapper {
         Pageant pageant = new Pageant( title );
 
         pageant.setStatus( pageantSummaryDTO.status() );
+        pageant.setStartedAt( pageantSummaryDTO.startedAt() );
+        pageant.setEndedAt( pageantSummaryDTO.endedAt() );
 
         return pageant;
     }
@@ -59,16 +61,20 @@ public class PageantMapperImpl implements PageantMapper {
         UUID id = null;
         String title = null;
         PageantStatus status = null;
+        LocalDateTime startedAt = null;
+        LocalDateTime endedAt = null;
         LocalDateTime createdAt = null;
         LocalDateTime updatedAt = null;
 
         id = pageant.getId();
         title = pageant.getTitle();
         status = pageant.getStatus();
+        startedAt = pageant.getStartedAt();
+        endedAt = pageant.getEndedAt();
         createdAt = pageant.getCreatedAt();
         updatedAt = pageant.getUpdatedAt();
 
-        PageantSummaryDTO pageantSummaryDTO = new PageantSummaryDTO( id, title, status, createdAt, updatedAt );
+        PageantSummaryDTO pageantSummaryDTO = new PageantSummaryDTO( id, title, status, startedAt, endedAt, createdAt, updatedAt );
 
         return pageantSummaryDTO;
     }

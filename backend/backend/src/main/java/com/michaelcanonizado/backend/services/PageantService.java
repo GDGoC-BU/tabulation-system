@@ -13,6 +13,8 @@ import com.michaelcanonizado.backend.repositories.PageantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class PageantService {
     @Autowired
@@ -36,6 +38,7 @@ public class PageantService {
         });
 
         pageant.setStatus(PageantStatus.ONGOING);
+        pageant.setStartedAt(LocalDateTime.now());
 
         return mapper.toSummary(repository.save(pageant));
     }
@@ -56,6 +59,7 @@ public class PageantService {
         });
 
         pageant.setStatus(PageantStatus.CLOSED);
+        pageant.setEndedAt(LocalDateTime.now());
 
         return mapper.toSummary(repository.save(pageant));
     }
