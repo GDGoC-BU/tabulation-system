@@ -3,14 +3,14 @@ package com.michaelcanonizado.backend.mappers;
 import com.michaelcanonizado.backend.dtos.manager.ManagerSummaryDTO;
 import com.michaelcanonizado.backend.models.Manager;
 import com.michaelcanonizado.backend.models.ManagerRole;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-29T22:27:26+0800",
+    date = "2025-08-31T20:32:34+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -45,21 +45,21 @@ public class ManagerMapperImpl implements ManagerMapper {
 
         UUID id = null;
         String username = null;
-        Instant lastSeenAt = null;
-        Instant createdAt = null;
-        Instant updatedAt = null;
         ManagerRole role = null;
+        LocalDateTime lastSeenAt = null;
+        LocalDateTime createdAt = null;
+        LocalDateTime updatedAt = null;
 
         id = manager.getId();
         username = manager.getUsername();
+        role = manager.getRole();
         lastSeenAt = manager.getLastSeenAt();
         createdAt = manager.getCreatedAt();
         updatedAt = manager.getUpdatedAt();
-        role = manager.getRole();
 
         boolean isOnline = false;
 
-        ManagerSummaryDTO managerSummaryDTO = new ManagerSummaryDTO( id, username, isOnline, lastSeenAt, createdAt, updatedAt, role );
+        ManagerSummaryDTO managerSummaryDTO = new ManagerSummaryDTO( id, username, isOnline, role, lastSeenAt, createdAt, updatedAt );
 
         return managerSummaryDTO;
     }

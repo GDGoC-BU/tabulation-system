@@ -8,6 +8,7 @@ import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.models.Gender;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-29T22:27:25+0800",
+    date = "2025-08-31T20:32:34+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -173,6 +174,8 @@ public class CollegeMapperImpl implements CollegeMapper {
         String lastName = null;
         Gender gender = null;
         int age = 0;
+        LocalDateTime createdAt = null;
+        LocalDateTime updatedAt = null;
 
         id = candidate.getId();
         number = candidate.getNumber();
@@ -180,8 +183,10 @@ public class CollegeMapperImpl implements CollegeMapper {
         lastName = candidate.getLastName();
         gender = candidate.getGender();
         age = candidate.getAge();
+        createdAt = candidate.getCreatedAt();
+        updatedAt = candidate.getUpdatedAt();
 
-        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, gender, age );
+        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, gender, age, createdAt, updatedAt );
 
         return candidateSummaryDTO;
     }

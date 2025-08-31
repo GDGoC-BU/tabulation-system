@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
-import com.michaelcanonizado.backend.dtos.judge.JudgeDetailedDTO;
+import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
@@ -38,7 +38,7 @@ public class JudgeService {
     @Autowired
     private JudgeMapper mapper;
 
-    public JudgeDetailedDTO addJudge(JudgeCreateDTO judgeCreateDTO) {
+    public JudgeSummaryDTO addJudge(JudgeCreateDTO judgeCreateDTO) {
         /* Add authentication! Password needs to be hashed:
            JudgeCreateDTO.password -> Judge.passwordHash */
         Judge judge = new Judge(judgeCreateDTO.username(), judgeCreateDTO.password());
@@ -56,34 +56,34 @@ public class JudgeService {
         /* Batch save to minimize insert queries */
         scoreRepository.saveAll(newScores);
 
-        return mapper.toDetailedDTO(savedJudge);
+        return mapper.toSummaryDTO(savedJudge);
     }
 
-    public JudgeDetailedDTO getJudge(UUID id) {
+    public JudgeSummaryDTO getJudge(UUID id) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
-        return mapper.toDetailedDTO(judge);
+        return mapper.toSummaryDTO(judge);
     }
 
-    public List<JudgeDetailedDTO> getJudges() {
+    public List<JudgeSummaryDTO> getJudges() {
         return judgeRepository
                 .findAll()
                 .stream()
                 .map(judge -> {
-                    return mapper.toDetailedDTO(judge);
+                    return mapper.toSummaryDTO(judge);
                 })
                 .toList();
     }
 
-    public JudgeDetailedDTO updateJudge(UUID id, JudgeUpdateDTO judgeUpdateDTO) {
+    public JudgeSummaryDTO updateJudge(UUID id, JudgeUpdateDTO judgeUpdateDTO) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(judge, judgeUpdateDTO);
-        return mapper.toDetailedDTO(judgeRepository.save(judge));
+        return mapper.toSummaryDTO(judgeRepository.save(judge));
     }
 
     public void deleteJudge(UUID id) {

@@ -5,14 +5,14 @@ import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-29T22:36:08+0800",
+    date = "2025-08-31T20:32:35+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -59,8 +59,8 @@ public class PageantMapperImpl implements PageantMapper {
         UUID id = null;
         String title = null;
         PageantStatus status = null;
-        Instant createdAt = null;
-        Instant updatedAt = null;
+        LocalDateTime createdAt = null;
+        LocalDateTime updatedAt = null;
 
         id = pageant.getId();
         title = pageant.getTitle();
