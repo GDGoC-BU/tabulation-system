@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
@@ -9,6 +10,7 @@ import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.SegmentMapper;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.CandidateSegmentQualification;
+import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.models.Segment;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationRepository;
@@ -35,6 +37,9 @@ public class SegmentService {
     @Autowired
     private SegmentMapper mapper;
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     @Transactional
     public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
         /* Load DTO to entity */
@@ -51,6 +56,10 @@ public class SegmentService {
         return mapper.toDetailedDTO(savedSegment);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     @Transactional
     public SegmentDetailedDTO getSegment(UUID id) {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
@@ -60,6 +69,10 @@ public class SegmentService {
         return mapper.toDetailedDTO(segment);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     @Transactional
     public List<SegmentSummaryDTO> getSegments() {
         return segmentRepository
@@ -70,6 +83,9 @@ public class SegmentService {
                 .toList();
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     @Transactional
     public SegmentSummaryDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
@@ -80,6 +96,9 @@ public class SegmentService {
         return mapper.toSummaryDTO(segmentRepository.save(segment));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public void deleteSegment(UUID id) {
         if (!segmentRepository.existsById(id)) {
             throw new EntityNotFoundException("Can't delete! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);

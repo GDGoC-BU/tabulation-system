@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.pageant.PageantCreateDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
@@ -23,6 +24,9 @@ public class PageantService {
     @Autowired
     private PageantMapper mapper;
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         if (repository.existsBy()) {
             throw new EntityAlreadyExistException("A pageant already exist! Only one is allowed.", ErrorCode.ENTITY_ALREADY_EXIST);
@@ -72,6 +76,9 @@ public class PageantService {
         return mapper.toSummary(pageant);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public PageantSummaryDTO updatePageant(PageantUpdateDTO pageantUpdateDTO) {
         Pageant pageant = repository.findSingleton().orElseThrow(() -> {
             return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);

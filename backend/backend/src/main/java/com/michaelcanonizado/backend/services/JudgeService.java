@@ -1,15 +1,13 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.JudgeMapper;
-import com.michaelcanonizado.backend.models.Candidate;
-import com.michaelcanonizado.backend.models.Criterion;
-import com.michaelcanonizado.backend.models.Judge;
-import com.michaelcanonizado.backend.models.Score;
+import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CriterionRepository;
 import com.michaelcanonizado.backend.repositories.JudgeRepository;
@@ -38,6 +36,9 @@ public class JudgeService {
     @Autowired
     private JudgeMapper mapper;
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public JudgeSummaryDTO addJudge(JudgeCreateDTO judgeCreateDTO) {
         /* Add authentication! Password needs to be hashed:
            JudgeCreateDTO.password -> Judge.passwordHash */
@@ -59,6 +60,10 @@ public class JudgeService {
         return mapper.toSummaryDTO(savedJudge);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public JudgeSummaryDTO getJudge(UUID id) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -67,6 +72,10 @@ public class JudgeService {
         return mapper.toSummaryDTO(judge);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public List<JudgeSummaryDTO> getJudges() {
         return judgeRepository
                 .findAll()
@@ -77,6 +86,9 @@ public class JudgeService {
                 .toList();
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public JudgeSummaryDTO updateJudge(UUID id, JudgeUpdateDTO judgeUpdateDTO) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -86,6 +98,9 @@ public class JudgeService {
         return mapper.toSummaryDTO(judgeRepository.save(judge));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public void deleteJudge(UUID id) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't delete. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);

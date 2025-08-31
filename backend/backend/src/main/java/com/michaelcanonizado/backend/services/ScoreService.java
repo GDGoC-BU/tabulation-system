@@ -1,10 +1,10 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.score.ScoreDetailedDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
-import com.michaelcanonizado.backend.exceptions.entity.PageantStatusException;
 import com.michaelcanonizado.backend.exceptions.entity.SegmentStatusException;
 import com.michaelcanonizado.backend.mappers.ScoreMapper;
 import com.michaelcanonizado.backend.models.*;
@@ -30,6 +30,10 @@ public class ScoreService {
     @Autowired
     private ScoreMapper mapper;
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public List<ScoreDetailedDTO> getScores(UUID judgeId, UUID candidateId, UUID criterionId, UUID segmentId) {
         return scoreRepository.findAll(
                 Specification.allOf(
@@ -43,19 +47,14 @@ public class ScoreService {
         }).toList();
     }
 
+    @RequirePageantStatus({
+            PageantStatus.ONGOING
+    })
     @Transactional
     public ScoreDetailedDTO updateScore(UUID id, ScoreUpdateDTO scoreUpdateDTO) {
         Pageant pageant = pageantRepository.findSingleton().orElseThrow(() -> {
             return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
         });
-
-        if (pageant.getStatus() == PageantStatus.CLOSED) {
-            throw new PageantStatusException("Pageant is closed! Wait for admin to open.", ErrorCode.PAGEANT_LOCKED);
-        }
-
-        if (pageant.getStatus() == PageantStatus.FINALIZING) {
-            throw new PageantStatusException("Pageant is finalizing! Can't modify scores.", ErrorCode.PAGEANT_LOCKED);
-        }
 
         Score score = scoreRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Score not found!", ErrorCode.ENTITY_NOT_FOUND);

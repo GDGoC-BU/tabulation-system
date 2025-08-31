@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionCreateDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionUpdateDTO;
@@ -36,6 +37,9 @@ public class CriterionService {
     @Autowired
     private CriterionMapper mapper;
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public CriterionSummaryDTO addCriterion(CriterionCreateDTO criterionCreateDTO) {
         String name = criterionCreateDTO.name();
         int maxScore = criterionCreateDTO.maxScore();
@@ -63,6 +67,10 @@ public class CriterionService {
         return mapper.toSummaryDTO(savedCriterion);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public CriterionSummaryDTO updateCriterion(UUID id, CriterionUpdateDTO criterionUpdateDTO) {
         Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! Criterion not found.", ErrorCode.ENTITY_NOT_FOUND);
@@ -72,6 +80,9 @@ public class CriterionService {
         return mapper.toSummaryDTO(criterionRepository.save(criterion));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     @Transactional
     public void deleteCriterion(UUID id) {
         Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {

@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
@@ -8,6 +9,7 @@ import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CollegeMapper;
 import com.michaelcanonizado.backend.models.College;
+import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,12 +25,19 @@ public class CollegeService {
     @Autowired
     private CollegeMapper mapper;
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     @Transactional
     public CollegeDetailedDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
         College college = repository.save(mapper.toEntity(collegeCreateDTO));
         return mapper.toDetailedDTO(college);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     @Transactional
     public CollegeDetailedDTO getCollege(UUID id) {
         College college = repository.findById(id).orElseThrow(() -> {
@@ -37,12 +46,19 @@ public class CollegeService {
         return mapper.toDetailedDTO(college);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public List<CollegeSummaryDTO> getColleges() {
         return repository.findAll().stream().map(college -> {
             return mapper.toSummaryDTO(college);
         }).toList();
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public CollegeSummaryDTO updateCollege(UUID id, CollegeUpdateDTO collegeUpdateDTO) {
         College college = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! College not found.", ErrorCode.ENTITY_NOT_FOUND);
@@ -51,6 +67,9 @@ public class CollegeService {
         return mapper.toSummaryDTO(repository.save(college));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public void deleteCollege(UUID id) {
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Can't delete! College not found.", ErrorCode.ENTITY_NOT_FOUND);

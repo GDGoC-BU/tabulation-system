@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
@@ -40,6 +41,10 @@ public class CandidateService {
     @Autowired
     private CandidateMapper mapper;
 
+
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     @Transactional
     public CandidateSummaryDTO addCandidate(CandidateCreateDTO candidateCreateDTO) {
         /* Load DTO to Entity */
@@ -72,6 +77,10 @@ public class CandidateService {
         return mapper.toSummaryDTO(savedCandidate);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public CandidateSummaryDTO getCandidate(UUID id) {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Candidate not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -79,6 +88,10 @@ public class CandidateService {
         return mapper.toSummaryDTO(candidate);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public List<CandidateSummaryDTO> getCandidates() {
         List<Candidate> candidates = candidateRepository.findAll();
         return candidates
@@ -88,6 +101,9 @@ public class CandidateService {
                 .toList();
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+    })
     public CandidateSummaryDTO updateCandidate(UUID id, CandidateUpdateDTO candidateUpdateDTO) {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! Candidate not found.", ErrorCode.ENTITY_NOT_FOUND);
@@ -97,6 +113,9 @@ public class CandidateService {
         return mapper.toSummaryDTO(candidateRepository.save(candidate));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+    })
     @Transactional
     public void deleteCandidate(UUID id) {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
