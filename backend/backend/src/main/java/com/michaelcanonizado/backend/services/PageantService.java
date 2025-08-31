@@ -8,6 +8,7 @@ import com.michaelcanonizado.backend.exceptions.entity.EntityAlreadyExistExcepti
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.Pageant;
+import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,36 @@ public class PageantService {
 
         Pageant pageant = repository.save(mapper.toEntity(pageantCreateDTO));
         return mapper.toSummary(pageant);
+    }
+
+    public PageantSummaryDTO startPageant() {
+        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
+            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+
+        pageant.setStatus(PageantStatus.ONGOING);
+
+        return mapper.toSummary(repository.save(pageant));
+    }
+
+    public PageantSummaryDTO finalizePageant() {
+        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
+            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+
+        pageant.setStatus(PageantStatus.FINALIZING);
+
+        return mapper.toSummary(repository.save(pageant));
+    }
+
+    public PageantSummaryDTO closePageant() {
+        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
+            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+
+        pageant.setStatus(PageantStatus.CLOSED);
+
+        return mapper.toSummary(repository.save(pageant));
     }
 
     public PageantSummaryDTO getPageant() {

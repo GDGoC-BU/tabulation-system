@@ -25,17 +25,20 @@ public class PageantController {
 
     @PostMapping("/pageant/start")
     public ResponseEntity<PageantSummaryDTO> startPageant() {
-        return new ResponseEntity<>(HttpStatus.OK);
+        PageantSummaryDTO pageant = service.startPageant();
+        return new ResponseEntity<>(pageant, HttpStatus.OK);
     }
 
     @PostMapping("/pageant/finalize")
     public ResponseEntity<PageantSummaryDTO> finalizePageant() {
-        return new ResponseEntity<>(HttpStatus.OK);
+        PageantSummaryDTO pageant = service.finalizePageant();
+        return new ResponseEntity<>(pageant, HttpStatus.OK);
     }
 
     @PostMapping("/pageant/close")
     public ResponseEntity<PageantSummaryDTO> closePageant() {
-        return new ResponseEntity<>(HttpStatus.OK);
+        PageantSummaryDTO pageant = service.closePageant();
+        return new ResponseEntity<>(pageant, HttpStatus.OK);
     }
 
     @GetMapping("/pageant")
