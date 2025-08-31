@@ -12,8 +12,6 @@ import com.michaelcanonizado.backend.repositories.PageantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 public class PageantService {
     @Autowired
@@ -31,7 +29,7 @@ public class PageantService {
         return mapper.toSummary(pageant);
     }
 
-    public PageantSummaryDTO getCurrentPageant() {
+    public PageantSummaryDTO getPageant() {
         Pageant pageant = repository.findSingleton().orElseThrow(() -> {
             return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
         });
@@ -39,7 +37,7 @@ public class PageantService {
         return mapper.toSummary(pageant);
     }
 
-    public PageantSummaryDTO updatePageant(UUID id, PageantUpdateDTO pageantUpdateDTO) {
+    public PageantSummaryDTO updatePageant(PageantUpdateDTO pageantUpdateDTO) {
         Pageant pageant = repository.findSingleton().orElseThrow(() -> {
             return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
         });
