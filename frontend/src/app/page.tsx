@@ -9,9 +9,9 @@ export default function Home() {
           <TextDisplay>Tabulation</TextDisplay>
         </div>
         <div className='flex gap-4'>
-          <LinkButton href='/judge'>Judge</LinkButton>
+          <LinkButton href='/judge/login'>Judge</LinkButton>
 
-          <LinkButton href='/admin'>Admin</LinkButton>
+          <LinkButton href='/admin/login'>Admin</LinkButton>
         </div>
       </div>
     </div>
