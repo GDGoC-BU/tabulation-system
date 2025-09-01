@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils'
 import NextLink from 'next/link'
+import { TextBody, TextHeading } from '../text'
 
-function Link({
+export function LinkButton({
   className,
   children,
   href,
@@ -16,9 +17,24 @@ function Link({
       href={href}
       {...props}
     >
-      {children}
+      <TextHeading>{children}</TextHeading>
     </NextLink>
   )
 }
 
-export default Link
+export function LinkText({
+  className,
+  children,
+  href,
+  ...props
+}: ComponentClassNameAndChildrenProp & { href: string }) {
+  return (
+    <NextLink
+      className={cn(className, 'underline hover:cursor-pointer')}
+      href={href}
+      {...props}
+    >
+      <TextBody>{children}</TextBody>
+    </NextLink>
+  )
+}

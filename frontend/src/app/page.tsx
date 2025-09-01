@@ -1,5 +1,5 @@
 import { TextDisplay, TextHeading } from '@/components/text'
-import Link from '@/components/link'
+import { LinkButton } from '@/components/link'
 
 export default function Home() {
   return (
@@ -9,13 +9,9 @@ export default function Home() {
           <TextDisplay>Tabulation</TextDisplay>
         </div>
         <div className='flex gap-4'>
-          <Link href='/judge'>
-            <TextHeading>Judge</TextHeading>
-          </Link>
+          <LinkButton href='/judge'>Judge</LinkButton>
 
-          <Link href='/admin'>
-            <TextHeading>Admin</TextHeading>
-          </Link>
+          <LinkButton href='/admin'>Admin</LinkButton>
         </div>
       </div>
     </div>
