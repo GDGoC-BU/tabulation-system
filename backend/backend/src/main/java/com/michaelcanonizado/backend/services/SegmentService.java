@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.caches.PageantCacheService;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
@@ -8,10 +9,7 @@ import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.SegmentMapper;
-import com.michaelcanonizado.backend.models.Candidate;
-import com.michaelcanonizado.backend.models.CandidateSegmentQualification;
-import com.michaelcanonizado.backend.models.PageantStatus;
-import com.michaelcanonizado.backend.models.Segment;
+import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
@@ -37,6 +35,9 @@ public class SegmentService {
     @Autowired
     private SegmentMapper mapper;
 
+    @Autowired
+    private PageantCacheService pageantCacheService;
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
@@ -44,6 +45,11 @@ public class SegmentService {
     public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
         /* Load DTO to entity */
         Segment segment = mapper.toEntity(segmentCreateDTO);
+
+        /* Connect the current pageant */
+        Pageant pageant = pageantCacheService.get();
+        segment.setPageant(pageant);
+
         Segment savedSegment = segmentRepository.save(segment);
 
         /* Get current candidates and qualify them to the new segment */

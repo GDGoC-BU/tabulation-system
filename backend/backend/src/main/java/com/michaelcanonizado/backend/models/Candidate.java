@@ -47,6 +47,14 @@ public class Candidate extends Auditable {
     @JoinColumn(name = "college_id", nullable = false)
     private College college;
 
+    @JsonBackReference
+    @ManyToOne(
+            optional = false,
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(name = "pageant_id", nullable = false)
+    private Pageant pageant;
+
     /* Temporary list. Still need the real Segment object
     with their details. Exclude list from getter and expose a
     separate getter stream to extract the actual segment data:
@@ -70,13 +78,14 @@ public class Candidate extends Auditable {
     )
     private List<Score> scores = new ArrayList<>();
 
-    public Candidate(int number, String firstName, String lastName, CandidateGender candidateGender, int age, College college) {
+    public Candidate(int number, String firstName, String lastName, CandidateGender candidateGender, int age, College college, Pageant pageant) {
         this.number = number;
         this.firstName = firstName;
         this.lastName = lastName;
         this.candidateGender = candidateGender;
         this.age = age;
         this.college = college;
+        this.pageant = pageant;
     }
 
     public void addCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {

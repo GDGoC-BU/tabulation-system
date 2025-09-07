@@ -4,8 +4,10 @@ import com.github.javafaker.Faker;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.CandidateGender;
 import com.michaelcanonizado.backend.models.College;
+import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
+import com.michaelcanonizado.backend.repositories.PageantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -20,21 +22,25 @@ public class CandidateSeeder implements CommandLineRunner {
     private final Faker faker = new Faker();
     private final CandidateRepository candidateRepository;
     private final CollegeRepository collegeRepository;
+    private final PageantRepository pageantRepository;
 
     @Autowired
-    public CandidateSeeder(CandidateRepository candidateRepository, CollegeRepository collegeRepository) {
+    public CandidateSeeder(CandidateRepository candidateRepository, CollegeRepository collegeRepository, PageantRepository pageantRepository) {
         this.candidateRepository = candidateRepository;
         this.collegeRepository = collegeRepository;
+        this.pageantRepository = pageantRepository;
     }
 
     @Transactional
     @Override
     public void run(String... args) throws Exception {
+        Pageant pageant = pageantRepository.findAll().getFirst();
         List<College> colleges =  collegeRepository.findAll();
+
         for (int i = 1; i <= colleges.size(); i++) {
             College college = colleges.get(i-1);
-            candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.FEMALE, 20, college));
-            candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.MALE, 20, college));
+            candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.FEMALE, 20, college,pageant));
+            candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.MALE, 20, college,pageant));
         }
     }
 }

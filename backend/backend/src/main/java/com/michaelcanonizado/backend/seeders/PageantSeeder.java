@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-@Order(9)
+@Order(0)
 public class PageantSeeder implements CommandLineRunner {
     private final PageantRepository repository;
 

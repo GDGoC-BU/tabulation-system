@@ -4,6 +4,7 @@ import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.models.Judge;
+import com.michaelcanonizado.backend.models.Pageant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-07T20:45:12+0800",
+    date = "2025-09-07T21:05:45+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -28,8 +29,9 @@ public class JudgeMapperImpl implements JudgeMapper {
         username = judgeCreateDTO.username();
 
         String passwordHash = null;
+        Pageant pageant = null;
 
-        Judge judge = new Judge( username, passwordHash );
+        Judge judge = new Judge( username, passwordHash, pageant );
 
         return judge;
     }
@@ -45,8 +47,9 @@ public class JudgeMapperImpl implements JudgeMapper {
         username = judgeSummaryDTO.username();
 
         String passwordHash = null;
+        Pageant pageant = null;
 
-        Judge judge = new Judge( username, passwordHash );
+        Judge judge = new Judge( username, passwordHash, pageant );
 
         judge.setLastSeenAt( judgeSummaryDTO.lastSeenAt() );
 

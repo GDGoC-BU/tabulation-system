@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,6 +30,14 @@ public class Segment {
     @Column(nullable = false)
     private SegmentStatus status = SegmentStatus.PENDING;
 
+    @JsonBackReference
+    @ManyToOne(
+            optional = false,
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(name = "pageant_id", nullable = false)
+    private Pageant pageant;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "segment",
@@ -54,9 +63,10 @@ public class Segment {
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
 
-    public Segment(String name, int phase) {
+    public Segment(String name, int phase, Pageant pageant) {
         this.name = name;
         this.phase = phase;
+        this.pageant = pageant;
     }
 
     public void addCriterion(Criterion criterion) {

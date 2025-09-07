@@ -9,6 +9,7 @@ import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.CandidateGender;
 import com.michaelcanonizado.backend.models.Criterion;
+import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.Segment;
 import com.michaelcanonizado.backend.models.SegmentStatus;
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-07T20:45:12+0800",
+    date = "2025-09-07T21:05:45+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -38,7 +39,9 @@ public class SegmentMapperImpl implements SegmentMapper {
         name = segmentCreateDTO.name();
         phase = segmentCreateDTO.phase();
 
-        Segment segment = new Segment( name, phase );
+        Pageant pageant = null;
+
+        Segment segment = new Segment( name, phase, pageant );
 
         return segment;
     }
@@ -55,7 +58,9 @@ public class SegmentMapperImpl implements SegmentMapper {
         name = segmentSummaryDTO.name();
         phase = segmentSummaryDTO.phase();
 
-        Segment segment = new Segment( name, phase );
+        Pageant pageant = null;
+
+        Segment segment = new Segment( name, phase, pageant );
 
         segment.setStatus( segmentSummaryDTO.status() );
         segment.setCriteria( criterionSummaryDTOListToCriterionList( segmentSummaryDTO.criteria() ) );

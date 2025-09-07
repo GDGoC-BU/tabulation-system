@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.caches.PageantCacheService;
 import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
@@ -36,13 +37,19 @@ public class JudgeService {
     @Autowired
     private JudgeMapper mapper;
 
+    @Autowired
+    private PageantCacheService pageantCacheService;
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
     public JudgeSummaryDTO addJudge(JudgeCreateDTO judgeCreateDTO) {
+        /* Connect the current pageant */
+        Pageant pageant = pageantCacheService.get();
+
         /* Add authentication! Password needs to be hashed:
            JudgeCreateDTO.password -> Judge.passwordHash */
-        Judge judge = new Judge(judgeCreateDTO.username(), judgeCreateDTO.password());
+        Judge judge = new Judge(judgeCreateDTO.username(), judgeCreateDTO.password(), pageant);
         Judge savedJudge = judgeRepository.save(judge);
 
         /* Pre-generate the scores for the new judge */

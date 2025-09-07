@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.caches.PageantCacheService;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
@@ -41,6 +42,8 @@ public class CandidateService {
     @Autowired
     private CandidateMapper mapper;
 
+    @Autowired
+    private PageantCacheService pageantCacheService;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION
@@ -49,6 +52,11 @@ public class CandidateService {
     public CandidateSummaryDTO addCandidate(CandidateCreateDTO candidateCreateDTO) {
         /* Load DTO to Entity */
         Candidate candidate = mapper.toEntity(candidateCreateDTO);
+
+        /* Connect the current pageant */
+        Pageant pageant = pageantCacheService.get();
+        candidate.setPageant(pageant);
+
         Candidate savedCandidate = candidateRepository.save(candidate);
 
         /* Get available segments and qualify

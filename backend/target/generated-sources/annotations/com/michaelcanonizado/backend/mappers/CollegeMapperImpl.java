@@ -8,6 +8,7 @@ import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.CandidateGender;
 import com.michaelcanonizado.backend.models.College;
+import com.michaelcanonizado.backend.models.Pageant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-07T20:45:12+0800",
+    date = "2025-09-07T21:05:45+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -144,8 +145,9 @@ public class CollegeMapperImpl implements CollegeMapper {
         age = candidateSummaryDTO.age();
 
         College college = null;
+        Pageant pageant = null;
 
-        Candidate candidate = new Candidate( number, firstName, lastName, candidateGender, age, college );
+        Candidate candidate = new Candidate( number, firstName, lastName, candidateGender, age, college, pageant );
 
         return candidate;
     }

@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,6 +21,14 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Judge extends Account {
+    @JsonBackReference
+    @ManyToOne(
+            optional = false,
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(name = "pageant_id", nullable = false)
+    private Pageant pageant;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "judge",
@@ -29,8 +38,9 @@ public class Judge extends Account {
     )
     private List<Score> scores  = new ArrayList<>();
 
-    public Judge(String username, String passwordHash) {
+    public Judge(String username, String passwordHash, Pageant pageant) {
         super(username, passwordHash);
+        this.pageant = pageant;
     }
 
     public void addScore(Score score) {

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -32,6 +34,30 @@ public class Pageant extends Auditable {
 
     @Column(nullable = true)
     private LocalDateTime endedAt;
+
+    @OneToMany(
+            mappedBy = "pageant",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Candidate> candidates = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "pageant",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Judge> judges = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "pageant",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Segment> segments = new ArrayList<>();
 
     public Pageant(String title) {
         this.title = title;
