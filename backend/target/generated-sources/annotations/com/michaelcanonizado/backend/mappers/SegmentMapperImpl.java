@@ -7,8 +7,8 @@ import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
+import com.michaelcanonizado.backend.models.CandidateGender;
 import com.michaelcanonizado.backend.models.Criterion;
-import com.michaelcanonizado.backend.models.Gender;
 import com.michaelcanonizado.backend.models.Segment;
 import com.michaelcanonizado.backend.models.SegmentStatus;
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-31T21:20:05+0800",
+    date = "2025-09-07T14:27:46+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -193,7 +193,7 @@ public class SegmentMapperImpl implements SegmentMapper {
         int number = 0;
         String firstName = null;
         String lastName = null;
-        Gender gender = null;
+        CandidateGender candidateGender = null;
         int age = 0;
         LocalDateTime createdAt = null;
         LocalDateTime updatedAt = null;
@@ -202,12 +202,12 @@ public class SegmentMapperImpl implements SegmentMapper {
         number = candidate.getNumber();
         firstName = candidate.getFirstName();
         lastName = candidate.getLastName();
-        gender = candidate.getGender();
+        candidateGender = candidate.getCandidateGender();
         age = candidate.getAge();
         createdAt = candidate.getCreatedAt();
         updatedAt = candidate.getUpdatedAt();
 
-        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, gender, age, createdAt, updatedAt );
+        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, candidateGender, age, createdAt, updatedAt );
 
         return candidateSummaryDTO;
     }

@@ -4,8 +4,8 @@ import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
+import com.michaelcanonizado.backend.models.CandidateGender;
 import com.michaelcanonizado.backend.models.College;
-import com.michaelcanonizado.backend.models.Gender;
 import com.michaelcanonizado.backend.services.CollegeService;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-31T21:20:05+0800",
+    date = "2025-09-07T14:27:46+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -34,17 +34,17 @@ public class CandidateMapperImpl implements CandidateMapper {
         int number = 0;
         String firstName = null;
         String lastName = null;
-        Gender gender = null;
+        CandidateGender candidateGender = null;
         int age = 0;
 
         college = collegeService.findById( candidateCreateDTO.collegeId() );
         number = candidateCreateDTO.number();
         firstName = candidateCreateDTO.firstName();
         lastName = candidateCreateDTO.lastName();
-        gender = candidateCreateDTO.gender();
+        candidateGender = candidateCreateDTO.candidateGender();
         age = candidateCreateDTO.age();
 
-        Candidate candidate = new Candidate( number, firstName, lastName, gender, age, college );
+        Candidate candidate = new Candidate( number, firstName, lastName, candidateGender, age, college );
 
         return candidate;
     }
@@ -59,7 +59,7 @@ public class CandidateMapperImpl implements CandidateMapper {
         int number = 0;
         String firstName = null;
         String lastName = null;
-        Gender gender = null;
+        CandidateGender candidateGender = null;
         int age = 0;
         LocalDateTime createdAt = null;
         LocalDateTime updatedAt = null;
@@ -68,12 +68,12 @@ public class CandidateMapperImpl implements CandidateMapper {
         number = candidate.getNumber();
         firstName = candidate.getFirstName();
         lastName = candidate.getLastName();
-        gender = candidate.getGender();
+        candidateGender = candidate.getCandidateGender();
         age = candidate.getAge();
         createdAt = candidate.getCreatedAt();
         updatedAt = candidate.getUpdatedAt();
 
-        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, gender, age, createdAt, updatedAt );
+        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, candidateGender, age, createdAt, updatedAt );
 
         return candidateSummaryDTO;
     }
@@ -87,7 +87,7 @@ public class CandidateMapperImpl implements CandidateMapper {
         candidate.setNumber( candidateUpdateDTO.number() );
         candidate.setFirstName( candidateUpdateDTO.firstName() );
         candidate.setLastName( candidateUpdateDTO.lastName() );
-        candidate.setGender( candidateUpdateDTO.gender() );
+        candidate.setCandidateGender( candidateUpdateDTO.candidateGender() );
         candidate.setAge( candidateUpdateDTO.age() );
     }
 }

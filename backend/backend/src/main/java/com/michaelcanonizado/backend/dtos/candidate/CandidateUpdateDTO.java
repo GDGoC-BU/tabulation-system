@@ -1,7 +1,6 @@
 package com.michaelcanonizado.backend.dtos.candidate;
 
-import com.michaelcanonizado.backend.models.Gender;
-import jakarta.validation.constraints.Max;
+import com.michaelcanonizado.backend.models.CandidateGender;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +17,7 @@ public record CandidateUpdateDTO(
         String lastName,
 
         @NotNull(message = "required")
-        Gender gender,
+        CandidateGender candidateGender,
 
         @NotNull(message = "required")
         @Min(value = 0, message = ">= 0")

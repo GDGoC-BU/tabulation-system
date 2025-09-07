@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.models;
 
-public enum Gender {
+public enum CandidateGender {
     MALE,
     FEMALE,
     OTHER

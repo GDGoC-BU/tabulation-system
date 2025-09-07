@@ -6,8 +6,8 @@ import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
+import com.michaelcanonizado.backend.models.CandidateGender;
 import com.michaelcanonizado.backend.models.College;
-import com.michaelcanonizado.backend.models.Gender;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-31T21:20:05+0800",
+    date = "2025-09-07T14:27:46+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -134,18 +134,18 @@ public class CollegeMapperImpl implements CollegeMapper {
         int number = 0;
         String firstName = null;
         String lastName = null;
-        Gender gender = null;
+        CandidateGender candidateGender = null;
         int age = 0;
 
         number = candidateSummaryDTO.number();
         firstName = candidateSummaryDTO.firstName();
         lastName = candidateSummaryDTO.lastName();
-        gender = candidateSummaryDTO.gender();
+        candidateGender = candidateSummaryDTO.candidateGender();
         age = candidateSummaryDTO.age();
 
         College college = null;
 
-        Candidate candidate = new Candidate( number, firstName, lastName, gender, age, college );
+        Candidate candidate = new Candidate( number, firstName, lastName, candidateGender, age, college );
 
         return candidate;
     }
@@ -172,7 +172,7 @@ public class CollegeMapperImpl implements CollegeMapper {
         int number = 0;
         String firstName = null;
         String lastName = null;
-        Gender gender = null;
+        CandidateGender candidateGender = null;
         int age = 0;
         LocalDateTime createdAt = null;
         LocalDateTime updatedAt = null;
@@ -181,12 +181,12 @@ public class CollegeMapperImpl implements CollegeMapper {
         number = candidate.getNumber();
         firstName = candidate.getFirstName();
         lastName = candidate.getLastName();
-        gender = candidate.getGender();
+        candidateGender = candidate.getCandidateGender();
         age = candidate.getAge();
         createdAt = candidate.getCreatedAt();
         updatedAt = candidate.getUpdatedAt();
 
-        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, gender, age, createdAt, updatedAt );
+        CandidateSummaryDTO candidateSummaryDTO = new CandidateSummaryDTO( id, number, firstName, lastName, candidateGender, age, createdAt, updatedAt );
 
         return candidateSummaryDTO;
     }
