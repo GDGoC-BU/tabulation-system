@@ -22,9 +22,7 @@ public class PageantStatusAspect {
 
     @Before("@within(requirePageantStatus) || @annotation(requirePageantStatus)")
     public void checkPageantStatus(RequirePageantStatus requirePageantStatus) {
-        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
-        });
+        Pageant pageant = repository.findAll().getFirst();
 
         PageantStatus currentStatus = pageant.getStatus();
 

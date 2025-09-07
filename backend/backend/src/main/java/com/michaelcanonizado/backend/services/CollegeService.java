@@ -79,6 +79,8 @@ public class CollegeService {
     }
 
     public College findById(UUID id) {
-        return repository.findById(id).orElseThrow(()-> new EntityNotFoundException("College not found!", ErrorCode.ENTITY_NOT_FOUND));
+        return repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("College not found!", ErrorCode.ENTITY_NOT_FOUND);
+        });
     }
 }

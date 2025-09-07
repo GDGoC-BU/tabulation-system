@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PageantService {
@@ -28,17 +30,13 @@ public class PageantService {
             PageantStatus.PREPARATION
     })
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
-        if (repository.existsBy()) {
-            throw new EntityAlreadyExistException("A pageant already exist! Only one is allowed.", ErrorCode.ENTITY_ALREADY_EXIST);
-        }
-
         Pageant pageant = repository.save(mapper.toEntity(pageantCreateDTO));
         return mapper.toSummary(pageant);
     }
 
-    public PageantSummaryDTO startPageant() {
-        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
+    public PageantSummaryDTO startPageant(UUID id) {
+        Pageant pageant = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         pageant.setStatus(PageantStatus.ONGOING);
@@ -47,9 +45,9 @@ public class PageantService {
         return mapper.toSummary(repository.save(pageant));
     }
 
-    public PageantSummaryDTO finalizePageant() {
-        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
+    public PageantSummaryDTO finalizePageant(UUID id) {
+        Pageant pageant = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         pageant.setStatus(PageantStatus.FINALIZING);
@@ -57,9 +55,9 @@ public class PageantService {
         return mapper.toSummary(repository.save(pageant));
     }
 
-    public PageantSummaryDTO closePageant() {
-        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
+    public PageantSummaryDTO closePageant(UUID id) {
+        Pageant pageant = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         pageant.setStatus(PageantStatus.CLOSED);
@@ -68,23 +66,40 @@ public class PageantService {
         return mapper.toSummary(repository.save(pageant));
     }
 
-    public PageantSummaryDTO getPageant() {
-        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
+    public PageantSummaryDTO getPageant(UUID id) {
+        Pageant pageant = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         return mapper.toSummary(pageant);
     }
 
+    public List<PageantSummaryDTO> getPageants() {
+        List<Pageant> pageants = repository.findAll();
+        return pageants
+                .stream()
+                .map(pageant -> {
+                    return mapper.toSummary(pageant);
+                }).toList();
+    }
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
-    public PageantSummaryDTO updatePageant(PageantUpdateDTO pageantUpdateDTO) {
-        Pageant pageant = repository.findSingleton().orElseThrow(() -> {
-            return new EntityNotFoundException("A pageant doesn't exist! Create a new one.", ErrorCode.ENTITY_NOT_FOUND);
+    public PageantSummaryDTO updatePageant(UUID id, PageantUpdateDTO pageantUpdateDTO) {
+        Pageant pageant = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Can't update! Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(pageant, pageantUpdateDTO);
         return mapper.toSummary(repository.save(pageant));
+    }
+
+    public void deletePageant(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Can't delete! Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
+        }
+
+        repository.deleteById(id);
     }
 }
