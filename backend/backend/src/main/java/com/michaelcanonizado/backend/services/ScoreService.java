@@ -52,8 +52,6 @@ public class ScoreService {
     })
     @Transactional
     public ScoreDetailedDTO updateScore(UUID id, ScoreUpdateDTO scoreUpdateDTO) {
-        Pageant pageant = pageantRepository.findAll().getFirst();
-
         Score score = scoreRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Score not found!", ErrorCode.ENTITY_NOT_FOUND);
         });

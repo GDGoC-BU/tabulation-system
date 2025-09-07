@@ -1,8 +1,8 @@
 package com.michaelcanonizado.backend.aspects;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.caches.PageantCacheService;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
 import com.michaelcanonizado.backend.exceptions.entity.PageantStatusException;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
@@ -20,9 +20,12 @@ public class PageantStatusAspect {
     @Autowired
     private PageantRepository repository;
 
+    @Autowired
+    private PageantCacheService cacheService;
+
     @Before("@within(requirePageantStatus) || @annotation(requirePageantStatus)")
     public void checkPageantStatus(RequirePageantStatus requirePageantStatus) {
-        Pageant pageant = repository.findAll().getFirst();
+        Pageant pageant = cacheService.get();
 
         PageantStatus currentStatus = pageant.getStatus();
 
@@ -33,6 +36,7 @@ public class PageantStatusAspect {
 
         String message = switch (currentStatus) {
             case PREPARATION -> "Pageant is locked! Wait for admin to open.";
+            case ONGOING -> "Pageant is ongoing! Can't perform operation.";
             case FINALIZING -> "Pageant is finalizing! Operation not allowed!";
             case CLOSED -> "Pageant is closed! Operation not allowed!";
             default -> "Operation not allowed!";
