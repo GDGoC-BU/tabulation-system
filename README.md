@@ -1,5 +1,5 @@
 # 🗳️ Tabulation Demo
-An offline tabulation system designed for critical real-time scoring and result computation.  
+An offline tabulation system that can manage multiple pageants, designed for critical real-time scoring and result computation.  
 
 ---
 
@@ -12,7 +12,7 @@ An offline tabulation system designed for critical real-time scoring and result 
 
 ---
 
-## 🚀 Current To-Implement Features
+## 🚀 Current To-Implement
 
 ### 1. Codebase
 - Strong coding standards
@@ -41,8 +41,8 @@ An offline tabulation system designed for critical real-time scoring and result 
 - Contestant leaderboard
 - Instant notification if judge/s disconnects
 
-### 6. Authentication  
-- Issues JWT at logins, and token is attached on every request
+### 6. Dynamic Formulas
+- Each pageant will have their own set of awards and each award has its own formula. The admin will be provided with a formula maker at the dashboard, and that formula will be evaluated using a formula engine made with SpEL (Spring Expression Language). This is the main thing that will allow the system to be reusable and manage multiple pageants.
 
 ### 7. Logging  
 - Logs for minute details of different subsystems for tracking:  
