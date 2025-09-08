@@ -3,7 +3,7 @@ package com.michaelcanonizado.backend.aspects;
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.caches.PageantCacheService;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.entity.PageantStatusException;
+import com.michaelcanonizado.backend.exceptions.customs.PageantStatusException;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;

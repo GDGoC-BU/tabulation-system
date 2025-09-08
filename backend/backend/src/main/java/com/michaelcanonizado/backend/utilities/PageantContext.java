@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.utilities;
 
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
+import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import lombok.Getter;

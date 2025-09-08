@@ -1,4 +1,4 @@
-package com.michaelcanonizado.backend.exceptions.entity;
+package com.michaelcanonizado.backend.exceptions.customs;
 
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 

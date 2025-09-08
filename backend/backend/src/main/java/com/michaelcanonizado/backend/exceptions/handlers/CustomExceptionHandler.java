@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.exceptions.handlers;
 
 import com.michaelcanonizado.backend.exceptions.common.ErrorResponse;
-import com.michaelcanonizado.backend.exceptions.entity.*;
+import com.michaelcanonizado.backend.exceptions.customs.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

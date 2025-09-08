@@ -6,10 +6,11 @@ import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.entity.EntityNotFoundException;
+import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CandidateMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
+import com.michaelcanonizado.backend.utilities.PageantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,9 @@ public class CandidateService {
 
     @Autowired
     private PageantCacheService pageantCacheService;
+
+    @Autowired
+    private PageantContext pageantContext;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION
@@ -93,6 +97,12 @@ public class CandidateService {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Candidate not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
+
+        UUID currentPageantId = pageantContext.getId();
+        if (!currentPageantId.equals(candidate.getPageant().getId())) {
+
+        }
+
         return mapper.toSummaryDTO(candidate);
     }
 
