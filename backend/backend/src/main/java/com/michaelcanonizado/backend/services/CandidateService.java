@@ -53,6 +53,9 @@ public class CandidateService {
     @Autowired
     private PageantContext pageantContext;
 
+    @Autowired
+    private PageantGuard pageantGuard;
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
@@ -109,7 +112,7 @@ public class CandidateService {
         });
 
         UUID currentPageantId = pageantContext.getId();
-        PageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
+        pageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
 
         return mapper.toSummaryDTO(candidate);
     }
@@ -138,7 +141,7 @@ public class CandidateService {
         });
 
         UUID currentPageantId = pageantContext.getId();
-        PageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
+        pageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
 
         mapper.updateEntityFromDTO(candidate, candidateUpdateDTO);
         return mapper.toSummaryDTO(candidateRepository.save(candidate));
@@ -154,7 +157,7 @@ public class CandidateService {
         });
 
         UUID currentPageantId = pageantContext.getId();
-        PageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
+        pageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
 
         College college = candidate.getCollege();
         college.removeCandidate(candidate);
