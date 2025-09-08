@@ -42,6 +42,9 @@ public class CandidateService {
     private ScoreRepository scoreRepository;
 
     @Autowired
+    private PageantRepository pageantRepository;
+
+    @Autowired
     private CandidateMapper mapper;
 
     @Autowired
@@ -59,7 +62,13 @@ public class CandidateService {
         Candidate candidate = mapper.toEntity(candidateCreateDTO);
 
         /* Connect the current pageant */
-        Pageant pageant = pageantCacheService.get();
+        UUID currentPageantId = pageantContext.getId();
+        Pageant pageant = pageantRepository.findById(currentPageantId).orElseThrow(() -> {
+           return new EntityNotFoundException(
+                   "Cannot create candidate! Pageant being connected to it doesn't exist.",
+                   ErrorCode.ENTITY_NOT_FOUND
+           );
+        });
         candidate.setPageant(pageant);
 
         Candidate savedCandidate = candidateRepository.save(candidate);
@@ -99,7 +108,8 @@ public class CandidateService {
             return new EntityNotFoundException("Candidate not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
-        PageantGuard.assertAccess(candidate.getPageant().getId(), pageantContext.getId());
+        UUID currentPageantId = pageantContext.getId();
+        PageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
 
         return mapper.toSummaryDTO(candidate);
     }
@@ -109,7 +119,9 @@ public class CandidateService {
             PageantStatus.ONGOING
     })
     public List<CandidateSummaryDTO> getCandidates() {
-        List<Candidate> candidates = candidateRepository.findAll();
+        UUID currentPageantId = pageantContext.getId();
+        List<Candidate> candidates = candidateRepository.findAllByPageant_Id(currentPageantId);
+
         return candidates
                 .stream()
                 .sorted(Comparator.comparing(Candidate::getNumber))
@@ -125,6 +137,9 @@ public class CandidateService {
             return new EntityNotFoundException("Can't update! Candidate not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
+        UUID currentPageantId = pageantContext.getId();
+        PageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
+
         mapper.updateEntityFromDTO(candidate, candidateUpdateDTO);
         return mapper.toSummaryDTO(candidateRepository.save(candidate));
     }
@@ -137,6 +152,10 @@ public class CandidateService {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't delete! Candidate not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
+
+        UUID currentPageantId = pageantContext.getId();
+        PageantGuard.assertAccess(candidate.getPageant().getId(), currentPageantId);
+
         College college = candidate.getCollege();
         college.removeCandidate(candidate);
         candidateRepository.delete(candidate);
