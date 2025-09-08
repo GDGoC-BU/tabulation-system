@@ -7,10 +7,11 @@ import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
+import com.michaelcanonizado.backend.security.PageantGuard;
 import com.michaelcanonizado.backend.mappers.CandidateMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
-import com.michaelcanonizado.backend.utilities.PageantContext;
+import com.michaelcanonizado.backend.security.PageantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,10 +99,7 @@ public class CandidateService {
             return new EntityNotFoundException("Candidate not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
-        UUID currentPageantId = pageantContext.getId();
-        if (!currentPageantId.equals(candidate.getPageant().getId())) {
-
-        }
+        PageantGuard.assertAccess(candidate.getPageant().getId(), pageantContext.getId());
 
         return mapper.toSummaryDTO(candidate);
     }

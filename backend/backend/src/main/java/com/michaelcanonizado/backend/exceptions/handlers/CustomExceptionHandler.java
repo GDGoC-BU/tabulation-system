@@ -52,6 +52,20 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
+    @ExceptionHandler(PageantAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handlePageantAccessDeniedException(PageantAccessDeniedException exception, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
     @ExceptionHandler(SegmentStatusException.class)
     public ResponseEntity<ErrorResponse> handleSegmentStatusException(SegmentStatusException exception, HttpServletRequest request) {
         HttpStatus status = HttpStatus.FORBIDDEN;

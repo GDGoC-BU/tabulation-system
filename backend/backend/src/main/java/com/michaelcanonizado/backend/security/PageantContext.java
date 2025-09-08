@@ -1,4 +1,4 @@
-package com.michaelcanonizado.backend.utilities;
+package com.michaelcanonizado.backend.security;
 
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
