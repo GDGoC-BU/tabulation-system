@@ -1,17 +1,16 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
+import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
 import com.michaelcanonizado.backend.mappers.JudgeMapper;
 import com.michaelcanonizado.backend.models.*;
-import com.michaelcanonizado.backend.repositories.CandidateRepository;
-import com.michaelcanonizado.backend.repositories.CriterionRepository;
-import com.michaelcanonizado.backend.repositories.JudgeRepository;
-import com.michaelcanonizado.backend.repositories.ScoreRepository;
+import com.michaelcanonizado.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,17 +33,27 @@ public class JudgeService {
     private ScoreRepository scoreRepository;
 
     @Autowired
+    private PageantRepository pageantRepository;
+
+    @Autowired
     private JudgeMapper mapper;
 
     @Autowired
-    private PageantCacheService pageantCacheService;
+    private PageantContext pageantContext;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
     public JudgeSummaryDTO addJudge(JudgeCreateDTO judgeCreateDTO) {
         /* Connect the current pageant */
-        Pageant pageant = pageantCacheService.get();
+        /* Connect to the selected pageant */
+        UUID selectedPageantId = pageantContext.getId();
+        Pageant pageant = pageantRepository.findById(selectedPageantId).orElseThrow(() -> {
+            return new PageantAccessDeniedException(
+                    "Pageant not found! Can't perform operation",
+                    ErrorCode.PAGEANT_ACCESS_DENIED
+            );
+        });
 
         /* Add authentication! Password needs to be hashed:
            JudgeCreateDTO.password -> Judge.passwordHash */

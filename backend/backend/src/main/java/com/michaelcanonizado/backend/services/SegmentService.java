@@ -7,11 +7,14 @@ import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
+import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
 import com.michaelcanonizado.backend.mappers.SegmentMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationRepository;
+import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
+import com.michaelcanonizado.backend.contexts.PageantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +35,13 @@ public class SegmentService {
     private CandidateSegmentQualificationRepository csqRepository;
 
     @Autowired
+    private PageantRepository pageantRepository;
+
+    @Autowired
     private SegmentMapper mapper;
 
     @Autowired
-    private PageantCacheService pageantCacheService;
+    private PageantContext pageantContext;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION
@@ -45,8 +51,14 @@ public class SegmentService {
         /* Load DTO to entity */
         Segment segment = mapper.toEntity(segmentCreateDTO);
 
-        /* Connect the current pageant */
-        Pageant pageant = pageantCacheService.get();
+        /* Connect to the selected pageant */
+        UUID selectedPageantId = pageantContext.getId();
+        Pageant pageant = pageantRepository.findById(selectedPageantId).orElseThrow(() -> {
+            return new PageantAccessDeniedException(
+                    "Pageant not found! Can't perform operation",
+                    ErrorCode.PAGEANT_ACCESS_DENIED
+            );
+        });
         segment.setPageant(pageant);
 
         Segment savedSegment = segmentRepository.save(segment);

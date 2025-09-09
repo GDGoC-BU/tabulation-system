@@ -11,7 +11,7 @@ import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.AwardRepository;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
-import com.michaelcanonizado.backend.security.PageantContext;
+import com.michaelcanonizado.backend.contexts.PageantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
