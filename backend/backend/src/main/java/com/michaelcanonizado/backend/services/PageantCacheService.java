@@ -1,4 +1,4 @@
-package com.michaelcanonizado.backend.caches;
+package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.repositories.PageantRepository;

@@ -1,9 +1,8 @@
 package com.michaelcanonizado.backend.aspects;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
-import com.michaelcanonizado.backend.caches.PageantCacheService;
+import com.michaelcanonizado.backend.services.PageantCacheService;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantStatusException;
 import com.michaelcanonizado.backend.models.Pageant;
