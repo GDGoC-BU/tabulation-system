@@ -25,14 +25,14 @@ public class PageantService {
     @Autowired
     private PageantMapper mapper;
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         Pageant pageant = repository.save(mapper.toEntity(pageantCreateDTO));
         return mapper.toSummary(pageant);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
     public PageantSummaryDTO startPageant(UUID id) {
         Pageant pageant = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -44,6 +44,9 @@ public class PageantService {
         return mapper.toSummary(repository.save(pageant));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.ONGOING
+    })
     public PageantSummaryDTO finalizePageant(UUID id) {
         Pageant pageant = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -54,6 +57,9 @@ public class PageantService {
         return mapper.toSummary(repository.save(pageant));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.FINALIZING
+    })
     public PageantSummaryDTO closePageant(UUID id) {
         Pageant pageant = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -82,9 +88,6 @@ public class PageantService {
                 }).toList();
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     public PageantSummaryDTO updatePageant(UUID id, PageantUpdateDTO pageantUpdateDTO) {
         Pageant pageant = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
