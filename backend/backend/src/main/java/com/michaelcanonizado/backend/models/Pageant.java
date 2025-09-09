@@ -59,6 +59,14 @@ public class Pageant extends Auditable {
     )
     private List<Segment> segments = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "pageant",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Award> awards = new ArrayList<>();
+
     public Pageant(String title) {
         this.title = title;
     }
