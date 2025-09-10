@@ -44,6 +44,12 @@ public class CandidateService {
     private PageantRepository pageantRepository;
 
     @Autowired
+    private AwardRepository awardRepository;
+
+    @Autowired
+    private AwardLeaderboardRepository awardLeaderboardRepository;
+
+    @Autowired
     private CandidateMapper mapper;
 
     @Autowired
@@ -90,6 +96,22 @@ public class CandidateService {
         });
         /* Batch save to minimize insert queries */
         scoreRepository.saveAll(newScores);
+
+        /* Get available awards and pre-generate
+           candidate rows in the award's leaderboard */
+        List<Award> awards = awardRepository.findAllByPageant_Id(selectedPageantId);
+        List<AwardLeaderboard> awardLeaderboards = new ArrayList<>();
+        awards.forEach(award -> {
+            awardLeaderboards.add(
+                    new AwardLeaderboard(
+                            0,
+                            savedCandidate,
+                            award
+                    )
+            );
+        });
+        /* Batch save to minimize insert queries */
+        awardLeaderboardRepository.saveAll(awardLeaderboards);
 
         /* Save candidate to database */
         return mapper.toSummaryDTO(savedCandidate);
