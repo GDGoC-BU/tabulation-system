@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.seeders;
 
+import com.github.javafaker.Faker;
 import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.Criterion;
 import com.michaelcanonizado.backend.models.Judge;
@@ -32,6 +33,8 @@ public class ScoreSeeder implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) throws Exception {
+        Faker faker = new Faker();
+
         List<Candidate> candidates = candidateRepository.findAll();
         List<Criterion> criteria = criterionRepository.findAll();
         List<Judge> judges = judgeRepository.findAll();
@@ -39,7 +42,15 @@ public class ScoreSeeder implements CommandLineRunner {
         candidates.forEach(candidate -> {
             criteria.forEach(criterion -> {
                 judges.forEach(judge -> {
-                    Score score = new Score(criterion.getMaxScore(), judge, candidate, criterion);
+                    Score score = new Score(
+                            faker.number().numberBetween(
+                                    0,
+                                    criterion.getMaxScore()
+                            ),
+                            judge,
+                            candidate,
+                            criterion
+                    );
                     criterion.addScore(score);
                     scoreRepository.save(score);
                 });
