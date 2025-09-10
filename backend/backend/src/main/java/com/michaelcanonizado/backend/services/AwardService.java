@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.github.javafaker.Faker;
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
@@ -12,6 +13,7 @@ import com.michaelcanonizado.backend.repositories.AwardRepository;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.contexts.PageantContext;
+import com.michaelcanonizado.backend.utilities.AwardFormulaEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,9 @@ public class AwardService {
     @Autowired
     private PageantContext pageantContext;
 
+    @Autowired
+    private AwardFormulaEncoder formulaEncoder;
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
     })
@@ -55,6 +60,11 @@ public class AwardService {
             );
         });
         award.setPageant(pageant);
+
+        /* Encode formula to SpEL safe format */
+        String rawFormula = award.getFormula();
+        String encodedFormula = formulaEncoder.encode(rawFormula);
+        award.setFormula(encodedFormula);
 
         /* Save Award */
         Award savedAward = awardRepository.save(award);
@@ -75,6 +85,28 @@ public class AwardService {
         /* Batch save to minimize insert queries */
         awardLeaderboardRepository.saveAll(awardLeaderboards);
 
+        /* Decode formula back to raw form since
+           created award will be returned back. */
+        encodedFormula = savedAward.getFormula();
+        String decodedFormula = formulaEncoder.decode(encodedFormula);
+        savedAward.setFormula(decodedFormula);
         return mapper.toSummaryDTO(savedAward);
+    }
+
+    public List<AwardSummaryDTO> getAwards() {
+        UUID selectedPageantId = pageantContext.getId();
+
+        List<Award> awards = awardRepository.findAllByPageant_Id(selectedPageantId);
+
+        return awards
+                .stream()
+                .map(award -> {
+                    String encodedFormula = award.getFormula();
+                    String decodedFormula = formulaEncoder.decode(encodedFormula);
+                    award.setFormula(decodedFormula);
+
+                    return mapper.toSummaryDTO(award);
+                })
+                .toList();
     }
 }
