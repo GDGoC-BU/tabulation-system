@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.controllers;
 
+import com.michaelcanonizado.backend.dtos.AwardLeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
 import com.michaelcanonizado.backend.services.AwardService;
@@ -8,12 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("api/v1")
@@ -27,9 +26,16 @@ public class AwardController {
         return new ResponseEntity<>(award, HttpStatus.CREATED);
     }
 
+    /* TEMPORARY ENDPOINT */
+    @GetMapping("/awards/{id}/results")
+    public ResponseEntity<List<AwardLeaderboardSummaryDTO>> getAwardResults(@PathVariable UUID id) {
+        List<AwardLeaderboardSummaryDTO> leaderboard = service.getAwardResult(id);
+        return new ResponseEntity<>(leaderboard, HttpStatus.OK);
+    }
+
     @GetMapping("/awards")
     public ResponseEntity<List<AwardSummaryDTO>> getAward() {
         List<AwardSummaryDTO> awards = service.getAwards();
-        return new ResponseEntity<>(awards, HttpStatus.CREATED);
+        return new ResponseEntity<>(awards, HttpStatus.OK);
     }
 }

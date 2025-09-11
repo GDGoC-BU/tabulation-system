@@ -45,9 +45,9 @@ public class AwardLeaderboard {
     private Award award;
 
     @Column(nullable = false)
-    private int score;
+    private Double score;
 
-    public AwardLeaderboard(int score, Candidate candidate, Award award) {
+    public AwardLeaderboard(Double score, Candidate candidate, Award award) {
         this.candidate = candidate;
         this.award = award;
         this.score = score;

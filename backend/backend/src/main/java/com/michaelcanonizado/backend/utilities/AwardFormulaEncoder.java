@@ -61,7 +61,7 @@ public class AwardFormulaEncoder {
             );
 
     /* Main encode method */
-    public String encode(String rawFormula) {
+    public String encodeFormula(String rawFormula) {
         /* Identify the UUIDs */
         Matcher matcher = RAW_UUID_PATTERN.matcher(rawFormula);
 
@@ -72,7 +72,7 @@ public class AwardFormulaEncoder {
         while (matcher.find()) {
             String raw = matcher.group(1);
             /* Encoding matched UUID */
-            String encoded = PREFIX + raw.replace("-", DASH_REPLACEMENT).toLowerCase();
+            String encoded = encodeUUID(UUID.fromString(raw));
             /* Replace the matched portion with the encoded UUID */
             matcher.appendReplacement(sb, Matcher.quoteReplacement("#" + encoded));
         }
@@ -84,7 +84,7 @@ public class AwardFormulaEncoder {
     }
 
     /* Main decode method */
-    public String decode(String encodedFormula) {
+    public String decodeFormula(String encodedFormula) {
         /* Identify the encoded UUIDs */
         Matcher matcher = ENCODED_PATTERN.matcher(encodedFormula);
 
@@ -120,6 +120,16 @@ public class AwardFormulaEncoder {
         }
 
         return set;
+    }
+
+    /* Encode raw UUID */
+    public String encodeUUID(UUID rawUUID) {
+        if (rawUUID == null) {
+            /* THROW CUSTOM EXCEPTION */
+            throw new IllegalArgumentException("Trying to encode UUID that is null");
+        }
+
+        return PREFIX + rawUUID.toString().replace("-", DASH_REPLACEMENT).toLowerCase();
     }
 
     /* Decode encoded UUID string */

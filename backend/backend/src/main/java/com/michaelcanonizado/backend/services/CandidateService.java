@@ -104,7 +104,7 @@ public class CandidateService {
         awards.forEach(award -> {
             awardLeaderboards.add(
                     new AwardLeaderboard(
-                            0,
+                            0.0,
                             savedCandidate,
                             award
                     )
