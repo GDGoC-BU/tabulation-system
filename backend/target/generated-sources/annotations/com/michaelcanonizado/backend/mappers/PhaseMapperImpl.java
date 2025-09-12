@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.mappers;
 import com.michaelcanonizado.backend.dtos.phase.PhaseCreateDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseDetailedDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseUpdateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.Phase;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-13T01:02:11+0800",
+    date = "2025-09-13T01:16:45+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -79,6 +80,16 @@ public class PhaseMapperImpl implements PhaseMapper {
         PhaseDetailedDTO phaseDetailedDTO = new PhaseDetailedDTO( id, name, sequence, segments );
 
         return phaseDetailedDTO;
+    }
+
+    @Override
+    public void updateEntityFromDTO(Phase phase, PhaseUpdateDTO phaseUpdateDTO) {
+        if ( phaseUpdateDTO == null ) {
+            return;
+        }
+
+        phase.setName( phaseUpdateDTO.name() );
+        phase.setSequence( phaseUpdateDTO.sequence() );
     }
 
     protected SegmentSummaryDTO segmentToSegmentSummaryDTO(Segment segment) {

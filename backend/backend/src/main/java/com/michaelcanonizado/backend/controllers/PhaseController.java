@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.controllers;
 import com.michaelcanonizado.backend.dtos.phase.PhaseCreateDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseDetailedDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseUpdateDTO;
 import com.michaelcanonizado.backend.services.PhaseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +37,11 @@ public class PhaseController {
     public ResponseEntity<List<PhaseSummaryDTO>> getPhases() {
         List<PhaseSummaryDTO> phases = service.getPhases();
         return new ResponseEntity<>(phases, HttpStatus.OK);
+    }
+
+    @PutMapping("/phases/{id}")
+    public ResponseEntity<PhaseDetailedDTO> getPhases(@PathVariable UUID id, @RequestBody @Valid PhaseUpdateDTO phaseUpdateDTO) {
+        PhaseDetailedDTO phase = service.updatePhase(id, phaseUpdateDTO);
+        return new ResponseEntity<>(phase, HttpStatus.OK);
     }
 }

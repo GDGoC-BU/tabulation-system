@@ -4,6 +4,7 @@ import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.phase.PhaseCreateDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseDetailedDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.PhaseMapper;
@@ -33,7 +34,7 @@ public class PhaseService {
     @Autowired
     private PageantContext pageantContext;
 
-    public PhaseDetailedDTO addPhase(@Valid PhaseCreateDTO phaseCreateDTO) {
+    public PhaseDetailedDTO addPhase(PhaseCreateDTO phaseCreateDTO) {
         Phase phase = mapper.toEntity(phaseCreateDTO);
 
         /* Connect to the selected pageant */
@@ -81,5 +82,15 @@ public class PhaseService {
         return phaseRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Phase not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
+    }
+
+    public PhaseDetailedDTO updatePhase(UUID id, PhaseUpdateDTO phaseUpdateDTO) {
+        Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Can't update! Phase not found.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+
+        mapper.updateEntityFromDTO(phase, phaseUpdateDTO);
+
+        return mapper.toDetailedDTO(phaseRepository.save(phase));
     }
 }
