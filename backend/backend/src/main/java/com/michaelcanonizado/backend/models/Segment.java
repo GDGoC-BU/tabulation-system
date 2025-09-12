@@ -28,7 +28,7 @@ public class Segment {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SegmentStatus status = SegmentStatus.PENDING;
+    private PhaseSegmentStatus status = PhaseSegmentStatus.PENDING;
 
     @JsonBackReference
     @ManyToOne(

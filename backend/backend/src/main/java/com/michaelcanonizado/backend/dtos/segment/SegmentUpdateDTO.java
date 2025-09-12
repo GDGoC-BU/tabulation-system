@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
-import com.michaelcanonizado.backend.models.SegmentStatus;
+import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +14,6 @@ public record SegmentUpdateDTO(
         int sequence,
 
         @NotNull(message = "required")
-        SegmentStatus status
+        PhaseSegmentStatus status
 ) {
 }

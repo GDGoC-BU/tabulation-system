@@ -66,7 +66,7 @@ public class ScoreService {
             throw new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
         }
 
-        if (segment.getStatus() != SegmentStatus.ACTIVE) {
+        if (segment.getStatus() != PhaseSegmentStatus.ONGOING) {
             throw new SegmentStatusException("Segment is not ACTIVE! Can't update score.", ErrorCode.SEGMENT_NOT_ACTIVE);
         }
 

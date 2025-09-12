@@ -10,8 +10,8 @@ import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.CandidateGender;
 import com.michaelcanonizado.backend.models.Criterion;
 import com.michaelcanonizado.backend.models.Pageant;
+import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 import com.michaelcanonizado.backend.models.Segment;
-import com.michaelcanonizado.backend.models.SegmentStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-12T19:38:19+0800",
+    date = "2025-09-12T20:00:49+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -77,7 +77,7 @@ public class SegmentMapperImpl implements SegmentMapper {
         UUID id = null;
         String name = null;
         int sequence = 0;
-        SegmentStatus status = null;
+        PhaseSegmentStatus status = null;
         List<CriterionSummaryDTO> criteria = null;
 
         id = segment.getId();
@@ -101,7 +101,7 @@ public class SegmentMapperImpl implements SegmentMapper {
         UUID id = null;
         String name = null;
         int sequence = 0;
-        SegmentStatus status = null;
+        PhaseSegmentStatus status = null;
         List<CriterionSummaryDTO> criteria = null;
 
         qualifiedCandidates = candidateListToCandidateSummaryDTOList( segment.getQualifiedCandidates() );

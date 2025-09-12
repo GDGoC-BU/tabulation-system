@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.models;
 
-public enum SegmentStatus {
+public enum PhaseSegmentStatus {
     PENDING,
-    ACTIVE,
+    ONGOING,
     CLOSED
 }
