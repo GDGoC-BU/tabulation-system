@@ -7,16 +7,13 @@ import com.michaelcanonizado.backend.models.Judge;
 import com.michaelcanonizado.backend.models.Score;
 import com.michaelcanonizado.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Component
-@Order(7)
-public class ScoreSeeder implements CommandLineRunner {
+public class ScoreSeeder implements DatabaseSeeder {
     private final ScoreRepository scoreRepository;
     private final CandidateRepository candidateRepository;
     private final CriterionRepository criterionRepository;
@@ -32,7 +29,7 @@ public class ScoreSeeder implements CommandLineRunner {
 
     @Transactional
     @Override
-    public void run(String... args) throws Exception {
+    public void seed() {
         Faker faker = new Faker();
 
         List<Candidate> candidates = candidateRepository.findAll();

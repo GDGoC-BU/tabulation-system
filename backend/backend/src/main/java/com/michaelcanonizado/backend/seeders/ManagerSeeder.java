@@ -4,13 +4,10 @@ import com.michaelcanonizado.backend.models.Manager;
 import com.michaelcanonizado.backend.models.ManagerRole;
 import com.michaelcanonizado.backend.repositories.ManagerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-@Order(8)
-public class ManagerSeeder implements CommandLineRunner {
+public class ManagerSeeder implements DatabaseSeeder {
     private final ManagerRepository repository;
 
     @Autowired
@@ -19,7 +16,7 @@ public class ManagerSeeder implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void seed() {
         repository.save(new Manager("admin", "a*****", ManagerRole.ADMIN));
     }
 }

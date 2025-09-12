@@ -2,8 +2,6 @@ package com.michaelcanonizado.backend.seeders;
 
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -13,8 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-@Order(1)
-public class CollegeSeeder implements CommandLineRunner {
+public class CollegeSeeder implements DatabaseSeeder {
     private final CollegeRepository repository;
 
     private final List<College> colleges = Arrays.asList(
@@ -41,7 +38,7 @@ public class CollegeSeeder implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void seed() {
         colleges.forEach(repository::save);
     }
 }

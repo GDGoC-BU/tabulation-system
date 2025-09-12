@@ -4,13 +4,9 @@ import com.michaelcanonizado.backend.models.Criterion;
 import com.michaelcanonizado.backend.models.Segment;
 import com.michaelcanonizado.backend.repositories.CriterionRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
-import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +22,7 @@ class CriterionItem {
 }
 
 @Component
-@Order(3)
-public class CriterionSeeder implements CommandLineRunner {
+public class CriterionSeeder implements DatabaseSeeder {
     private final SegmentRepository segmentRepository;
     private final CriterionRepository criterionRepository;
 
@@ -52,7 +47,7 @@ public class CriterionSeeder implements CommandLineRunner {
 
     @Transactional
     @Override
-    public void run(String... args) throws Exception {
+    public void seed() {
         List<Segment> segments = segmentRepository.findAll();
 
         segments.forEach(segment -> {

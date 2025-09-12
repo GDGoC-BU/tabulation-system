@@ -1,38 +1,36 @@
 package com.michaelcanonizado.backend.seeders;
 
-import com.michaelcanonizado.backend.models.Pageant;
+import com.michaelcanonizado.backend.models.Phase;
 import com.michaelcanonizado.backend.models.Segment;
-import com.michaelcanonizado.backend.repositories.PageantRepository;
+import com.michaelcanonizado.backend.repositories.PhaseRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Component
-@Order(2)
-public class SegmentSeeder implements CommandLineRunner {
+public class SegmentSeeder implements DatabaseSeeder {
     private final SegmentRepository segmentRepository;
-    private final PageantRepository pageantRepository;
+    private final PhaseRepository phaseRepository;
 
     @Autowired
-    public SegmentSeeder(SegmentRepository segmentRepository, PageantRepository pageantRepository) {
+    public SegmentSeeder(SegmentRepository segmentRepository, PhaseRepository phaseRepository) {
         this.segmentRepository = segmentRepository;
-        this.pageantRepository = pageantRepository;
+        this.phaseRepository = SegmentSeeder.this.phaseRepository;
     }
 
     @Override
-    public void run(String... args) throws Exception {
-        Pageant pageant = pageantRepository.findAll().getFirst();
+    public void seed() {
+        List<Phase> phases = phaseRepository.findAll();
 
         List<Segment> segments = Arrays.asList(
-                new Segment("Swimwear", 1, pageant),
-                new Segment("Formal Attire", 2, pageant),
-                new Segment("Question and Answer", 3, pageant),
-                new Segment("Final Round", 4, pageant)
+                new Segment("Interview Proper", 1, phases.get(0)),
+                new Segment("Swimwear", 1, phases.get(1)),
+                new Segment("Formal Attire", 2, phases.get(1)),
+                new Segment("Question and Answer", 3, phases.get(1)),
+                new Segment("Final Round", 4, phases.get(1))
         );
 
         segments.forEach(segmentRepository::save);

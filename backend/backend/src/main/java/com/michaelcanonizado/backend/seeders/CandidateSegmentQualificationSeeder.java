@@ -7,16 +7,13 @@ import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Component
-@Order(6)
-public class CandidateSegmentQualificationSeeder implements CommandLineRunner {
+public class CandidateSegmentQualificationSeeder implements DatabaseSeeder {
     private final CandidateSegmentQualificationRepository csqRepository;
     private final CandidateRepository candidateRepository;
     private final SegmentRepository segmentRepository;
@@ -30,7 +27,7 @@ public class CandidateSegmentQualificationSeeder implements CommandLineRunner {
 
     @Transactional
     @Override
-    public void run(String... args) throws Exception {
+    public void seed() {
         List<Candidate> candidates = candidateRepository.findAll();
         List<Segment> segments = segmentRepository.findAll();
 

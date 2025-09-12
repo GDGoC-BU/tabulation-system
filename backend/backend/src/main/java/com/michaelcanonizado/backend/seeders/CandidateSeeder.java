@@ -9,16 +9,13 @@ import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Component
-@Order(5)
-public class CandidateSeeder implements CommandLineRunner {
+public class CandidateSeeder implements DatabaseSeeder {
     private final Faker faker = new Faker();
     private final CandidateRepository candidateRepository;
     private final CollegeRepository collegeRepository;
@@ -33,7 +30,7 @@ public class CandidateSeeder implements CommandLineRunner {
 
     @Transactional
     @Override
-    public void run(String... args) throws Exception {
+    public void seed() {
         Pageant pageant = pageantRepository.findAll().getFirst();
         List<College> colleges =  collegeRepository.findAll();
 
