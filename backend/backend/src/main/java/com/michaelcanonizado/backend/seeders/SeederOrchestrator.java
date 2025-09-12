@@ -18,7 +18,7 @@ public class SeederOrchestrator implements CommandLineRunner {
             CollegeSeeder collegeSeeder,
             CriterionSeeder criterionSeeder,
             JudgeSeeder judgeSeeder,
-            ManagerSeeder managerSeeder,
+            AdminSeeder adminSeeder,
             ScoreSeeder scoreSeeder,
             SegmentSeeder segmentSeeder,
             PhaseSeeder phaseSeeder
@@ -27,7 +27,7 @@ public class SeederOrchestrator implements CommandLineRunner {
            the order of execution of seeders */
         this.seeders = List.of(
                 pageantSeeder,
-                managerSeeder,
+                adminSeeder,
                 judgeSeeder,
                 phaseSeeder,
                 segmentSeeder,

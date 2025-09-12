@@ -13,13 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public class Manager extends Account {
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ManagerRole role;
-
-    public Manager(String username, String passwordHash, ManagerRole role) {
+public class Admin extends Account {
+    public Admin(String username, String passwordHash) {
         super(username, passwordHash);
-        this.role = role;
     }
 }
