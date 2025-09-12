@@ -40,8 +40,14 @@ public class PhaseController {
     }
 
     @PutMapping("/phases/{id}")
-    public ResponseEntity<PhaseDetailedDTO> getPhases(@PathVariable UUID id, @RequestBody @Valid PhaseUpdateDTO phaseUpdateDTO) {
+    public ResponseEntity<PhaseDetailedDTO> updatePhases(@PathVariable UUID id, @RequestBody @Valid PhaseUpdateDTO phaseUpdateDTO) {
         PhaseDetailedDTO phase = service.updatePhase(id, phaseUpdateDTO);
         return new ResponseEntity<>(phase, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/phases/{id}")
+    public ResponseEntity<Void> deletePhase(@PathVariable UUID id) {
+        service.deletePhase(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

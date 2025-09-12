@@ -93,4 +93,15 @@ public class PhaseService {
 
         return mapper.toDetailedDTO(phaseRepository.save(phase));
     }
+
+    public void deletePhase(UUID id) {
+        if(!phaseRepository.existsById(id)) {
+            throw new EntityNotFoundException(
+                    "Can't delete! Phase not found.",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        }
+
+        phaseRepository.deleteById(id);
+    }
 }
