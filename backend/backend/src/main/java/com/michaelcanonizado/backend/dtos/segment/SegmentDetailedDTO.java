@@ -10,7 +10,7 @@ import java.util.UUID;
 public record SegmentDetailedDTO(
         UUID id,
         String name,
-        int phase,
+        int sequence,
         SegmentStatus status,
         List<CriterionSummaryDTO> criteria,
         List<CandidateSummaryDTO> qualifiedCandidates

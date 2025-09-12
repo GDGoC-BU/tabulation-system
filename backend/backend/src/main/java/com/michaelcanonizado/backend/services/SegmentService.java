@@ -95,7 +95,7 @@ public class SegmentService {
         return segmentRepository
                 .findAll()
                 .stream()
-                .sorted(Comparator.comparing(Segment::getPhase))
+                .sorted(Comparator.comparing(Segment::getSequence))
                 .map(mapper::toSummaryDTO)
                 .toList();
     }

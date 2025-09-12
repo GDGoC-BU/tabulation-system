@@ -10,6 +10,6 @@ public record SegmentCreateDTO(
 
         @NotNull(message = "required")
         @Min(value = 1, message = ">= 1")
-        int phase
+        int sequence
 ) {
 }

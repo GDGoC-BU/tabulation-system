@@ -11,7 +11,7 @@ public record SegmentUpdateDTO(
 
         @NotNull(message = "required")
         @Min(value = 1, message = ">= 1")
-        int phase,
+        int sequence,
 
         @NotNull(message = "required")
         SegmentStatus status

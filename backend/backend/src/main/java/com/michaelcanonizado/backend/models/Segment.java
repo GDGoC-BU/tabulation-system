@@ -24,7 +24,7 @@ public class Segment {
     private String name;
 
     @Column(nullable = false)
-    private int phase;
+    private int sequence;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -63,9 +63,9 @@ public class Segment {
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
 
-    public Segment(String name, int phase, Pageant pageant) {
+    public Segment(String name, int sequence, Pageant pageant) {
         this.name = name;
-        this.phase = phase;
+        this.sequence = sequence;
         this.pageant = pageant;
     }
 
