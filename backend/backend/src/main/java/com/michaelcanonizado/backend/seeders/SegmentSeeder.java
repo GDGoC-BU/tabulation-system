@@ -18,7 +18,7 @@ public class SegmentSeeder implements DatabaseSeeder {
     @Autowired
     public SegmentSeeder(SegmentRepository segmentRepository, PhaseRepository phaseRepository) {
         this.segmentRepository = segmentRepository;
-        this.phaseRepository = SegmentSeeder.this.phaseRepository;
+        this.phaseRepository = phaseRepository;
     }
 
     @Override

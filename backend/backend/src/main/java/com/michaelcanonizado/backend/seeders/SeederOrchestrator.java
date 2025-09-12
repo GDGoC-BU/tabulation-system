@@ -12,26 +12,30 @@ public class SeederOrchestrator implements CommandLineRunner {
 
     @Autowired
     public SeederOrchestrator(
+            PageantSeeder pageantSeeder,
             CandidateSeeder candidateSeeder,
             CandidateSegmentQualificationSeeder candidateSegmentQualificationSeeder,
             CollegeSeeder collegeSeeder,
             CriterionSeeder criterionSeeder,
             JudgeSeeder judgeSeeder,
             ManagerSeeder managerSeeder,
-            PageantSeeder pageantSeeder,
             ScoreSeeder scoreSeeder,
-            SegmentSeeder segmentSeeder
+            SegmentSeeder segmentSeeder,
+            PhaseSeeder phaseSeeder
     ) {
+        /* Order of the seeders in this list determine
+           the order of execution of seeders */
         this.seeders = List.of(
                 pageantSeeder,
+                managerSeeder,
+                judgeSeeder,
+                phaseSeeder,
+                segmentSeeder,
+                criterionSeeder,
+                collegeSeeder,
                 candidateSeeder,
                 candidateSegmentQualificationSeeder,
-                collegeSeeder,
-                criterionSeeder,
-                judgeSeeder,
-                managerSeeder,
-                scoreSeeder,
-                segmentSeeder
+                scoreSeeder
         );
     }
 
