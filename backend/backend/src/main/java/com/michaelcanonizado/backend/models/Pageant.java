@@ -57,7 +57,7 @@ public class Pageant extends Auditable {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<Segment> segments = new ArrayList<>();
+    private List<Phase> phases = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "pageant",

@@ -35,8 +35,8 @@ public class Segment {
             optional = false,
             fetch = FetchType.LAZY
     )
-    @JoinColumn(name = "pageant_id", nullable = false)
-    private Pageant pageant;
+    @JoinColumn(name = "phase_id", nullable = false)
+    private Phase phase;
 
     @JsonManagedReference
     @OneToMany(
@@ -63,10 +63,10 @@ public class Segment {
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
 
-    public Segment(String name, int sequence, Pageant pageant) {
+    public Segment(String name, int sequence, Phase phase) {
         this.name = name;
         this.sequence = sequence;
-        this.pageant = pageant;
+        this.phase = phase;
     }
 
     public void addCriterion(Criterion criterion) {

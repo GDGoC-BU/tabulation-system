@@ -1,9 +1,8 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
-import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 
-import java.util.List;
 import java.util.UUID;
 
 public record SegmentSummaryDTO(
@@ -11,6 +10,6 @@ public record SegmentSummaryDTO(
         String name,
         int sequence,
         PhaseSegmentStatus status,
-        List<CriterionSummaryDTO> criteria
+        PhaseSummaryDTO phase
 ) {
 }

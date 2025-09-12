@@ -51,15 +51,8 @@ public class SegmentService {
         /* Load DTO to entity */
         Segment segment = mapper.toEntity(segmentCreateDTO);
 
-        /* Connect to the selected pageant */
-        UUID selectedPageantId = pageantContext.getId();
-        Pageant pageant = pageantRepository.findById(selectedPageantId).orElseThrow(() -> {
-            return new PageantAccessDeniedException(
-                    "Pageant not found! Can't perform operation",
-                    ErrorCode.PAGEANT_ACCESS_DENIED
-            );
-        });
-        segment.setPageant(pageant);
+        /* Check if phase being connected actually belongs to the pageant */
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
 
         Segment savedSegment = segmentRepository.save(segment);
 
@@ -93,9 +86,8 @@ public class SegmentService {
     @Transactional
     public List<SegmentSummaryDTO> getSegments() {
         return segmentRepository
-                .findAll()
+                .findAllOrderByPhaseSequenceAndSegmentSequence()
                 .stream()
-                .sorted(Comparator.comparing(Segment::getSequence))
                 .map(mapper::toSummaryDTO)
                 .toList();
     }

@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
@@ -10,22 +11,28 @@ import com.michaelcanonizado.backend.models.Candidate;
 import com.michaelcanonizado.backend.models.CandidateGender;
 import com.michaelcanonizado.backend.models.Criterion;
 import com.michaelcanonizado.backend.models.Pageant;
+import com.michaelcanonizado.backend.models.Phase;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 import com.michaelcanonizado.backend.models.Segment;
+import com.michaelcanonizado.backend.services.PhaseService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-12T20:00:49+0800",
+    date = "2025-09-13T00:35:34+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
 public class SegmentMapperImpl implements SegmentMapper {
+
+    @Autowired
+    private PhaseService phaseService;
 
     @Override
     public Segment toEntity(SegmentCreateDTO segmentCreateDTO) {
@@ -33,15 +40,15 @@ public class SegmentMapperImpl implements SegmentMapper {
             return null;
         }
 
+        Phase phase = null;
         String name = null;
         int sequence = 0;
 
+        phase = phaseService.findById( segmentCreateDTO.phaseId() );
         name = segmentCreateDTO.name();
         sequence = segmentCreateDTO.sequence();
 
-        Pageant pageant = null;
-
-        Segment segment = new Segment( name, sequence, pageant );
+        Segment segment = new Segment( name, sequence, phase );
 
         return segment;
     }
@@ -54,16 +61,15 @@ public class SegmentMapperImpl implements SegmentMapper {
 
         String name = null;
         int sequence = 0;
+        Phase phase = null;
 
         name = segmentSummaryDTO.name();
         sequence = segmentSummaryDTO.sequence();
+        phase = phaseSummaryDTOToPhase( segmentSummaryDTO.phase() );
 
-        Pageant pageant = null;
-
-        Segment segment = new Segment( name, sequence, pageant );
+        Segment segment = new Segment( name, sequence, phase );
 
         segment.setStatus( segmentSummaryDTO.status() );
-        segment.setCriteria( criterionSummaryDTOListToCriterionList( segmentSummaryDTO.criteria() ) );
 
         return segment;
     }
@@ -78,15 +84,15 @@ public class SegmentMapperImpl implements SegmentMapper {
         String name = null;
         int sequence = 0;
         PhaseSegmentStatus status = null;
-        List<CriterionSummaryDTO> criteria = null;
+        PhaseSummaryDTO phase = null;
 
         id = segment.getId();
         name = segment.getName();
         sequence = segment.getSequence();
         status = segment.getStatus();
-        criteria = criterionListToCriterionSummaryDTOList( segment.getCriteria() );
+        phase = phaseToPhaseSummaryDTO( segment.getPhase() );
 
-        SegmentSummaryDTO segmentSummaryDTO = new SegmentSummaryDTO( id, name, sequence, status, criteria );
+        SegmentSummaryDTO segmentSummaryDTO = new SegmentSummaryDTO( id, name, sequence, status, phase );
 
         return segmentSummaryDTO;
     }
@@ -102,6 +108,7 @@ public class SegmentMapperImpl implements SegmentMapper {
         String name = null;
         int sequence = 0;
         PhaseSegmentStatus status = null;
+        PhaseSummaryDTO phase = null;
         List<CriterionSummaryDTO> criteria = null;
 
         qualifiedCandidates = candidateListToCandidateSummaryDTOList( segment.getQualifiedCandidates() );
@@ -109,9 +116,10 @@ public class SegmentMapperImpl implements SegmentMapper {
         name = segment.getName();
         sequence = segment.getSequence();
         status = segment.getStatus();
+        phase = phaseToPhaseSummaryDTO( segment.getPhase() );
         criteria = criterionListToCriterionSummaryDTOList( segment.getCriteria() );
 
-        SegmentDetailedDTO segmentDetailedDTO = new SegmentDetailedDTO( id, name, sequence, status, criteria, qualifiedCandidates );
+        SegmentDetailedDTO segmentDetailedDTO = new SegmentDetailedDTO( id, name, sequence, status, phase, criteria, qualifiedCandidates );
 
         return segmentDetailedDTO;
     }
@@ -127,66 +135,40 @@ public class SegmentMapperImpl implements SegmentMapper {
         segment.setStatus( segmentUpdateDTO.status() );
     }
 
-    protected Criterion criterionSummaryDTOToCriterion(CriterionSummaryDTO criterionSummaryDTO) {
-        if ( criterionSummaryDTO == null ) {
+    protected Phase phaseSummaryDTOToPhase(PhaseSummaryDTO phaseSummaryDTO) {
+        if ( phaseSummaryDTO == null ) {
             return null;
         }
 
         String name = null;
-        int maxScore = 0;
+        int sequence = 0;
 
-        name = criterionSummaryDTO.name();
-        maxScore = criterionSummaryDTO.maxScore();
+        name = phaseSummaryDTO.name();
+        sequence = phaseSummaryDTO.sequence();
 
-        Segment segment = null;
+        Pageant pageant = null;
 
-        Criterion criterion = new Criterion( name, maxScore, segment );
+        Phase phase = new Phase( name, sequence, pageant );
 
-        return criterion;
+        return phase;
     }
 
-    protected List<Criterion> criterionSummaryDTOListToCriterionList(List<CriterionSummaryDTO> list) {
-        if ( list == null ) {
-            return null;
-        }
-
-        List<Criterion> list1 = new ArrayList<Criterion>( list.size() );
-        for ( CriterionSummaryDTO criterionSummaryDTO : list ) {
-            list1.add( criterionSummaryDTOToCriterion( criterionSummaryDTO ) );
-        }
-
-        return list1;
-    }
-
-    protected CriterionSummaryDTO criterionToCriterionSummaryDTO(Criterion criterion) {
-        if ( criterion == null ) {
+    protected PhaseSummaryDTO phaseToPhaseSummaryDTO(Phase phase) {
+        if ( phase == null ) {
             return null;
         }
 
         UUID id = null;
         String name = null;
-        int maxScore = 0;
+        int sequence = 0;
 
-        id = criterion.getId();
-        name = criterion.getName();
-        maxScore = criterion.getMaxScore();
+        id = phase.getId();
+        name = phase.getName();
+        sequence = phase.getSequence();
 
-        CriterionSummaryDTO criterionSummaryDTO = new CriterionSummaryDTO( id, name, maxScore );
+        PhaseSummaryDTO phaseSummaryDTO = new PhaseSummaryDTO( id, name, sequence );
 
-        return criterionSummaryDTO;
-    }
-
-    protected List<CriterionSummaryDTO> criterionListToCriterionSummaryDTOList(List<Criterion> list) {
-        if ( list == null ) {
-            return null;
-        }
-
-        List<CriterionSummaryDTO> list1 = new ArrayList<CriterionSummaryDTO>( list.size() );
-        for ( Criterion criterion : list ) {
-            list1.add( criterionToCriterionSummaryDTO( criterion ) );
-        }
-
-        return list1;
+        return phaseSummaryDTO;
     }
 
     protected CandidateSummaryDTO candidateToCandidateSummaryDTO(Candidate candidate) {
@@ -225,6 +207,37 @@ public class SegmentMapperImpl implements SegmentMapper {
         List<CandidateSummaryDTO> list1 = new ArrayList<CandidateSummaryDTO>( list.size() );
         for ( Candidate candidate : list ) {
             list1.add( candidateToCandidateSummaryDTO( candidate ) );
+        }
+
+        return list1;
+    }
+
+    protected CriterionSummaryDTO criterionToCriterionSummaryDTO(Criterion criterion) {
+        if ( criterion == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        String name = null;
+        int maxScore = 0;
+
+        id = criterion.getId();
+        name = criterion.getName();
+        maxScore = criterion.getMaxScore();
+
+        CriterionSummaryDTO criterionSummaryDTO = new CriterionSummaryDTO( id, name, maxScore );
+
+        return criterionSummaryDTO;
+    }
+
+    protected List<CriterionSummaryDTO> criterionListToCriterionSummaryDTOList(List<Criterion> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<CriterionSummaryDTO> list1 = new ArrayList<CriterionSummaryDTO>( list.size() );
+        for ( Criterion criterion : list ) {
+            list1.add( criterionToCriterionSummaryDTO( criterion ) );
         }
 
         return list1;

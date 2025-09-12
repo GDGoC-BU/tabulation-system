@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.dtos.segment;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public record SegmentDetailedDTO(
         String name,
         int sequence,
         PhaseSegmentStatus status,
+        PhaseSummaryDTO phase,
         List<CriterionSummaryDTO> criteria,
         List<CandidateSummaryDTO> qualifiedCandidates
 ) {
