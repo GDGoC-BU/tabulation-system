@@ -1,20 +1,19 @@
-import { TextBody, TextDisplay, TextHeading, TextSub } from '@/components/text'
+import { LinkButton } from '@/components/link'
+import { TextDisplay } from '@/components/text'
 
 export default function Home() {
   return (
-    <div className='flex flex-col gap-2'>
-      <TextDisplay>Display</TextDisplay>
-      <TextHeading>Heading</TextHeading>
-      <TextBody>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-        mollit anim id est laborum.
-      </TextBody>
-      <TextSub>This is a sub text</TextSub>
+    <div className='grid h-screen place-items-center'>
+      <div className='flex flex-col items-center gap-4'>
+        <div>
+          <TextDisplay>Tabulation</TextDisplay>
+        </div>
+        <div className='flex gap-4'>
+          <LinkButton href='/judge/login'>Judge</LinkButton>
+
+          <LinkButton href='/admin/login'>Admin</LinkButton>
+        </div>
+      </div>
     </div>
   )
 }
