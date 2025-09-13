@@ -1,9 +1,20 @@
+import { TextBody, TextDisplay, TextHeading, TextSub } from '@/components/text'
+
 export default function Home() {
   return (
-    <div>
-      <h1 className='font-heading font- text-2xl'>Hello World</h1>
-
-      <h1 className='font-body text-2xl'>This is a body</h1>
+    <div className='flex flex-col gap-2'>
+      <TextDisplay>Display</TextDisplay>
+      <TextHeading>Heading</TextHeading>
+      <TextBody>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+        velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+        occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+        mollit anim id est laborum.
+      </TextBody>
+      <TextSub>This is a sub text</TextSub>
     </div>
   )
 }
