@@ -1,0 +1,24 @@
+COMPONENTS:
+- all files are to be in kebab-case
+	- this-is-a-component.tsx
+	- this-is-a-server-action.ts
+
+- Component structure:
+
+	export default function Component({}:Prop) {
+
+		// Custom hooks
+		// React hooks. useState, useRef, useEffect, in that order
+		// Helper functions
+		// Early returns
+		// Render logic
+
+		return <div></div>
+	}
+	
+	- Utilize /features and /components. Page component should not be long
+	- use regular functions and not arrow functions
+	- export default directly unless Compound Component
+	- reusable helper functions should be stored someplace else, unless they are only used in the component like: onClick()
+	- Early returns such as: if(!data) return <div>loading...</div>
+	- Render logic such as: const buttonName = loading ? "loading" : "click me"
