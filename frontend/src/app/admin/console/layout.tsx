@@ -6,8 +6,8 @@ export default function layout({ children }: ComponentChildrenProp) {
     <SidebarProvider defaultOpen={true}>
       <Navigation.Admin.Vertical />
       <div className='w-full'>
-        <Navigation.Admin.Horizontal className='p-4' />
-        <main className='p-4'>{children}</main>
+        <Navigation.Admin.Horizontal />
+        <main>{children}</main>
       </div>
     </SidebarProvider>
   )

@@ -7,7 +7,7 @@ export default function Horizontal({ className }: ComponentClassNameProp) {
   return (
     <div
       className={cn(
-        'sticky top-0 flex h-[65px] flex-row justify-between border-b backdrop-blur-xl',
+        'sticky top-0 flex h-[65px] flex-row justify-between border-b p-4 backdrop-blur-xl',
         className
       )}
     >
