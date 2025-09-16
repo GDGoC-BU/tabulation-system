@@ -1,9 +1,9 @@
 import Console from '@/components/console'
 
-export default function AdminDashboard() {
+export default function AdminCandidates() {
   return (
     <Console>
-      <Console.Header>Dashboard</Console.Header>
+      <Console.Header>Pageants</Console.Header>
       <Console.Content></Console.Content>
     </Console>
   )

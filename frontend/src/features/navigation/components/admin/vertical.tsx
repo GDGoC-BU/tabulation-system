@@ -57,12 +57,14 @@ export default function Vertical() {
       <SidebarHeader className='flex h-[65px] flex-col justify-center border-b'>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className='h-full hover:cursor-pointer'>
-              <Circle />
-              <div className='flex flex-col'>
-                <TextSub>Managing</TextSub>
-                <TextBody className='font-bold'>MMBU 2025</TextBody>
-              </div>
+            <SidebarMenuButton className='h-full hover:cursor-pointer' asChild>
+              <Link href='/admin/console'>
+                <Circle />
+                <div className='flex flex-col'>
+                  <TextSub>Managing</TextSub>
+                  <TextBody className='font-bold'>MMBU 2025</TextBody>
+                </div>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -76,7 +78,7 @@ export default function Vertical() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuButton asChild>
-                <Link href='/actions/console/pageants'>
+                <Link href='/admin/console/pageants'>
                   <Crown />
                   <TextBody>Pageants</TextBody>
                 </Link>
@@ -84,7 +86,7 @@ export default function Vertical() {
             </SidebarMenu>
             <SidebarMenu>
               <SidebarMenuButton asChild>
-                <Link href='/actions/console/dashboard'>
+                <Link href='/admin/console/dashboard'>
                   <Gauge />
                   <TextBody>Dashboard</TextBody>
                 </Link>
@@ -127,7 +129,7 @@ export default function Vertical() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuButton asChild>
-                <Link href='/actions/console/colleges'>
+                <Link href='/admin/console/colleges'>
                   <School />
                   <TextBody>Colleges</TextBody>
                 </Link>
