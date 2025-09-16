@@ -18,11 +18,7 @@ export const metadata: Metadata = {
   description: 'change me (description)!'
 }
 
-export default function RootLayout({
-  children
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: ComponentChildrenProp) {
   return (
     <html lang='en'>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
