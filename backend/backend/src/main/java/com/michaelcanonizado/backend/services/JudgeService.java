@@ -35,6 +35,8 @@ public class JudgeService {
             return new EntityNotFoundException("Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
+        pageantContext.assertAccess(judge.getId());
+
         return mapper.toSummaryDTO(judge);
     }
 
@@ -43,8 +45,9 @@ public class JudgeService {
             PageantStatus.ONGOING
     })
     public List<JudgeSummaryDTO> getJudges() {
+        UUID selectedPageantId = pageantContext.getId();
         return judgeRepository
-                .findAll()
+                .findAllByPageant_Id(selectedPageantId)
                 .stream()
                 .map(judge -> {
                     return mapper.toSummaryDTO(judge);
@@ -60,6 +63,8 @@ public class JudgeService {
             return new EntityNotFoundException("Can't update. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
+        pageantContext.assertAccess(judge.getId());
+
         mapper.updateEntityFromDTO(judge, judgeUpdateDTO);
         return mapper.toSummaryDTO(judgeRepository.save(judge));
     }
@@ -71,6 +76,7 @@ public class JudgeService {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't delete. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
+        pageantContext.assertAccess(judge.getId());
         judgeRepository.delete(judge);
     }
 }
