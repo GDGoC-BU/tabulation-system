@@ -6,11 +6,16 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(
+        name = "role",
+        discriminatorType = DiscriminatorType.STRING
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public class Account extends Auditable {
+public abstract class Account extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)
@@ -22,6 +27,9 @@ public class Account extends Auditable {
 
     @Column(nullable = false, unique = true)
     private String passwordHash;
+
+    @Column(nullable = false, insertable = false, updatable = false)
+    private String role;
 
     @Column(nullable = false)
     private boolean isOnline = false;

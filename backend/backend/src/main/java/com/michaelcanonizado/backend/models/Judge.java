@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@DiscriminatorValue("JUDGE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter

@@ -1,8 +1,8 @@
-package com.michaelcanonizado.backend.dtos.judge;
+package com.michaelcanonizado.backend.dtos.account;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record JudgeCreateDTO(
+public record AccountCreateDTO(
         @NotBlank(message = "required")
         String username,
 
