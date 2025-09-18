@@ -168,11 +168,10 @@ public class CandidateService {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't delete! Candidate not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
-
-        pageantContext.assertAccess(candidate.getPageant().getId());
-
-        College college = candidate.getCollege();
-        college.removeCandidate(candidate);
+        pageantContext.assertAccess(
+                candidate.getPageant()
+                        .getId()
+        );
         candidateRepository.delete(candidate);
     }
 }
