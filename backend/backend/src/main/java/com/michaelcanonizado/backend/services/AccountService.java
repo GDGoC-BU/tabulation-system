@@ -8,6 +8,7 @@ import com.michaelcanonizado.backend.dtos.account.AccountSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
+import com.michaelcanonizado.backend.exceptions.customs.PageantStatusException;
 import com.michaelcanonizado.backend.mappers.AccountMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
@@ -20,10 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AccountService {
@@ -60,6 +60,7 @@ public class AccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Transactional
     public String loginAccount(AccountLoginDTO accountLoginDTO) {
         String username = accountLoginDTO.username();
         String password = accountLoginDTO.password();
@@ -70,7 +71,27 @@ public class AccountService {
 
         AccountPrincipal principal = (AccountPrincipal) authentication.getPrincipal();
         Account account = principal.getAccount();
-        return jwtService.generateToken(account);
+
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        if (account instanceof Judge judge) {
+            Pageant pageant = judge.getPageant();
+
+            /* Might also check if pageant is null, but this
+               might need a custom exception. */
+
+            /* Judge can only log in if their assign pageant is ongoing. */
+            if (!pageant.getStatus().equals(PageantStatus.ONGOING)) {
+                throw new PageantStatusException(
+                        "Assigned pageant must be ONGOING to login",
+                        ErrorCode.PAGEANT_ACCESS_DENIED
+                );
+            }
+
+            extraClaims.put("pageant_id", pageant.getId());
+        }
+
+        return jwtService.generateToken(account, extraClaims);
     }
 
     public AccountSummaryDTO createAdmin(AccountCreateDTO request) {

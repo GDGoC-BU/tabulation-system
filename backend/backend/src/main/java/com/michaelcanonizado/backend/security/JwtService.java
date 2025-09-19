@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -39,12 +40,12 @@ public class JwtService {
         this.secretKey = Encoders.BASE64URL.encode(sk.getEncoded());
     }
 
-    public String generateToken(Account account) {
+    public String generateToken(Account account, Map<String, Object> extraClaims) {
         String username = account.getUsername();
         String role = getRole(account);
-        Map<String, Object> claims = Map.of(
-                "role", role
-        );
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+        claims.putAll(extraClaims);
 
         Date issuedAt = Date.from(Instant.now());
         Date expirationAt = Date.from(Instant.now().plus(Duration.ofMillis(EXPIRATION_MS)));
