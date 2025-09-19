@@ -1,5 +1,7 @@
 package com.michaelcanonizado.backend.security;
 
+import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.customs.UnsupportedAccountTypeException;
 import com.michaelcanonizado.backend.models.Account;
 import com.michaelcanonizado.backend.models.Admin;
 import com.michaelcanonizado.backend.models.Judge;
@@ -29,8 +31,10 @@ public class AccountDetailsService implements UserDetailsService {
         } else if (account instanceof Judge) {
             authorities = List.of("JUDGE");
         } else {
-            /* Throw proper error */
-            throw new UsernameNotFoundException("Unknown account type");
+            throw new UnsupportedAccountTypeException(
+                    "Unknown account type encountered! Please contact admin.",
+                    ErrorCode.UNSUPPORTED_ACCOUNT_TYPE
+            );
         }
 
         return new AccountPrincipal(

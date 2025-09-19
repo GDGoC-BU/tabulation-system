@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.security;
 
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
+import com.michaelcanonizado.backend.exceptions.customs.UnsupportedAccountTypeException;
 import com.michaelcanonizado.backend.models.Account;
 import com.michaelcanonizado.backend.models.Admin;
 import com.michaelcanonizado.backend.models.Judge;
@@ -62,8 +62,10 @@ public class JwtService {
         } else if (account instanceof Judge) {
             return "JUDGE";
         } else {
-            /* THROW CUSTOM EXCEPTION */
-            throw new EntityNotFoundException("UNKNOWN ACCOUNT TYPE", ErrorCode.PAGEANT_ACCESS_DENIED);
+            throw new UnsupportedAccountTypeException(
+                    "Unknown account type encountered! Please contact admin.",
+                    ErrorCode.UNSUPPORTED_ACCOUNT_TYPE
+            );
         }
     }
 
