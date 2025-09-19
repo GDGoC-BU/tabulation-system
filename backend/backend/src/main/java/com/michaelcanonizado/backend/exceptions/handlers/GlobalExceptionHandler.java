@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.exceptions.handlers;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.common.ErrorResponse;
 import com.michaelcanonizado.backend.exceptions.common.SQLState;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.PropertyValueException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -110,6 +111,24 @@ public class GlobalExceptionHandler {
                 status.value(),
                 status.getReasonPhrase(),
                 ErrorCode.DATABASE_ERROR,
+                message,
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredJwtException(
+            ExpiredJwtException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        String message = "Token expired! Please login again.";
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                ErrorCode.TOKEN_EXPIRED,
                 message,
                 request.getRequestURI()
         );
