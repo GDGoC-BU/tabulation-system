@@ -123,7 +123,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
-            BadCredentialsException exception,
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
@@ -141,7 +140,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(
-            AccessDeniedException exception,
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.FORBIDDEN;
@@ -159,7 +157,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<ErrorResponse> handleExpiredJwtException(
-            ExpiredJwtException exception,
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
@@ -179,8 +176,7 @@ public class GlobalExceptionHandler {
             MalformedJwtException.class,
             SignatureException.class
     })
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
-            RuntimeException exception,
+    public ResponseEntity<ErrorResponse> handleMalformedJwtException(
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
