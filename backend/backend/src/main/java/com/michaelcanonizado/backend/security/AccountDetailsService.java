@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,21 +23,19 @@ public class AccountDetailsService implements UserDetailsService {
             return new UsernameNotFoundException("User not found");
         });
 
-        List<String> roles;
+        List<String> authorities;
         if (account instanceof Admin) {
-            roles = List.of("ADMIN");
+            authorities = List.of("ADMIN");
         } else if (account instanceof Judge) {
-            roles = List.of("JUDGE");
+            authorities = List.of("JUDGE");
         } else {
             /* Throw proper error */
             throw new UsernameNotFoundException("Unknown account type");
         }
 
         return new AccountPrincipal(
-                account.getId(),
-                account.getUsername(),
-                account.getPasswordHash(),
-                roles
+                account,
+                authorities
         );
     }
 }

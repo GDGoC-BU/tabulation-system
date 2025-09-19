@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.services;
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.account.AccountCreateDTO;
+import com.michaelcanonizado.backend.dtos.account.AccountLoginDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
@@ -10,7 +11,12 @@ import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedExcep
 import com.michaelcanonizado.backend.mappers.AccountMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
+import com.michaelcanonizado.backend.security.AccountPrincipal;
+import com.michaelcanonizado.backend.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +50,26 @@ public class AccountService {
     @Autowired
     private PageantContext pageantContext;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtService;
+
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+    public String loginAccount(AccountLoginDTO accountLoginDTO) {
+        String username = accountLoginDTO.username();
+        String password = accountLoginDTO.password();
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password)
+        );
+
+        AccountPrincipal principal = (AccountPrincipal) authentication.getPrincipal();
+        Account account = principal.getAccount();
+        return jwtService.generateToken(account);
+    }
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
