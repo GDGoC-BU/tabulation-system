@@ -26,10 +26,14 @@ import java.util.function.Function;
 public class JwtService {
     private final String secretKey;
 
-    /* Token valid for 4 hours */
-    private final long EXPIRATION_MS = 1000 * 60 * 60 * 4;
+    /* Token valid for 6 hours */
+    private final long EXPIRATION_MS = 1000 * 60 * 60 * 6;
 
     public JwtService() throws NoSuchAlgorithmException {
+        /* Generate a secret key on construct. I.e: secret keys
+           are generated on initial backend startup. Therefore,
+           if the backend restarts, all JWTs issued before will
+           be invalidated. They need to log in again. */
         KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
         SecretKey sk = keyGen.generateKey();
         this.secretKey = Encoders.BASE64URL.encode(sk.getEncoded());
