@@ -33,33 +33,45 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                /* Disable CSRF protection */
                 .csrf(csrf -> csrf.disable())
+                /* Make session stateless */
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(request ->
                         request.requestMatchers(
+                                /* Allow unauthenticated access to these routes */
                                 "api/v1/accounts/login"
                                 )
                                 .permitAll()
+                                /* Everything else, authenticate */
                                 .anyRequest()
                                 .authenticated()
                 )
+                /* Allow credentials to be passed in HTTP Headers.
+                   I.e: You need this if you want to hit the backend
+                   Curl or Postman. */
                 .httpBasic(Customizer.withDefaults())
+                /* Check for JWTs, else proceed with basic credentials check */
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                /* Ensure that filterChainExceptionHandler is the very first filter */
+                /* Ensure that filterChainExceptionHandler is the very first filter
+                   to catch filter exceptions. */
                 .addFilterBefore(filterChainExceptionHandler, JwtFilter.class)
                 .build();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider()
-    {
+    public AuthenticationProvider authenticationProvider() {
+        /* Determine the service that will fetch user details */
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        /* Use Bcrypt as password encoder */
         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
         return provider;
     }
 
+    /* Expose AuthenticationManager to the app. Can now be
+       used in services. */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
