@@ -1,5 +1,7 @@
-package com.michaelcanonizado.backend.security;
+package com.michaelcanonizado.backend.security.filters;
 
+import com.michaelcanonizado.backend.security.AccountDetailsService;
+import com.michaelcanonizado.backend.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

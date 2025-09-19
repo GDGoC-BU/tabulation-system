@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.configurations;
 
-import com.michaelcanonizado.backend.security.JwtFilter;
+import com.michaelcanonizado.backend.security.filters.JwtFilter;
 import com.michaelcanonizado.backend.security.filters.FilterChainExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
