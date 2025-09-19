@@ -71,12 +71,6 @@ public class AccountService {
         return jwtService.generateToken(account);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION,
-            PageantStatus.ONGOING,
-            PageantStatus.FINALIZING,
-            PageantStatus.CLOSED
-    })
     public AccountSummaryDTO createAdmin(AccountCreateDTO request) {
         String username = request.username();
         String password = request.password();
