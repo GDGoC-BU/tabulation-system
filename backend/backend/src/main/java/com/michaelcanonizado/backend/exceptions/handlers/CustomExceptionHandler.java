@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class CustomExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
+            EntityNotFoundException exception,
+            HttpServletRequest request
+    ) {
         HttpStatus status = HttpStatus.NOT_FOUND;
 
         ErrorResponse response = new ErrorResponse(
@@ -25,7 +28,10 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(EntityAlreadyExistException.class)
-    public ResponseEntity<ErrorResponse> handleEntityAlreadyExistException(EntityAlreadyExistException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleEntityAlreadyExistException(
+            EntityAlreadyExistException exception,
+            HttpServletRequest request
+    ) {
         HttpStatus status = HttpStatus.CONFLICT;
 
         ErrorResponse response = new ErrorResponse(
@@ -39,7 +45,10 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(PageantStatusException.class)
-    public ResponseEntity<ErrorResponse> handlePageantStatusException(PageantStatusException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handlePageantStatusException(
+            PageantStatusException exception,
+            HttpServletRequest request
+    ) {
         HttpStatus status = HttpStatus.LOCKED;
 
         ErrorResponse response = new ErrorResponse(
@@ -53,7 +62,10 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(PageantAccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handlePageantAccessDeniedException(PageantAccessDeniedException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handlePageantAccessDeniedException(
+            PageantAccessDeniedException exception,
+            HttpServletRequest request
+    ) {
         HttpStatus status = HttpStatus.FORBIDDEN;
 
         ErrorResponse response = new ErrorResponse(
@@ -67,7 +79,10 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(SegmentStatusException.class)
-    public ResponseEntity<ErrorResponse> handleSegmentStatusException(SegmentStatusException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleSegmentStatusException(
+            SegmentStatusException exception,
+            HttpServletRequest request
+    ) {
         HttpStatus status = HttpStatus.FORBIDDEN;
 
         ErrorResponse response = new ErrorResponse(
@@ -81,7 +96,10 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(UnsupportedAccountTypeException.class)
-    public ResponseEntity<ErrorResponse> handleUnsupportedAccountTypeException(UnsupportedAccountTypeException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleUnsupportedAccountTypeException(
+            UnsupportedAccountTypeException exception,
+            HttpServletRequest request
+    ) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
         ErrorResponse response = new ErrorResponse(

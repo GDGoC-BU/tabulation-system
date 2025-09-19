@@ -21,7 +21,10 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException exception,
+            HttpServletRequest request
+    ) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String message = exception.getBindingResult()
                 .getFieldErrors()
@@ -41,7 +44,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleRequestInvalidBodyException(HttpMessageNotReadableException exception, HttpServletRequest request) throws IOException {
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException exception,
+            HttpServletRequest request
+    ) throws IOException {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         ErrorResponse response = new ErrorResponse(
@@ -55,7 +61,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PropertyValueException.class)
-    public ResponseEntity<ErrorResponse> handlePropertyValueException(PropertyValueException exception, HttpServletRequest request) throws IOException {
+    public ResponseEntity<ErrorResponse> handlePropertyValueException(
+            PropertyValueException exception,
+            HttpServletRequest request
+    ) throws IOException {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         String propertyName = exception.getPropertyName();
@@ -74,7 +83,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handlePropertyValueException(ConstraintViolationException exception, HttpServletRequest request) throws IOException {
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+            ConstraintViolationException exception,
+            HttpServletRequest request
+    ) throws IOException {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         String sqlState = exception.getSQLException().getSQLState();
