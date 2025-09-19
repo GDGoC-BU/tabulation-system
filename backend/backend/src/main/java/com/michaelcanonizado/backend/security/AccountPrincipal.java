@@ -1,7 +1,6 @@
 package com.michaelcanonizado.backend.security;
 
 import com.michaelcanonizado.backend.models.Account;
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Getter
 public class AccountPrincipal implements UserDetails {
     private final Account account;
     private final List<? extends GrantedAuthority> authorities;
@@ -25,13 +23,17 @@ public class AccountPrincipal implements UserDetails {
         return authorities;
     }
 
-    @Override
-    public String getPassword() {
-        return account.getPasswordHash();
+    public Account getAccount() {
+        return account;
     }
 
     @Override
     public String getUsername() {
+        return account.getUsername();
+    }
+
+    @Override
+    public String getPassword() {
         return account.getPasswordHash();
     }
 
