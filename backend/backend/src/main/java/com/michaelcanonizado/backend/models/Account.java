@@ -8,10 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(
-        name = "role",
-        discriminatorType = DiscriminatorType.STRING
-)
+@DiscriminatorColumn(name = "account_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
@@ -27,9 +24,6 @@ public abstract class Account extends Auditable {
 
     @Column(nullable = false, unique = true)
     private String passwordHash;
-
-    @Column(nullable = false, insertable = false, updatable = false)
-    private String role;
 
     @Column(nullable = false)
     private boolean isOnline = false;

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@DiscriminatorValue("ADMIN")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
