@@ -176,11 +176,11 @@ public class GlobalExceptionHandler {
             MalformedJwtException.class,
             SignatureException.class
     })
-    public ResponseEntity<ErrorResponse> handleMalformedJwtException(
+    public ResponseEntity<ErrorResponse> handleInvalidJwtException(
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
-        String message = "Malformed token! Please login again.";
+        String message = "Invalid token! Please login again.";
 
         ErrorResponse response = new ErrorResponse(
                 status.value(),
