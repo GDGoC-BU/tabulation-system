@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -61,12 +62,20 @@ public class SecurityConfiguration {
                 .build();
     }
 
+    /* Centralize the password encoder to keep encoding consistent.
+       I.e: Using a different value in strength to encode/decode
+       will not work! */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
+    }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         /* Determine the service that will fetch user details */
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         /* Use Bcrypt as password encoder */
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+        provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 

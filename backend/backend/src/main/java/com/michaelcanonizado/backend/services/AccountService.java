@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -56,7 +57,8 @@ public class AccountService {
     @Autowired
     private JwtService jwtService;
 
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public String loginAccount(AccountLoginDTO accountLoginDTO) {
         String username = accountLoginDTO.username();
@@ -74,7 +76,7 @@ public class AccountService {
     public AccountSummaryDTO createAdmin(AccountCreateDTO request) {
         String username = request.username();
         String password = request.password();
-        String passwordHash = encoder.encode(password);
+        String passwordHash = passwordEncoder.encode(password);
         Admin admin = new Admin(username, passwordHash);
         return mapper.toSummaryDTO(accountRepository.save(admin));
     }
@@ -85,7 +87,7 @@ public class AccountService {
     public AccountSummaryDTO createJudge(AccountCreateDTO request) {
         String username = request.username();
         String password = request.password();
-        String passwordHash = encoder.encode(password);
+        String passwordHash = passwordEncoder.encode(password);
 
         UUID selectedPageantId = pageantContext.getId();
         Pageant pageant = pageantRepository.findById(selectedPageantId).orElseThrow(() -> {
