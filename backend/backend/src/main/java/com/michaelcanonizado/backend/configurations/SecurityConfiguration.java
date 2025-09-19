@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.configurations;
 
 import com.michaelcanonizado.backend.security.JwtFilter;
+import com.michaelcanonizado.backend.security.filters.FilterChainExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,9 @@ public class SecurityConfiguration {
     @Autowired
     private JwtFilter jwtFilter;
 
+    @Autowired
+    private FilterChainExceptionHandler filterChainExceptionHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -43,6 +47,8 @@ public class SecurityConfiguration {
                 )
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                /* Ensure that filterChainExceptionHandler is the very first filter */
+                .addFilterBefore(filterChainExceptionHandler, JwtFilter.class)
                 .build();
     }
 
