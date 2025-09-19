@@ -35,31 +35,44 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
 
+        /* If a bearer token is used for authentication */
         String tokenPrefix = "Bearer ";
         if (authorizationHeader != null && authorizationHeader.startsWith(tokenPrefix)) {
+            /* Extract token */
             token = authorizationHeader.substring(tokenPrefix.length());
+            /* Extract username from token */
             username = jwtService.extractUsername(token);
         }
 
+        /* If a username was extracted, and the request hasn't been authenticated
+           by another filter, authenticate it. */
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            /* Fetch account from database */
             UserDetails userDetails =
                     applicationContext
                             .getBean(AccountDetailsService.class)
                             .loadUserByUsername(username);
 
+            /* Validate the token
+               (signature, not expired, and matches the expected account) */
             if (jwtService.validateToken(token, userDetails)) {
+                /* Create the spring security authentication object */
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
                                 userDetails.getAuthorities()
                         );
+                /* Attach other metadata from the request */
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
+                /* Set the authentication object to SecurityContext.
+                   Following filters no longer have to authenticate. */
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+        /* Proceed with the next filter */
         filterChain.doFilter(request, response);
     }
 }
