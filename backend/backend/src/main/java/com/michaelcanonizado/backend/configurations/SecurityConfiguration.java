@@ -58,12 +58,17 @@ public class SecurityConfiguration {
                    I.e: You need this if you want to hit the backend
                    Curl or Postman. */
                 .httpBasic(Customizer.withDefaults())
+                /* Should always be the last filter! Only runs when request is
+                   already authenticated. */
                 .addFilterAfter(pageantContextResolverFilter, UsernamePasswordAuthenticationFilter.class)
                 /* Check for JWTs, else proceed with basic credentials check */
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 /* Ensure that filterChainExceptionHandler is the very first filter
                    to catch filter exceptions. */
                 .addFilterBefore(filterChainExceptionHandler, JwtFilter.class)
+                /* Final filter chain order:
+                   FilterChainExceptionHandler -> JwtFilter ->
+                   UsernamePasswordAuthenticationFilter -> PageantContextResolverFilter */
                 .build();
     }
 
