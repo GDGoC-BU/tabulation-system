@@ -22,22 +22,16 @@ import java.util.UUID;
 public class CollegeService {
     @Autowired
     private CollegeRepository repository;
+
     @Autowired
     private CollegeMapper mapper;
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     @Transactional
     public CollegeDetailedDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
         College college = repository.save(mapper.toEntity(collegeCreateDTO));
         return mapper.toDetailedDTO(college);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
-    })
     @Transactional
     public CollegeDetailedDTO getCollege(UUID id) {
         College college = repository.findById(id).orElseThrow(() -> {
@@ -46,19 +40,12 @@ public class CollegeService {
         return mapper.toDetailedDTO(college);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
-    })
     public List<CollegeSummaryDTO> getColleges() {
         return repository.findAll().stream().map(college -> {
             return mapper.toSummaryDTO(college);
         }).toList();
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     public CollegeSummaryDTO updateCollege(UUID id, CollegeUpdateDTO collegeUpdateDTO) {
         College college = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! College not found.", ErrorCode.ENTITY_NOT_FOUND);
@@ -67,9 +54,6 @@ public class CollegeService {
         return mapper.toSummaryDTO(repository.save(college));
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     public void deleteCollege(UUID id) {
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Can't delete! College not found.", ErrorCode.ENTITY_NOT_FOUND);
