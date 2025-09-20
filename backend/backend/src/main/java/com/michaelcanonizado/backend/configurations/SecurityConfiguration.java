@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.configurations;
 
 import com.michaelcanonizado.backend.security.filters.JwtFilter;
 import com.michaelcanonizado.backend.security.filters.FilterChainExceptionHandler;
+import com.michaelcanonizado.backend.security.filters.PageantContextResolverFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PageantContextResolverFilter pageantContextResolverFilter;
 
     @Autowired
     private JwtFilter jwtFilter;
@@ -54,6 +58,7 @@ public class SecurityConfiguration {
                    I.e: You need this if you want to hit the backend
                    Curl or Postman. */
                 .httpBasic(Customizer.withDefaults())
+                .addFilterAfter(pageantContextResolverFilter, UsernamePasswordAuthenticationFilter.class)
                 /* Check for JWTs, else proceed with basic credentials check */
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 /* Ensure that filterChainExceptionHandler is the very first filter

@@ -111,4 +111,38 @@ public class CustomExceptionHandler {
         );
         return new ResponseEntity<>(response, status);
     }
+
+    @ExceptionHandler(PageantHeaderLookupFailureException.class)
+    public ResponseEntity<ErrorResponse> handlePageantHeaderLookupFailureException(
+            PageantHeaderLookupFailureException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
+    @ExceptionHandler(PageantContextMissingException.class)
+    public ResponseEntity<ErrorResponse> handlePageantContextMissingException(
+            PageantContextMissingException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
 }
