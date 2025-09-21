@@ -13,27 +13,34 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { TextBody } from '@/components/text'
-
-const formSchema = z.object({
-  username: z.string(),
-  password: z.string()
-})
+import { TextBody, TextSub } from '@/components/text'
+import loginSchema from '../schemas/login'
+import { login } from '../actions/login'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Admin() {
-  /* Form definition */
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<ServerFormActionResponse | null>(null)
+  const router = useRouter()
+
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       username: '',
       password: ''
     }
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    setIsLoading(true)
+    const response = await login(values)
+    if (response.isSuccessful) {
+      router.push('/admin/console')
+    } else {
+      setError(response)
+    }
+    setIsLoading(false)
   }
 
   return (
@@ -68,7 +75,10 @@ export default function Admin() {
             </FormItem>
           )}
         />
-        <Button variant='outline' className='w-full'>
+        {error && (
+          <TextSub className='text-destructive'>{error.message}</TextSub>
+        )}
+        <Button disabled={isLoading} variant='outline' className='w-full'>
           <TextBody>Submit</TextBody>
         </Button>
       </form>

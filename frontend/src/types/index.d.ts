@@ -1,8 +1,13 @@
 type ComponentClassNameProp = {
-	className?: string;
-};
+  className?: string
+}
 type ComponentChildrenProp = {
-	children?: React.ReactNode;
-};
+  children?: React.ReactNode
+}
 type ComponentClassNameAndChildrenProp = ComponentClassNameProp &
-	ComponentChildrenProp;
+  ComponentChildrenProp
+
+type ServerFormActionResponse = {
+  isSuccessful: boolean
+  message?: string
+}
