@@ -3,7 +3,9 @@ import Console from '@/components/console'
 export default function AdminDashboard() {
   return (
     <Console>
-      <Console.Header>Dashboard</Console.Header>
+      <Console.Header>
+        <Console.Header.Title>Dashboard</Console.Header.Title>
+      </Console.Header>
       <Console.Content></Console.Content>
     </Console>
   )

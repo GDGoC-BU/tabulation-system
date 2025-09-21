@@ -1,9 +1,15 @@
 import Console from '@/components/console'
+import { getPageants } from '@/features/pageants/actions/getPageants'
 
-export default function AdminPageants() {
+export default async function AdminPageants() {
+  const pageants = await getPageants()
+  console.log(pageants)
+
   return (
     <Console>
-      <Console.Header>Pageants</Console.Header>
+      <Console.Header>
+        <Console.Header.Title>Pageants</Console.Header.Title>
+      </Console.Header>
       <Console.Content></Console.Content>
     </Console>
   )

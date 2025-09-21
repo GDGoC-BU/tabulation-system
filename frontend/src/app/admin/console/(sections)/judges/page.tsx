@@ -3,7 +3,9 @@ import Console from '@/components/console'
 export default function AdminJudges() {
   return (
     <Console>
-      <Console.Header>Judges</Console.Header>
+      <Console.Header>
+        <Console.Header.Title>Judges</Console.Header.Title>
+      </Console.Header>
       <Console.Content></Console.Content>
     </Console>
   )
