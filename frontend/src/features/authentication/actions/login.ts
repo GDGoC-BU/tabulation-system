@@ -3,9 +3,8 @@
 import api from '@/lib/axios'
 import loginSchema from '../schemas/login'
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import axios from 'axios'
-import { BackendErrorResponse } from '@/types'
+import { BackendErrorResponse, ServerFormActionResponse } from '@/types'
 
 export async function login(data: unknown): Promise<ServerFormActionResponse> {
   const result = loginSchema.safeParse(data)
@@ -52,5 +51,10 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
         message: 'Something went wrong! Please contact admin.'
       }
     }
+  }
+
+  return {
+    isSuccessful: false,
+    message: 'something went wrong'
   }
 }
