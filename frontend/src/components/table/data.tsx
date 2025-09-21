@@ -73,7 +73,7 @@ export default function DataTable<TData, TValue>({
 
                   return (
                     <TableCell key={cell.id}>
-                      <TextBody>
+                      <TextBody className=''>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()

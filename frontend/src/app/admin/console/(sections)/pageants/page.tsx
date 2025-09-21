@@ -5,7 +5,6 @@ import { pageantTableColumns } from '@/features/pageants/components/pageant-tabl
 
 export default async function AdminPageants() {
   const pageants = await getPageants()
-  console.log(pageants)
 
   return (
     <Console>
