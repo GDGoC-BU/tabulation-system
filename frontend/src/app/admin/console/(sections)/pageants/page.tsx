@@ -1,5 +1,5 @@
 import Console from '@/components/console'
-import { getPageants } from '@/features/pageants/actions/getPageants'
+import { getPageants } from '@/features/pageants/actions/get-pageants'
 
 export default async function AdminPageants() {
   const pageants = await getPageants()
