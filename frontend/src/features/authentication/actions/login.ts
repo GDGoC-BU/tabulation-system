@@ -5,6 +5,7 @@ import loginSchema from '../schemas/login'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import axios from 'axios'
+import { BackendErrorResponse } from '@/types'
 
 export async function login(data: unknown): Promise<ServerFormActionResponse> {
   const result = loginSchema.safeParse(data)
@@ -26,7 +27,7 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
 
     const cookieStore = await cookies()
     cookieStore.set({
-      name: 'token',
+      name: 'TOKEN',
       value: token,
       secure: true,
       httpOnly: true,
@@ -40,9 +41,10 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       if (error.response) {
+        const backendError = error.response.data as BackendErrorResponse
         return {
           isSuccessful: false,
-          message: 'Wrong username or password!'
+          message: backendError.message
         }
       }
       return {

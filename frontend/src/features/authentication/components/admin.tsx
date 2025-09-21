@@ -18,6 +18,7 @@ import loginSchema from '../schemas/login'
 import { login } from '../actions/login'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ServerFormActionResponse } from '@/types'
 
 export default function Admin() {
   const [isLoading, setIsLoading] = useState(false)
