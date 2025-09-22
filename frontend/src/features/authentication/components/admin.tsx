@@ -80,7 +80,7 @@ export default function Admin() {
           <TextSub className='text-destructive'>{error.message}</TextSub>
         )}
         <Button disabled={isLoading} variant='outline' className='w-full'>
-          <TextBody>Submit</TextBody>
+          Submit
         </Button>
       </form>
     </Form>

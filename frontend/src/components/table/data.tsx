@@ -41,14 +41,12 @@ export default function DataTable<TData, TValue>({
               {headerGroup.headers.map(header => {
                 return (
                   <TableHead key={header.id}>
-                    <TextBody>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TextBody>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 )
               })}

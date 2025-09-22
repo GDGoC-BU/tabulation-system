@@ -72,15 +72,13 @@ export default function Vertical() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>
-            <TextSub>Home</TextSub>
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Home</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuButton asChild>
                 <Link href='/admin/console/pageants'>
                   <Crown />
-                  <TextBody>Pageants</TextBody>
+                  Pageants
                 </Link>
               </SidebarMenuButton>
             </SidebarMenu>
@@ -88,7 +86,7 @@ export default function Vertical() {
               <SidebarMenuButton asChild>
                 <Link href='/admin/console/dashboard'>
                   <Gauge />
-                  <TextBody>Dashboard</TextBody>
+                  Dashboard
                 </Link>
               </SidebarMenuButton>
             </SidebarMenu>
@@ -96,9 +94,7 @@ export default function Vertical() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>
-            <TextSub>Manage</TextSub>
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Manage</SidebarGroupLabel>
           <SidebarGroupContent>
             {pageantAction.map((action, index) => {
               return (
@@ -107,12 +103,10 @@ export default function Vertical() {
                     <SidebarMenuButton asChild>
                       <Link href={action.url}>
                         <action.icon />
-                        <TextBody>{action.title}</TextBody>
+                        {action.title}
                       </Link>
                     </SidebarMenuButton>
-                    <SidebarMenuBadge>
-                      <TextSub>{action.badgeValue}</TextSub>
-                    </SidebarMenuBadge>
+                    <SidebarMenuBadge>{action.badgeValue}</SidebarMenuBadge>
                   </SidebarMenuItem>
                 </SidebarMenu>
               )
@@ -123,15 +117,13 @@ export default function Vertical() {
         <SidebarSeparator />
 
         <SidebarGroup>
-          <SidebarGroupLabel>
-            <TextSub>Globals</TextSub>
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Globals</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuButton asChild>
                 <Link href='/admin/console/colleges'>
                   <School />
-                  <TextBody>Colleges</TextBody>
+                  Colleges
                 </Link>
               </SidebarMenuButton>
             </SidebarMenu>

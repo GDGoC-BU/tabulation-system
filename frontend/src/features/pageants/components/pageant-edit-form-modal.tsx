@@ -78,15 +78,11 @@ export default function PageantEditFormModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
             <DialogHeader>
-              <DialogTitle>
-                <TextBody>Edit Pageant</TextBody>
-              </DialogTitle>
-              <DialogDescription asChild>
-                <TextSub>
-                  {
-                    "Make changes to pageant details here. Click save when you're done."
-                  }
-                </TextSub>
+              <DialogTitle>Edit Pageant</DialogTitle>
+              <DialogDescription>
+                {
+                  "Make changes to pageant details here. Click save when you're done."
+                }
               </DialogDescription>
             </DialogHeader>
             <FormField
@@ -110,7 +106,7 @@ export default function PageantEditFormModal({
                 <Button variant='outline'>Cancel</Button>
               </DialogClose>
               <Button type='submit' disabled={isLoading} variant='default'>
-                <TextBody className='text-background'>Save changes</TextBody>
+                Save changes
               </Button>
             </DialogFooter>
           </form>
