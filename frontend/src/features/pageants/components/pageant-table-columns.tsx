@@ -2,20 +2,17 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import { PageantStatus, PageantSummary } from '../schemas/pageant'
-import {
-  Dialog,
-  DialogHeader,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { Ellipsis } from 'lucide-react'
+import { TextBody } from '@/components/text'
+import PageantEditFormModal from './pageant-edit-form-modal'
 
 export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
   {
     accessorKey: 'title',
-    header: 'Title'
+    header: 'Title',
+    cell: ({ row }) => {
+      const title = row.getValue('title') as string
+      return <TextBody>{title}</TextBody>
+    }
   },
   {
     accessorKey: 'status',
@@ -24,12 +21,12 @@ export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
       const { value, color } = row.getValue('status') as PageantStatus
 
       return (
-        <span
+        <div
           className='mx-2 w-fit rounded-md px-4 py-2 text-center'
           style={{ backgroundColor: color }}
         >
-          {value}
-        </span>
+          <TextBody>{value}</TextBody>
+        </div>
       )
     }
   },
@@ -53,7 +50,7 @@ export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
         hour12: true
       }).format(date)
 
-      return formatted
+      return <TextBody>{formatted}</TextBody>
     }
   },
   {
@@ -76,7 +73,7 @@ export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
         hour12: true
       }).format(date)
 
-      return formatted
+      return <TextBody>{formatted}</TextBody>
     }
   },
   {
@@ -84,23 +81,7 @@ export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
     cell: ({ row }) => {
       const pageant = row.original
 
-      return (
-        <Dialog>
-          <DialogTrigger>
-            <Ellipsis />
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit</DialogTitle>
-              <DialogDescription>
-                {
-                  "Make changes to pageant details here. Click save when you're done."
-                }
-              </DialogDescription>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
-      )
+      return <PageantEditFormModal pageant={pageant} />
     }
   }
 ]
