@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedExcep
 import com.michaelcanonizado.backend.exceptions.customs.PageantContextMissingException;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @RequestScope
 @Component
+@Setter
 public class PageantContext {
     /* Never expose the actual pageant object!
        If the object came from cache, that object
@@ -26,14 +28,10 @@ public class PageantContext {
        that the pageant is a fully managed entity. */
     private Pageant selectedPageant;
 
-    public void setSelectedPageant(Pageant selectedPageant) {
-        this.selectedPageant = selectedPageant;
-    }
-
     public UUID getId() {
         if (selectedPageant == null) {
             throw new PageantContextMissingException(
-                    "No pageant is selected for this request",
+                    "Cannot get pageant.id! No pageant is selected for this request.",
                     ErrorCode.PAGEANT_CONTEXT_MISSING
             );
         }
@@ -43,7 +41,7 @@ public class PageantContext {
     public PageantStatus getStatus() {
         if (selectedPageant == null) {
             throw new PageantContextMissingException(
-                    "No pageant is selected for this request",
+                    "Cannot get pageant.status! No pageant is selected for this request",
                     ErrorCode.PAGEANT_CONTEXT_MISSING
             );
         }
@@ -53,7 +51,7 @@ public class PageantContext {
     public void assertAccess(UUID entityPageantId) {
         if (selectedPageant == null) {
             throw new PageantContextMissingException(
-                    "No pageant is selected for this request",
+                    "Cannot assert access! No pageant is selected for this request.",
                     ErrorCode.PAGEANT_CONTEXT_MISSING
             );
         }

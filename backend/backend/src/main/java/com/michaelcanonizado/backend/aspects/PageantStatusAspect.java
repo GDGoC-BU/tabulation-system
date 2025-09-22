@@ -2,28 +2,88 @@ package com.michaelcanonizado.backend.aspects;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.customs.PageantContextMissingException;
+import com.michaelcanonizado.backend.exceptions.customs.PageantHeaderLookupFailureException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantStatusException;
+import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.contexts.PageantContext;
+import com.michaelcanonizado.backend.services.PageantCacheService;
+import com.michaelcanonizado.backend.utilities.RequestHeader;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @Aspect
 @Component
 public class PageantStatusAspect {
     @Autowired
-    private PageantRepository repository;
+    private PageantRepository pageantRepository;
 
     @Autowired
     private PageantContext pageantContext;
 
+    @Autowired
+    private PageantCacheService pageantCacheService;
+
+    @Autowired
+    private RequestHeader requestHeader;
+
     @Before("@within(requirePageantStatus) || @annotation(requirePageantStatus)")
     public void checkPageantStatus(RequirePageantStatus requirePageantStatus) {
+        /* Extract Pageant-Id from request headers and populate context
+           so the service can extract the context of the selected
+           pageant. */
+        String headerKey = "Pageant-Id";
+        String headerPageantId = requestHeader.getHeader(headerKey);
+
+        /* No Pageant-Id attached in header */
+        if (headerPageantId == null || headerPageantId.isBlank()) {
+            pageantContext.setSelectedPageant(null);
+            throw new PageantContextMissingException(
+                    "Entity locked under pageant status, but no Pageant-Id header is present!",
+                    ErrorCode.PAGEANT_CONTEXT_MISSING
+            );
+        }
+
+        try {
+            UUID pageantId = UUID.fromString(headerPageantId);
+
+            /* Check cache */
+            Pageant pageant = pageantCacheService.get(pageantId).orElseGet(() -> {
+                /* If not in cache, check database */
+                Pageant pageantInDatabase = pageantRepository.findById(pageantId).orElseThrow(() -> {
+                    /* If it doesn't exist anywhere */
+                    return new PageantHeaderLookupFailureException(
+                            "Cannot resolve the attached '" + headerKey + "' header! Pageant doesn't exist.",
+                            ErrorCode.INVALID_REQUEST_HEADER
+                    );
+                });
+
+                /* Update pageant cache */
+                pageantCacheService.put(pageantInDatabase);
+
+                /* Return the found pageant */
+                return pageantInDatabase;
+            });
+
+            /* Store pageant in context */
+            pageantContext.setSelectedPageant(pageant);
+        } catch (IllegalArgumentException e) {
+            /* Pageant-Id is attached in header but invalid UUID format */
+            pageantContext.setSelectedPageant(null);
+            throw new PageantHeaderLookupFailureException(
+                    "Cannot resolve the attached '" + headerKey + "' header! Invalid UUID format.",
+                    ErrorCode.INVALID_REQUEST_HEADER
+            );
+        }
+
+
         /* Get selected pageant status */
         PageantStatus currentStatus = pageantContext.getStatus();
 

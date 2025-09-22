@@ -20,6 +20,7 @@ public class PageantCacheService {
         return repository.findById(id);
     }
 
+    /* USE DTOS IN CACHES! DO NOT CACHE WHOLE ENTITIES BECAUSE OF THE BIDIRECTIONAL RELATIONSHIPS */
     public void put(Pageant pageantInDatabase) {
         /* Make sure your PageantCacheService.put(...) is safe in concurrent requests. If multiple requests miss the cache simultaneously, you don’t want race conditions. Usually, a ConcurrentHashMap or Caffeine handles this. */
     }
