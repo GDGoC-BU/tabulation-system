@@ -6,9 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record PageantUpdateDTO(
         @NotBlank(message = "required")
-        String title,
-
-        @NotNull(message = "required")
-        PageantStatus status
+        String title
 ) {
 }

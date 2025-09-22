@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-22T01:11:49+0800",
+    date = "2025-09-22T22:53:28+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
@@ -66,7 +66,6 @@ public class PageantMapperImpl implements PageantMapper {
             return;
         }
 
-        pageant.setStatus( pageantUpdateDTO.status() );
         pageant.setTitle( pageantUpdateDTO.title() );
     }
 }
