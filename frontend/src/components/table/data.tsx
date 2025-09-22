@@ -62,23 +62,13 @@ export default function DataTable<TData, TValue>({
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
               >
-                {row.getVisibleCells().map((cell, index) => {
-                  if (cell.getValue() == null) {
-                    return (
-                      <TableCell key={index}>
-                        <TextBody>-</TextBody>
-                      </TableCell>
-                    )
-                  }
-
+                {row.getVisibleCells().map(cell => {
                   return (
                     <TableCell key={cell.id}>
-                      <TextBody className=''>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TextBody>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   )
                 })}

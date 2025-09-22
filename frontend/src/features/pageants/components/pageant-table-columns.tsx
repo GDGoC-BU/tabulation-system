@@ -2,6 +2,15 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import { PageantStatus, PageantSummary } from '../schemas/pageant'
+import {
+  Dialog,
+  DialogHeader,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Ellipsis } from 'lucide-react'
 
 export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
   {
@@ -68,6 +77,30 @@ export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
       }).format(date)
 
       return formatted
+    }
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const pageant = row.original
+
+      return (
+        <Dialog>
+          <DialogTrigger>
+            <Ellipsis />
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit</DialogTitle>
+              <DialogDescription>
+                {
+                  "Make changes to pageant details here. Click save when you're done."
+                }
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      )
     }
   }
 ]
