@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +25,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { TextBody, TextSub } from '@/components/text'
+import { usePageant } from '@/features/pageants/store/usePageant'
 
 const pageantAction = [
   {
@@ -52,6 +55,10 @@ const pageantAction = [
 ]
 
 export default function Vertical() {
+  const pageant = usePageant(state => state.pageant)
+
+  const currentPageant = pageant ? pageant.title : '-'
+
   return (
     <Sidebar variant='sidebar' collapsible='icon'>
       <SidebarHeader className='flex h-[65px] flex-col justify-center border-b'>
@@ -60,10 +67,7 @@ export default function Vertical() {
             <SidebarMenuButton className='h-full hover:cursor-pointer' asChild>
               <Link href='/admin/console'>
                 <Circle />
-                <div className='flex flex-col'>
-                  <TextSub>Managing</TextSub>
-                  <TextBody className='font-bold'>MMBU 2025</TextBody>
-                </div>
+                <TextBody className='font-bold'>Tabulation</TextBody>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -71,6 +75,14 @@ export default function Vertical() {
       </SidebarHeader>
 
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Managing</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuButton>{currentPageant}</SidebarMenuButton>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Home</SidebarGroupLabel>
           <SidebarGroupContent>

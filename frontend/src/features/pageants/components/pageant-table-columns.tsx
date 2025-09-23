@@ -4,14 +4,16 @@ import { ColumnDef } from '@tanstack/react-table'
 import { PageantStatus, PageantSummary } from '../schemas/pageant'
 import { TextBody } from '@/components/text'
 import PageantEditFormModal from './pageant-edit-form-modal'
+import PageantTitle from './pageant-title'
 
 export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
   {
     accessorKey: 'title',
     header: 'Title',
     cell: ({ row }) => {
-      const title = row.getValue('title') as string
-      return <TextBody>{title}</TextBody>
+      const pageant = row.original as PageantSummary
+
+      return <PageantTitle pageant={pageant}>{pageant.title}</PageantTitle>
     }
   },
   {

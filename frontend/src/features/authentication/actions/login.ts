@@ -30,9 +30,6 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
     const token = response.data
     const { exp } = jwtDecode<BackendJwtPayload>(token)
 
-    console.log('Token: ', token)
-    console.log('Expires: ', exp)
-
     if (!exp) {
       return {
         isSuccessful: false,
