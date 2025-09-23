@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { jwtDecode } from 'jwt-decode'
 import { NextRequest, NextResponse } from 'next/server'
-import { JwtPayload } from './types'
+import { BackendJwtPayload } from './types'
 
 export async function middleware(request: NextRequest) {
   const cookieStore = await cookies()
@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
 
   if (token) {
-    const { role } = jwtDecode<JwtPayload>(token.value)
+    const { role } = jwtDecode<BackendJwtPayload>(token.value)
     accountRole = role
   }
 

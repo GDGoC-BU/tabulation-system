@@ -1,4 +1,4 @@
-import { JwtPayload as BaseJwtPayload } from 'jwt-decode'
+import { JwtPayload } from 'jwt-decode'
 
 type ComponentClassNameProp = {
   className?: string
@@ -14,7 +14,7 @@ type ServerFormActionResponse = {
   message?: string
 }
 
-type JwtPayload = {
+type BackendJwtPayload = {
   role: string
 } & JwtPayload
 

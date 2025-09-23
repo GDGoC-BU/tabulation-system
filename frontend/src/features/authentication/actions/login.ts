@@ -4,7 +4,12 @@ import api from '@/lib/axios'
 import loginSchema from '../schemas/login'
 import { cookies } from 'next/headers'
 import axios from 'axios'
-import { BackendErrorResponse, ServerFormActionResponse } from '@/types'
+import {
+  BackendErrorResponse,
+  ServerFormActionResponse,
+  BackendJwtPayload
+} from '@/types'
+import { jwtDecode } from 'jwt-decode'
 
 export async function login(data: unknown): Promise<ServerFormActionResponse> {
   const result = loginSchema.safeParse(data)
@@ -23,11 +28,23 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
   try {
     const response = await api.post('/accounts/login', body)
     const token = response.data
+    const { exp } = jwtDecode<BackendJwtPayload>(token)
+
+    console.log('Token: ', token)
+    console.log('Expires: ', exp)
+
+    if (!exp) {
+      return {
+        isSuccessful: false,
+        message: 'No expiry date in token.'
+      }
+    }
 
     const cookieStore = await cookies()
     cookieStore.set({
       name: 'TOKEN',
       value: token,
+      expires: new Date(exp * 1000),
       secure: true,
       httpOnly: true,
       path: '/',
