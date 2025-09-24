@@ -56,7 +56,7 @@ const pageantAction = [
 ]
 
 export default function Vertical() {
-  const pageant = usePageant(state => state.pageant)
+  const { pageant, setPageant } = usePageant(state => state)
   const isPageantSelected = pageant ? true : false
   const SelectedPageantIndicator = isPageantSelected ? (
     <SidebarMenuButton>
@@ -67,12 +67,20 @@ export default function Vertical() {
     <SidebarMenuButton>-</SidebarMenuButton>
   )
 
+  function removeSelectedPageantContext() {
+    setPageant(null)
+  }
+
   return (
     <Sidebar variant='sidebar' collapsible='icon'>
       <SidebarHeader className='flex h-[65px] flex-col justify-center border-b'>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className='h-full hover:cursor-pointer' asChild>
+            <SidebarMenuButton
+              className='h-full hover:cursor-pointer'
+              asChild
+              onClick={removeSelectedPageantContext}
+            >
               <Link href='/admin/console'>
                 <Circle />
                 <TextBody className='font-bold'>Tabulation</TextBody>
