@@ -1,14 +1,14 @@
 'use server'
 
 import { BackendErrorResponse, ServerFormActionResponse } from '@/types'
-import { pageantEditSchema } from '../schemas/pageant-edit'
+import { pageantAddSchema } from '../schemas/pageant-add'
 import api from '@/lib/axios'
 import axios from 'axios'
 
-export async function editPageant(
+export async function addPageant(
   data: unknown
 ): Promise<ServerFormActionResponse> {
-  const result = pageantEditSchema.safeParse(data)
+  const result = pageantAddSchema.safeParse(data)
   if (!result.success) {
     return {
       isSuccessful: false,
@@ -16,13 +16,12 @@ export async function editPageant(
     }
   }
 
-  const id = result.data.id
   const body = {
     title: result.data.title
   }
 
   try {
-    const response = await api.put(`/pageants/${id}`, body)
+    const response = await api.post(`/pageants`, body)
     return {
       isSuccessful: true
     }
