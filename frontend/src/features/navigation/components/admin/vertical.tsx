@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/sidebar'
 import {
   Circle,
+  Columns3Cog,
   Crown,
   Gauge,
   Layers,
@@ -24,7 +25,7 @@ import {
   UserStar
 } from 'lucide-react'
 import Link from 'next/link'
-import { TextBody, TextSub } from '@/components/text'
+import { TextBody } from '@/components/text'
 import { usePageant } from '@/features/pageants/store/usePageant'
 
 const pageantAction = [
@@ -56,8 +57,15 @@ const pageantAction = [
 
 export default function Vertical() {
   const pageant = usePageant(state => state.pageant)
-
-  const currentPageant = pageant ? pageant.title : '-'
+  const isPageantSelected = pageant ? true : false
+  const SelectedPageantIndicator = isPageantSelected ? (
+    <SidebarMenuButton>
+      <Columns3Cog />
+      {pageant?.title}
+    </SidebarMenuButton>
+  ) : (
+    <SidebarMenuButton>-</SidebarMenuButton>
+  )
 
   return (
     <Sidebar variant='sidebar' collapsible='icon'>
@@ -78,29 +86,35 @@ export default function Vertical() {
         <SidebarGroup>
           <SidebarGroupLabel>Managing</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuButton>{currentPageant}</SidebarMenuButton>
-            </SidebarMenu>
+            <SidebarMenu>{SelectedPageantIndicator}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Home</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuButton asChild>
-                <Link href='/admin/console/pageants'>
-                  <Crown />
-                  Pageants
-                </Link>
-              </SidebarMenuButton>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href='/admin/console/pageants'>
+                    <Crown />
+                    Pageants
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
             <SidebarMenu>
-              <SidebarMenuButton asChild>
-                <Link href='/admin/console/dashboard'>
-                  <Gauge />
-                  Dashboard
-                </Link>
-              </SidebarMenuButton>
+              <SidebarMenuItem
+                className={
+                  !isPageantSelected ? 'pointer-events-none opacity-50' : ''
+                }
+              >
+                <SidebarMenuButton asChild>
+                  <Link href='/admin/console/dashboard'>
+                    <Gauge />
+                    Dashboard
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -111,7 +125,11 @@ export default function Vertical() {
             {pageantAction.map((action, index) => {
               return (
                 <SidebarMenu key={index}>
-                  <SidebarMenuItem>
+                  <SidebarMenuItem
+                    className={
+                      !isPageantSelected ? 'pointer-events-none opacity-50' : ''
+                    }
+                  >
                     <SidebarMenuButton asChild>
                       <Link href={action.url}>
                         <action.icon />
