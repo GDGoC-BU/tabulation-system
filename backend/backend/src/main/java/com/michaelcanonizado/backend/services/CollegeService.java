@@ -2,14 +2,12 @@ package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
-import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CollegeMapper;
 import com.michaelcanonizado.backend.models.College;
-import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,17 +25,17 @@ public class CollegeService {
     private CollegeMapper mapper;
 
     @Transactional
-    public CollegeDetailedDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
+    public CollegeSummaryDTO addCollege(CollegeCreateDTO collegeCreateDTO) {
         College college = repository.save(mapper.toEntity(collegeCreateDTO));
-        return mapper.toDetailedDTO(college);
+        return mapper.toSummaryDTO(college);
     }
 
     @Transactional
-    public CollegeDetailedDTO getCollege(UUID id) {
+    public CollegeSummaryDTO getCollege(UUID id) {
         College college = repository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("College not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
-        return mapper.toDetailedDTO(college);
+        return mapper.toSummaryDTO(college);
     }
 
     public List<CollegeSummaryDTO> getColleges() {

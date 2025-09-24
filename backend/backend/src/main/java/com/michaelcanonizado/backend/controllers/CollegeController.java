@@ -1,7 +1,6 @@
 package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.college.CollegeCreateDTO;
-import com.michaelcanonizado.backend.dtos.college.CollegeDetailedDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.college.CollegeUpdateDTO;
 import com.michaelcanonizado.backend.services.CollegeService;
@@ -22,14 +21,14 @@ public class CollegeController {
     private CollegeService service;
 
     @PostMapping("/colleges")
-    public ResponseEntity<CollegeDetailedDTO> addCollege(@RequestBody @Valid CollegeCreateDTO collegeCreateDTO) {
-        CollegeDetailedDTO college = service.addCollege(collegeCreateDTO);
+    public ResponseEntity<CollegeSummaryDTO> addCollege(@RequestBody @Valid CollegeCreateDTO collegeCreateDTO) {
+        CollegeSummaryDTO college = service.addCollege(collegeCreateDTO);
         return new ResponseEntity<>(college, HttpStatus.CREATED);
     }
 
     @GetMapping("/colleges/{id}")
-    public ResponseEntity<CollegeDetailedDTO> getCollege(@PathVariable UUID id) {
-        CollegeDetailedDTO college = service.getCollege(id);
+    public ResponseEntity<CollegeSummaryDTO> getCollege(@PathVariable UUID id) {
+        CollegeSummaryDTO college = service.getCollege(id);
         return new ResponseEntity<>(college, HttpStatus.OK);
     }
 
