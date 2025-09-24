@@ -27,12 +27,12 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { TextBody, TextSub } from '@/components/text'
+import { TextSub } from '@/components/text'
 import { Button } from '@/components/ui/button'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { editPageant } from '../actions/edit-pageant'
 
-export default function PageantEditFormModal({
+export default function PageantEditFormDialog({
   pageant
 }: {
   pageant: PageantSummary

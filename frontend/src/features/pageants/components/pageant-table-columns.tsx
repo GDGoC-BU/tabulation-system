@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { PageantStatus, PageantSummary } from '../schemas/pageant'
 import { TextBody } from '@/components/text'
-import PageantEditFormModal from './pageant-edit-form-modal'
+import PageantEditFormDialog from './pageant-edit-form-dialog'
 import PageantTitle from './pageant-title'
 
 export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
@@ -83,7 +83,7 @@ export const pageantTableColumns: ColumnDef<PageantSummary>[] = [
     cell: ({ row }) => {
       const pageant = row.original
 
-      return <PageantEditFormModal pageant={pageant} />
+      return <PageantEditFormDialog pageant={pageant} />
     }
   }
 ]
