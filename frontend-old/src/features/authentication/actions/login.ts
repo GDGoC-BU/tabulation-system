@@ -29,11 +29,12 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
     /* Delete cookie so that no token in the auth header is present */
     const cookieStore = await cookies()
     cookieStore.delete('TOKEN')
+    cookieStore.delete('ACCOUNT_ROLE')
 
     /* login with credentials in body */
     const response = await api.post('/accounts/login', body)
     const token = response.data
-    const { exp } = jwtDecode<BackendJwtPayload>(token)
+    const { exp, role } = jwtDecode<BackendJwtPayload>(token)
 
     if (!exp) {
       return {
@@ -41,10 +42,25 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
         message: 'No expiry date in token.'
       }
     }
+    if (!role) {
+      return {
+        isSuccessful: false,
+        message: 'No account role in token.'
+      }
+    }
 
     cookieStore.set({
       name: 'TOKEN',
       value: token,
+      expires: new Date(exp * 1000),
+      secure: true,
+      httpOnly: true,
+      path: '/',
+      sameSite: 'strict'
+    })
+    cookieStore.set({
+      name: 'ACCOUNT_ROLE',
+      value: role,
       expires: new Date(exp * 1000),
       secure: true,
       httpOnly: true,

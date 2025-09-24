@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { UnauthorizedError } from './UnauthorizedError'
 
 const api = axios.create({
   baseURL: `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api/v1`,
@@ -20,5 +22,14 @@ api.interceptors.request.use(async config => {
 
   return config
 })
+
+api.interceptors.response.use(
+  response => response,
+  async error => {
+    if (error.response?.status === 401) {
+      throw new UnauthorizedError()
+    }
+  }
+)
 
 export default api

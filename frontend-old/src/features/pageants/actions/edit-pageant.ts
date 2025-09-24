@@ -1,13 +1,16 @@
 'use server'
 
-import { BackendErrorResponse, ServerFormActionResponse } from '@/types'
+import { ServerFormActionResponse } from '@/types'
 import { pageantEditSchema } from '../schemas'
 import api from '@/lib/axios'
-import axios from 'axios'
+import { backendErrorMessageResolver } from '@/lib/backend-error-message-resolver'
+import { redirect } from 'next/navigation'
+import { UnauthorizedError } from '@/lib/UnauthorizedError'
 
 export async function editPageant(
   data: unknown
 ): Promise<ServerFormActionResponse> {
+  let toRedirect = false
   const result = pageantEditSchema.safeParse(data)
   if (!result.success) {
     return {
@@ -26,23 +29,25 @@ export async function editPageant(
     return {
       isSuccessful: true
     }
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      if (error.response) {
-        const backendError = error.response.data as BackendErrorResponse
-        return {
-          isSuccessful: false,
-          message: backendError.message
-        }
-      }
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      toRedirect = true
+    }
+
+    if (!toRedirect) {
       return {
         isSuccessful: false,
-        message: 'Something went wrong! Please contact admin.'
+        message: backendErrorMessageResolver(error)
       }
     }
   }
-  return {
-    isSuccessful: false,
-    message: 'something went wrong'
+
+  if (toRedirect) {
+    redirect('/admin/login')
+  } else {
+    return {
+      isSuccessful: false,
+      message: 'Return error to satisy TS'
+    }
   }
 }
