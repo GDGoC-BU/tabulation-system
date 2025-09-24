@@ -1,5 +1,5 @@
-import { zStringToDate } from '@/schemas'
 import z from 'zod'
+import { zStringToDate } from '@/schemas'
 
 export const pageantStatusSchema = z.object({
   value: z.string(),
@@ -19,3 +19,16 @@ export const pageantSummarySchema = z.object({
 export type PageantSummary = z.infer<typeof pageantSummarySchema>
 
 export const pageantsSchema = z.array(pageantSummarySchema)
+
+export const pageantAddSchema = z.object({
+  title: z.string().min(1, {
+    error: 'Required'
+  })
+})
+
+export const pageantEditSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, {
+    error: 'Required'
+  })
+})

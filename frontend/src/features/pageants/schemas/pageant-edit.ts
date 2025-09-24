@@ -1,8 +1,0 @@
-import z from 'zod'
-
-export const pageantEditSchema = z.object({
-  id: z.string(),
-  title: z.string().min(1, {
-    error: 'Required'
-  })
-})

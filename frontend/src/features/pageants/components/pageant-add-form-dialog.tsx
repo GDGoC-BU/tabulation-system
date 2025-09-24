@@ -14,7 +14,7 @@ import { ServerFormActionResponse } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
-import { pageantAddSchema } from '../schemas/pageant-add'
+import { pageantAddSchema } from '../schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,

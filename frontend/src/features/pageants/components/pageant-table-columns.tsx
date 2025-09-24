@@ -1,7 +1,7 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { PageantStatus, PageantSummary } from '../schemas/pageant'
+import { PageantStatus, PageantSummary } from '../schemas'
 import { TextBody } from '@/components/text'
 import PageantEditFormDialog from './pageant-edit-form-dialog'
 import PageantTitle from './pageant-title'

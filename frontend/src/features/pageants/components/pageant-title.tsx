@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { ComponentClassNameAndChildrenProp } from '@/types'
 import React from 'react'
 import { usePageant } from '../store/usePageant'
-import { PageantSummary } from '../schemas/pageant'
+import { PageantSummary } from '../schemas'
 import { useRouter } from 'next/navigation'
 
 export default function PageantTitle({

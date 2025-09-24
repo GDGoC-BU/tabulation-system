@@ -10,13 +10,12 @@ import {
   DialogFooter
 } from '@/components/ui/dialog'
 import { Ellipsis } from 'lucide-react'
-import { PageantSummary } from '../schemas/pageant'
+import { PageantSummary, pageantEditSchema } from '../schemas'
 import { useState } from 'react'
 import { ServerFormActionResponse } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
-import { pageantEditSchema } from '../schemas/pageant-edit'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,

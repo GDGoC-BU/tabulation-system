@@ -1,7 +1,7 @@
 'use server'
 
 import { BackendErrorResponse, ServerFormActionResponse } from '@/types'
-import { pageantEditSchema } from '../schemas/pageant-edit'
+import { pageantEditSchema } from '../schemas'
 import api from '@/lib/axios'
 import axios from 'axios'
 

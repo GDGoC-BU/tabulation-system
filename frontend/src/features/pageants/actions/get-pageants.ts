@@ -1,7 +1,7 @@
 'use server'
 
 import api from '@/lib/axios'
-import { pageantsSchema } from '../schemas/pageant'
+import { pageantsSchema } from '../schemas'
 
 export async function getPageants() {
   try {
