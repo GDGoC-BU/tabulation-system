@@ -26,6 +26,11 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
   }
 
   try {
+    /* Delete cookie so that no token in the auth header is present */
+    const cookieStore = await cookies()
+    cookieStore.delete('TOKEN')
+
+    /* login with credentials in body */
     const response = await api.post('/accounts/login', body)
     const token = response.data
     const { exp } = jwtDecode<BackendJwtPayload>(token)
@@ -37,7 +42,6 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
       }
     }
 
-    const cookieStore = await cookies()
     cookieStore.set({
       name: 'TOKEN',
       value: token,
@@ -55,6 +59,7 @@ export async function login(data: unknown): Promise<ServerFormActionResponse> {
     if (axios.isAxiosError(error)) {
       if (error.response) {
         const backendError = error.response.data as BackendErrorResponse
+        console.log('Backend: ', backendError)
         return {
           isSuccessful: false,
           message: backendError.message
