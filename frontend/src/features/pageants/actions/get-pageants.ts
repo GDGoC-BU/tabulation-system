@@ -10,10 +10,9 @@ export async function getPageants() {
     if (!parsedResponse.success) {
       return []
     }
-
     return parsedResponse.data
   } catch (error) {
-    console.log(error)
+    console.log('Error fetching pageants: ', error)
   }
   return []
 }
