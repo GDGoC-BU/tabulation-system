@@ -17,10 +17,10 @@ public class CorsConfiguration {
                    the frontend's IP addresses changes, just disable CORS.*/
                 registry
                         .addMapping("/**")
-                        .allowedOrigins("*")
+                        .allowedOriginPatterns("*")
                         .allowedMethods("*")
                         .allowedHeaders("*")
-                        .allowCredentials(false);
+                        .allowCredentials(true);
 
             }
         };
