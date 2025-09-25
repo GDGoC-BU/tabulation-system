@@ -1,12 +1,13 @@
 import {
   Circle,
+  Columns3Cog,
   Crown,
   Gauge,
   Layers,
   Route,
   School,
-  User,
   UserRoundPen,
+  UserStar,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import {
@@ -23,6 +24,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar'
 import { TextBody } from '@/components/text'
+import { useSelectedPageant } from '@/features/pageants/store/use-selected-pageant'
 // import { usePageant } from '@/features/pageants/store/usePageant'
 
 const pageantAction = [
@@ -35,7 +37,7 @@ const pageantAction = [
   {
     title: 'Candidates',
     url: '/admin/console/candidates',
-    icon: User,
+    icon: UserStar,
     badgeValue: 20,
   },
   {
@@ -53,21 +55,20 @@ const pageantAction = [
 ]
 
 export default function Vertical() {
-  // const { pageant, setPageant } = usePageant((state) => state)
-  const pageant = { title: 'TEMPORARY' }
+  const { pageant, setPageant } = useSelectedPageant((state) => state)
   const isPageantSelected = pageant ? true : false
   const SelectedPageantIndicator = isPageantSelected ? (
     <SidebarMenuButton>
-      {/* <Columns3Cog /> */}
+      <Columns3Cog />
       {pageant?.title}
     </SidebarMenuButton>
   ) : (
     <SidebarMenuButton>-</SidebarMenuButton>
   )
 
-  // function removeSelectedPageantContext() {
-  //   setPageant(null)
-  // }
+  function removeSelectedPageantContext() {
+    setPageant(null)
+  }
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -77,7 +78,7 @@ export default function Vertical() {
             <SidebarMenuButton
               className="h-full hover:cursor-pointer"
               asChild
-              // onClick={removeSelectedPageantContext}
+              onClick={removeSelectedPageantContext}
             >
               <Link to="/admin/console">
                 <Circle />

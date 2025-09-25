@@ -1,4 +1,4 @@
-import { Link, Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthentication } from '@/features/authentication/store/use-authentication'
 import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
 import { SidebarProvider } from '@/components/ui/sidebar'
