@@ -12,6 +12,11 @@ export default function errorResolver(error: unknown): string {
       return error.message
     }
   }
+
+  // Generic Error was thrown
+  if (error instanceof Error) {
+    return error.message
+  }
   // Extreme case where error is none of the above
   return 'Something went wrong! Contact admin.'
 }
