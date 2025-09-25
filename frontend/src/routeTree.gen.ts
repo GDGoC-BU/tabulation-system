@@ -14,9 +14,8 @@ import { Route as AdminConsoleRouteRouteImport } from './routes/admin/console/ro
 import { Route as JudgeLoginIndexRouteImport } from './routes/judge/login/index'
 import { Route as AdminLoginIndexRouteImport } from './routes/admin/login/index'
 import { Route as AdminConsoleIndexRouteImport } from './routes/admin/console/index'
-import { Route as AdminConsolePageantsIndexRouteImport } from './routes/admin/console/pageants/index'
-import { Route as AdminConsoleDashboardIndexRouteImport } from './routes/admin/console/dashboard/index'
-import { Route as AdminConsoleCollegesIndexRouteImport } from './routes/admin/console/colleges/index'
+import { Route as AdminConsolePageantsRouteImport } from './routes/admin/console/pageants'
+import { Route as AdminConsoleCollegeRouteImport } from './routes/admin/console/college'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -43,85 +42,71 @@ const AdminConsoleIndexRoute = AdminConsoleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
-const AdminConsolePageantsIndexRoute =
-  AdminConsolePageantsIndexRouteImport.update({
-    id: '/pageants/',
-    path: '/pageants/',
-    getParentRoute: () => AdminConsoleRouteRoute,
-  } as any)
-const AdminConsoleDashboardIndexRoute =
-  AdminConsoleDashboardIndexRouteImport.update({
-    id: '/dashboard/',
-    path: '/dashboard/',
-    getParentRoute: () => AdminConsoleRouteRoute,
-  } as any)
-const AdminConsoleCollegesIndexRoute =
-  AdminConsoleCollegesIndexRouteImport.update({
-    id: '/colleges/',
-    path: '/colleges/',
-    getParentRoute: () => AdminConsoleRouteRoute,
-  } as any)
+const AdminConsolePageantsRoute = AdminConsolePageantsRouteImport.update({
+  id: '/pageants',
+  path: '/pageants',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
+const AdminConsoleCollegeRoute = AdminConsoleCollegeRouteImport.update({
+  id: '/college',
+  path: '/college',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
+  '/admin/console/college': typeof AdminConsoleCollegeRoute
+  '/admin/console/pageants': typeof AdminConsolePageantsRoute
   '/admin/console/': typeof AdminConsoleIndexRoute
   '/admin/login': typeof AdminLoginIndexRoute
   '/judge/login': typeof JudgeLoginIndexRoute
-  '/admin/console/colleges': typeof AdminConsoleCollegesIndexRoute
-  '/admin/console/dashboard': typeof AdminConsoleDashboardIndexRoute
-  '/admin/console/pageants': typeof AdminConsolePageantsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/console/college': typeof AdminConsoleCollegeRoute
+  '/admin/console/pageants': typeof AdminConsolePageantsRoute
   '/admin/console': typeof AdminConsoleIndexRoute
   '/admin/login': typeof AdminLoginIndexRoute
   '/judge/login': typeof JudgeLoginIndexRoute
-  '/admin/console/colleges': typeof AdminConsoleCollegesIndexRoute
-  '/admin/console/dashboard': typeof AdminConsoleDashboardIndexRoute
-  '/admin/console/pageants': typeof AdminConsolePageantsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
+  '/admin/console/college': typeof AdminConsoleCollegeRoute
+  '/admin/console/pageants': typeof AdminConsolePageantsRoute
   '/admin/console/': typeof AdminConsoleIndexRoute
   '/admin/login/': typeof AdminLoginIndexRoute
   '/judge/login/': typeof JudgeLoginIndexRoute
-  '/admin/console/colleges/': typeof AdminConsoleCollegesIndexRoute
-  '/admin/console/dashboard/': typeof AdminConsoleDashboardIndexRoute
-  '/admin/console/pageants/': typeof AdminConsolePageantsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin/console'
+    | '/admin/console/college'
+    | '/admin/console/pageants'
     | '/admin/console/'
     | '/admin/login'
     | '/judge/login'
-    | '/admin/console/colleges'
-    | '/admin/console/dashboard'
-    | '/admin/console/pageants'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/console/college'
+    | '/admin/console/pageants'
     | '/admin/console'
     | '/admin/login'
     | '/judge/login'
-    | '/admin/console/colleges'
-    | '/admin/console/dashboard'
-    | '/admin/console/pageants'
   id:
     | '__root__'
     | '/'
     | '/admin/console'
+    | '/admin/console/college'
+    | '/admin/console/pageants'
     | '/admin/console/'
     | '/admin/login/'
     | '/judge/login/'
-    | '/admin/console/colleges/'
-    | '/admin/console/dashboard/'
-    | '/admin/console/pageants/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -168,42 +153,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleIndexRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
-    '/admin/console/pageants/': {
-      id: '/admin/console/pageants/'
+    '/admin/console/pageants': {
+      id: '/admin/console/pageants'
       path: '/pageants'
       fullPath: '/admin/console/pageants'
-      preLoaderRoute: typeof AdminConsolePageantsIndexRouteImport
+      preLoaderRoute: typeof AdminConsolePageantsRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
-    '/admin/console/dashboard/': {
-      id: '/admin/console/dashboard/'
-      path: '/dashboard'
-      fullPath: '/admin/console/dashboard'
-      preLoaderRoute: typeof AdminConsoleDashboardIndexRouteImport
-      parentRoute: typeof AdminConsoleRouteRoute
-    }
-    '/admin/console/colleges/': {
-      id: '/admin/console/colleges/'
-      path: '/colleges'
-      fullPath: '/admin/console/colleges'
-      preLoaderRoute: typeof AdminConsoleCollegesIndexRouteImport
+    '/admin/console/college': {
+      id: '/admin/console/college'
+      path: '/college'
+      fullPath: '/admin/console/college'
+      preLoaderRoute: typeof AdminConsoleCollegeRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
   }
 }
 
 interface AdminConsoleRouteRouteChildren {
+  AdminConsoleCollegeRoute: typeof AdminConsoleCollegeRoute
+  AdminConsolePageantsRoute: typeof AdminConsolePageantsRoute
   AdminConsoleIndexRoute: typeof AdminConsoleIndexRoute
-  AdminConsoleCollegesIndexRoute: typeof AdminConsoleCollegesIndexRoute
-  AdminConsoleDashboardIndexRoute: typeof AdminConsoleDashboardIndexRoute
-  AdminConsolePageantsIndexRoute: typeof AdminConsolePageantsIndexRoute
 }
 
 const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
+  AdminConsoleCollegeRoute: AdminConsoleCollegeRoute,
+  AdminConsolePageantsRoute: AdminConsolePageantsRoute,
   AdminConsoleIndexRoute: AdminConsoleIndexRoute,
-  AdminConsoleCollegesIndexRoute: AdminConsoleCollegesIndexRoute,
-  AdminConsoleDashboardIndexRoute: AdminConsoleDashboardIndexRoute,
-  AdminConsolePageantsIndexRoute: AdminConsolePageantsIndexRoute,
 }
 
 const AdminConsoleRouteRouteWithChildren =

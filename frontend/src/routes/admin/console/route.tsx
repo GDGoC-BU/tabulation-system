@@ -1,6 +1,22 @@
-import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { Link, Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { useAuthentication } from '@/features/authentication/store/use-authentication'
+import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
 
 export const Route = createFileRoute('/admin/console')({
+  beforeLoad: async ({ context, location }) => {
+    /* Wait for zustand to load from locale storage */
+    await waitForStoreHydration(useAuthentication)
+    /* If not authenticated, redirect to login */
+    if (!context.authentication.isAuthenticated()) {
+      throw redirect({
+        to: '/admin/login',
+        search: {
+          /* But save the currenth location, so they can be redirected back here */
+          redirect: location.href,
+        },
+      })
+    }
+  },
   component: ConsoleLayout,
 })
 
@@ -39,7 +55,11 @@ function ConsoleLayout() {
         <div className="flex flex-row gap-4">
           {pageantActions.map((action) => {
             return (
-              <Link className="underline text-blue-500" to={action.url}>
+              <Link
+                key={action.url}
+                className="underline text-blue-500"
+                to={action.url}
+              >
                 {action.title}
               </Link>
             )

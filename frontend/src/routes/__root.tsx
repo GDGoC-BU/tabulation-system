@@ -5,9 +5,11 @@ import { TanstackDevtools } from '@tanstack/react-devtools'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import type { QueryClient } from '@tanstack/react-query'
+import type { AuthenticationStore } from '@/features/authentication/store/use-authentication'
 
 interface MyRouterContext {
   queryClient: QueryClient
+  authentication: AuthenticationStore
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
