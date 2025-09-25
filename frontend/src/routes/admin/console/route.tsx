@@ -1,6 +1,8 @@
 import { Link, Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthentication } from '@/features/authentication/store/use-authentication'
 import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import Navigation from '@/features/navigation/components'
 
 export const Route = createFileRoute('/admin/console')({
   beforeLoad: async ({ context, location }) => {
@@ -20,55 +22,16 @@ export const Route = createFileRoute('/admin/console')({
   component: ConsoleLayout,
 })
 
-const pageantActions = [
-  {
-    title: 'Pageants',
-    url: '/admin/console/pageants',
-  },
-  {
-    title: 'Judges',
-    url: '/admin/console/judges',
-  },
-  {
-    title: 'Candidates',
-    url: '/admin/console/candidates',
-  },
-  {
-    title: 'Phases',
-    url: '/admin/console/phases',
-  },
-  {
-    title: 'Segments',
-    url: '/admin/console/segments',
-  },
-  {
-    title: 'Colleges',
-    url: '/admin/console/colleges',
-  },
-]
-
 function ConsoleLayout() {
   return (
-    <div className="flex flex-col divide-y gap-4">
-      <div>
-        <h1>LAYOUT</h1>
-        <div className="flex flex-row gap-4">
-          {pageantActions.map((action) => {
-            return (
-              <Link
-                key={action.url}
-                className="underline text-blue-500"
-                to={action.url}
-              >
-                {action.title}
-              </Link>
-            )
-          })}
-        </div>
+    <SidebarProvider defaultOpen={true}>
+      <Navigation.Admin.Vertical />
+      <div className="w-full">
+        <Navigation.Admin.Horizontal />
+        <main>
+          <Outlet />
+        </main>
       </div>
-      <div>
-        <Outlet />
-      </div>
-    </div>
+    </SidebarProvider>
   )
 }

@@ -14,8 +14,13 @@ import { Route as AdminConsoleRouteRouteImport } from './routes/admin/console/ro
 import { Route as JudgeLoginIndexRouteImport } from './routes/judge/login/index'
 import { Route as AdminLoginIndexRouteImport } from './routes/admin/login/index'
 import { Route as AdminConsoleIndexRouteImport } from './routes/admin/console/index'
+import { Route as AdminConsoleSegmentsRouteImport } from './routes/admin/console/segments'
+import { Route as AdminConsolePhasesRouteImport } from './routes/admin/console/phases'
 import { Route as AdminConsolePageantsRouteImport } from './routes/admin/console/pageants'
-import { Route as AdminConsoleCollegeRouteImport } from './routes/admin/console/college'
+import { Route as AdminConsoleJudgesRouteImport } from './routes/admin/console/judges'
+import { Route as AdminConsoleDashboardRouteImport } from './routes/admin/console/dashboard'
+import { Route as AdminConsoleCollegesRouteImport } from './routes/admin/console/colleges'
+import { Route as AdminConsoleCandidatesRouteImport } from './routes/admin/console/candidates'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,30 +47,65 @@ const AdminConsoleIndexRoute = AdminConsoleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
+const AdminConsoleSegmentsRoute = AdminConsoleSegmentsRouteImport.update({
+  id: '/segments',
+  path: '/segments',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
+const AdminConsolePhasesRoute = AdminConsolePhasesRouteImport.update({
+  id: '/phases',
+  path: '/phases',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
 const AdminConsolePageantsRoute = AdminConsolePageantsRouteImport.update({
   id: '/pageants',
   path: '/pageants',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
-const AdminConsoleCollegeRoute = AdminConsoleCollegeRouteImport.update({
-  id: '/college',
-  path: '/college',
+const AdminConsoleJudgesRoute = AdminConsoleJudgesRouteImport.update({
+  id: '/judges',
+  path: '/judges',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
+const AdminConsoleDashboardRoute = AdminConsoleDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
+const AdminConsoleCollegesRoute = AdminConsoleCollegesRouteImport.update({
+  id: '/colleges',
+  path: '/colleges',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
+const AdminConsoleCandidatesRoute = AdminConsoleCandidatesRouteImport.update({
+  id: '/candidates',
+  path: '/candidates',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
-  '/admin/console/college': typeof AdminConsoleCollegeRoute
+  '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
+  '/admin/console/colleges': typeof AdminConsoleCollegesRoute
+  '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
+  '/admin/console/judges': typeof AdminConsoleJudgesRoute
   '/admin/console/pageants': typeof AdminConsolePageantsRoute
+  '/admin/console/phases': typeof AdminConsolePhasesRoute
+  '/admin/console/segments': typeof AdminConsoleSegmentsRoute
   '/admin/console/': typeof AdminConsoleIndexRoute
   '/admin/login': typeof AdminLoginIndexRoute
   '/judge/login': typeof JudgeLoginIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin/console/college': typeof AdminConsoleCollegeRoute
+  '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
+  '/admin/console/colleges': typeof AdminConsoleCollegesRoute
+  '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
+  '/admin/console/judges': typeof AdminConsoleJudgesRoute
   '/admin/console/pageants': typeof AdminConsolePageantsRoute
+  '/admin/console/phases': typeof AdminConsolePhasesRoute
+  '/admin/console/segments': typeof AdminConsoleSegmentsRoute
   '/admin/console': typeof AdminConsoleIndexRoute
   '/admin/login': typeof AdminLoginIndexRoute
   '/judge/login': typeof JudgeLoginIndexRoute
@@ -74,8 +114,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
-  '/admin/console/college': typeof AdminConsoleCollegeRoute
+  '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
+  '/admin/console/colleges': typeof AdminConsoleCollegesRoute
+  '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
+  '/admin/console/judges': typeof AdminConsoleJudgesRoute
   '/admin/console/pageants': typeof AdminConsolePageantsRoute
+  '/admin/console/phases': typeof AdminConsolePhasesRoute
+  '/admin/console/segments': typeof AdminConsoleSegmentsRoute
   '/admin/console/': typeof AdminConsoleIndexRoute
   '/admin/login/': typeof AdminLoginIndexRoute
   '/judge/login/': typeof JudgeLoginIndexRoute
@@ -85,16 +130,26 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin/console'
-    | '/admin/console/college'
+    | '/admin/console/candidates'
+    | '/admin/console/colleges'
+    | '/admin/console/dashboard'
+    | '/admin/console/judges'
     | '/admin/console/pageants'
+    | '/admin/console/phases'
+    | '/admin/console/segments'
     | '/admin/console/'
     | '/admin/login'
     | '/judge/login'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin/console/college'
+    | '/admin/console/candidates'
+    | '/admin/console/colleges'
+    | '/admin/console/dashboard'
+    | '/admin/console/judges'
     | '/admin/console/pageants'
+    | '/admin/console/phases'
+    | '/admin/console/segments'
     | '/admin/console'
     | '/admin/login'
     | '/judge/login'
@@ -102,8 +157,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin/console'
-    | '/admin/console/college'
+    | '/admin/console/candidates'
+    | '/admin/console/colleges'
+    | '/admin/console/dashboard'
+    | '/admin/console/judges'
     | '/admin/console/pageants'
+    | '/admin/console/phases'
+    | '/admin/console/segments'
     | '/admin/console/'
     | '/admin/login/'
     | '/judge/login/'
@@ -153,6 +213,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleIndexRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
+    '/admin/console/segments': {
+      id: '/admin/console/segments'
+      path: '/segments'
+      fullPath: '/admin/console/segments'
+      preLoaderRoute: typeof AdminConsoleSegmentsRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
+    '/admin/console/phases': {
+      id: '/admin/console/phases'
+      path: '/phases'
+      fullPath: '/admin/console/phases'
+      preLoaderRoute: typeof AdminConsolePhasesRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
     '/admin/console/pageants': {
       id: '/admin/console/pageants'
       path: '/pageants'
@@ -160,25 +234,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsolePageantsRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
-    '/admin/console/college': {
-      id: '/admin/console/college'
-      path: '/college'
-      fullPath: '/admin/console/college'
-      preLoaderRoute: typeof AdminConsoleCollegeRouteImport
+    '/admin/console/judges': {
+      id: '/admin/console/judges'
+      path: '/judges'
+      fullPath: '/admin/console/judges'
+      preLoaderRoute: typeof AdminConsoleJudgesRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
+    '/admin/console/dashboard': {
+      id: '/admin/console/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/console/dashboard'
+      preLoaderRoute: typeof AdminConsoleDashboardRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
+    '/admin/console/colleges': {
+      id: '/admin/console/colleges'
+      path: '/colleges'
+      fullPath: '/admin/console/colleges'
+      preLoaderRoute: typeof AdminConsoleCollegesRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
+    '/admin/console/candidates': {
+      id: '/admin/console/candidates'
+      path: '/candidates'
+      fullPath: '/admin/console/candidates'
+      preLoaderRoute: typeof AdminConsoleCandidatesRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
   }
 }
 
 interface AdminConsoleRouteRouteChildren {
-  AdminConsoleCollegeRoute: typeof AdminConsoleCollegeRoute
+  AdminConsoleCandidatesRoute: typeof AdminConsoleCandidatesRoute
+  AdminConsoleCollegesRoute: typeof AdminConsoleCollegesRoute
+  AdminConsoleDashboardRoute: typeof AdminConsoleDashboardRoute
+  AdminConsoleJudgesRoute: typeof AdminConsoleJudgesRoute
   AdminConsolePageantsRoute: typeof AdminConsolePageantsRoute
+  AdminConsolePhasesRoute: typeof AdminConsolePhasesRoute
+  AdminConsoleSegmentsRoute: typeof AdminConsoleSegmentsRoute
   AdminConsoleIndexRoute: typeof AdminConsoleIndexRoute
 }
 
 const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
-  AdminConsoleCollegeRoute: AdminConsoleCollegeRoute,
+  AdminConsoleCandidatesRoute: AdminConsoleCandidatesRoute,
+  AdminConsoleCollegesRoute: AdminConsoleCollegesRoute,
+  AdminConsoleDashboardRoute: AdminConsoleDashboardRoute,
+  AdminConsoleJudgesRoute: AdminConsoleJudgesRoute,
   AdminConsolePageantsRoute: AdminConsolePageantsRoute,
+  AdminConsolePhasesRoute: AdminConsolePhasesRoute,
+  AdminConsoleSegmentsRoute: AdminConsoleSegmentsRoute,
   AdminConsoleIndexRoute: AdminConsoleIndexRoute,
 }
 
