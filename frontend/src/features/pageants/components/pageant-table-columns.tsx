@@ -1,4 +1,5 @@
 import PageantTitle from './pageant-title'
+import PageantEditFormDialog from './pageant-edit-form-dialog'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { PageantSummary } from '../schemas'
 import { TextBody } from '@/components/text'
@@ -9,7 +10,6 @@ export const pageantTableColumns: Array<ColumnDef<PageantSummary>> = [
     header: 'Title',
     cell: ({ row }) => {
       const pageant = row.original
-
       return <PageantTitle pageant={pageant}>{pageant.title}</PageantTitle>
     },
   },
@@ -36,7 +36,7 @@ export const pageantTableColumns: Array<ColumnDef<PageantSummary>> = [
       const date: PageantSummary['startedAt'] = row.getValue('startedAt')
 
       if (!date) {
-        return null
+        return <TextBody>-</TextBody>
       }
 
       const formatted = new Intl.DateTimeFormat('en-US', {
@@ -59,7 +59,7 @@ export const pageantTableColumns: Array<ColumnDef<PageantSummary>> = [
       const date: PageantSummary['endedAt'] = row.getValue('endedAt')
 
       if (!date) {
-        return null
+        return <TextBody>-</TextBody>
       }
 
       const formatted = new Intl.DateTimeFormat('en-US', {
@@ -75,12 +75,12 @@ export const pageantTableColumns: Array<ColumnDef<PageantSummary>> = [
       return <TextBody>{formatted}</TextBody>
     },
   },
-  // {
-  //   id: 'actions',
-  //   cell: ({ row }) => {
-  //     const pageant = row.original
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const pageant = row.original
 
-  //     return <PageantEditFormDialog pageant={pageant} />
-  //   },
-  // },
+      return <PageantEditFormDialog pageant={pageant} />
+    },
+  },
 ]
