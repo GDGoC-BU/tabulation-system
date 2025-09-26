@@ -19,11 +19,11 @@ export default function PageantTitle({
   }
 
   return (
-    /* Modify text component so that default html parameters can be passed directly */
-    <div onClick={onClick}>
-      <TextBody className={cn('underline hover:cursor-pointer', className)}>
-        {children}
-      </TextBody>
-    </div>
+    <TextBody
+      onClick={onClick}
+      className={cn('underline hover:cursor-pointer', className)}
+    >
+      {children}
+    </TextBody>
   )
 }

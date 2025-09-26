@@ -51,7 +51,9 @@ export default function PageantEditFormDialog({
     },
   })
 
-  /* form default values are only set on initial render, Reset the default values again on open to get the fresh pageant details */
+  /* form default values are only set on initial render,
+     Reset the default values again on open to get the
+     fresh pageant details */
   useEffect(() => {
     if (isDialogOpen) {
       form.reset({
