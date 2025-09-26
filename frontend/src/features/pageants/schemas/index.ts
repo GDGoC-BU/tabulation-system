@@ -1,11 +1,10 @@
 import z from 'zod'
 import { zStringToDate } from '@/schemas'
 
-export const pageantStatusSchema = z.object({
+const pageantStatusSchema = z.object({
   value: z.string(),
   color: z.string(),
 })
-export type PageantStatus = z.infer<typeof pageantStatusSchema>
 
 export const pageantSummarySchema = z.object({
   id: z.string(),
@@ -26,6 +25,7 @@ export const pageantAddSchema = z.object({
     error: 'Required',
   }),
 })
+export type PageantAddParameters = z.infer<typeof pageantAddSchema>
 
 export const pageantEditSchema = z.object({
   id: z.string().min(1, {
@@ -35,9 +35,11 @@ export const pageantEditSchema = z.object({
     error: 'Required',
   }),
 })
+export type PageantEditParameters = z.infer<typeof pageantEditSchema>
 
 export const pageantDeleteSchema = z.object({
   id: z.string().min(1, {
     error: 'Required',
   }),
 })
+export type PageantDeleteParameters = z.infer<typeof pageantDeleteSchema>

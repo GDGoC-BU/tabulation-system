@@ -5,7 +5,7 @@ import { DialogClose } from '@radix-ui/react-dialog'
 import { useQueryClient } from '@tanstack/react-query'
 import { pageantAddSchema } from '../schemas'
 import useAddPageantMutate from '../hooks/use-add-pageant-mutate'
-import type z from 'zod'
+import type { PageantAddParameters } from '../schemas'
 import {
   Form,
   FormControl,
@@ -37,14 +37,14 @@ export default function PageantAddFormDialog() {
   } = useAddPageantMutate()
   const queryClient = useQueryClient()
 
-  const form = useForm<z.infer<typeof pageantAddSchema>>({
+  const form = useForm<PageantAddParameters>({
     resolver: zodResolver(pageantAddSchema),
     defaultValues: {
       title: '',
     },
   })
 
-  async function onSubmit(values: z.infer<typeof pageantAddSchema>) {
+  async function onSubmit(values: PageantAddParameters) {
     const isSuccess = await addPageant(values)
     if (isSuccess) {
       queryClient.invalidateQueries({ queryKey: ['pageants'] })

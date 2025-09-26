@@ -6,8 +6,8 @@ import {
 } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { z } from 'zod'
-import loginSchema from '@/features/authentication/schemas'
+import type { LoginParameters } from '@/features/authentication/schemas'
+import { loginSchema } from '@/features/authentication/schemas'
 import { TextHeading, TextSub } from '@/components/text'
 import {
   Form,
@@ -45,13 +45,13 @@ function AdminLogin() {
   const { mutateAsync, isError, error, isPending } = useLoginMutation()
   const navigate = useNavigate()
 
-  async function onSubmit(values: z.infer<typeof loginSchema>) {
+  async function onSubmit(values: LoginParameters) {
     const token = await mutateAsync(values)
     authentication.setAuthentication(token)
     navigate({ to: redirectBack })
   }
 
-  const form = useForm<z.infer<typeof loginSchema>>({
+  const form = useForm<LoginParameters>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       username: '',

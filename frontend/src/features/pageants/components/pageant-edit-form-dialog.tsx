@@ -7,8 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { pageantEditSchema } from '../schemas'
 import useEditPageantMutate from '../hooks/use-edit-pageant-mutate'
 import useDeletePageantMutate from '../hooks/use-delete-pageant-mutate'
-import type z from 'zod'
-import type { PageantSummary } from '../schemas'
+import type { PageantEditParameters, PageantSummary } from '../schemas'
 import { Button } from '@/components/ui/button'
 import { TextSub } from '@/components/text'
 import { Input } from '@/components/ui/input'
@@ -50,7 +49,7 @@ export default function PageantEditFormDialog({
   } = useDeletePageantMutate()
   const queryClient = useQueryClient()
 
-  const form = useForm<z.infer<typeof pageantEditSchema>>({
+  const form = useForm<PageantEditParameters>({
     resolver: zodResolver(pageantEditSchema),
     defaultValues: {
       id: '',
@@ -70,7 +69,7 @@ export default function PageantEditFormDialog({
     }
   }, [isDialogOpen, pageant, form])
 
-  async function onEditSubmit(values: z.infer<typeof pageantEditSchema>) {
+  async function onEditSubmit(values: PageantEditParameters) {
     const isSuccess = await editPageant(values)
     if (isSuccess) {
       queryClient.invalidateQueries({ queryKey: ['pageants'] })

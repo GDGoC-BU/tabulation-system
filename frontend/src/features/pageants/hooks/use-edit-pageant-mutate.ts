@@ -1,11 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
-import type { pageantEditSchema } from '../schemas'
-import type z from 'zod'
+import type { PageantEditParameters } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
 export default function useEditPageantMutate() {
-  return useMutation<boolean, string, z.infer<typeof pageantEditSchema>>({
+  return useMutation<boolean, string, PageantEditParameters>({
     mutationFn: async (data) => {
       try {
         const body = {

@@ -1,6 +1,6 @@
 import z from 'zod'
 
-const loginSchema = z.object({
+export const loginSchema = z.object({
   username: z.string().min(1, {
     error: 'Required',
   }),
@@ -8,7 +8,7 @@ const loginSchema = z.object({
     error: 'Required',
   }),
 })
-export default loginSchema
+export type LoginParameters = z.infer<typeof loginSchema>
 
 export const accountSchema = z.object({
   username: z.string(),

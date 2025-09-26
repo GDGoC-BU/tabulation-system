@@ -1,11 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
-import type { pageantAddSchema } from '../schemas'
-import type z from 'zod'
+import type { PageantAddParameters } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
 export default function useAddPageantMutate() {
-  return useMutation<boolean, string, z.infer<typeof pageantAddSchema>>({
+  return useMutation<boolean, string, PageantAddParameters>({
     mutationFn: async (data) => {
       try {
         const body = {
