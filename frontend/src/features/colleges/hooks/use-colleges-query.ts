@@ -1,17 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
-import { pageantsSchema } from '../schemas'
+import { collegesSchema } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function usePageantsQuery() {
+export function useCollegesQuery() {
   return useQuery({
-    queryKey: ['pageants'],
+    queryKey: ['colleges'],
     queryFn: async () => {
       try {
-        const response = await api.get('/pageants')
-        const parsedResponse = pageantsSchema.safeParse(response.data)
+        const response = await api.get('/colleges')
+        const parsedResponse = collegesSchema.safeParse(response.data)
         if (!parsedResponse.success) {
-          console.error("/pageants response doesn't match schema!")
+          console.error("/colleges response doesn't match schema!")
           return []
         }
         return parsedResponse.data
