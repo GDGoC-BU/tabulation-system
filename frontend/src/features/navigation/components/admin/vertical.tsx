@@ -24,7 +24,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar'
 import { TextBody } from '@/components/text'
-import { useSelectedPageant } from '@/features/pageants/store/use-selected-pageant'
+import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 
 const pageantAction = [
   {
@@ -54,16 +54,7 @@ const pageantAction = [
 ]
 
 export default function Vertical() {
-  const { pageant, setPageant } = useSelectedPageant((state) => state)
-  const isPageantSelected = pageant ? true : false
-  const SelectedPageantIndicator = isPageantSelected ? (
-    <SidebarMenuButton>
-      <Columns3Cog />
-      {pageant?.title}
-    </SidebarMenuButton>
-  ) : (
-    <SidebarMenuButton>-</SidebarMenuButton>
-  )
+  const { data } = useSelectedPageantQuery()
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -84,7 +75,12 @@ export default function Vertical() {
         <SidebarGroup>
           <SidebarGroupLabel>Managing</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>{SelectedPageantIndicator}</SidebarMenu>
+            <SidebarMenu>
+              <SidebarMenuButton>
+                <Columns3Cog />
+                {data ? data.title : '-'}
+              </SidebarMenuButton>
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
@@ -102,9 +98,7 @@ export default function Vertical() {
             </SidebarMenu>
             <SidebarMenu>
               <SidebarMenuItem
-                className={
-                  !isPageantSelected ? 'pointer-events-none opacity-50' : ''
-                }
+                className={!data ? 'pointer-events-none opacity-50' : ''}
               >
                 <SidebarMenuButton asChild>
                   <Link to="/admin/console/dashboard">
@@ -124,9 +118,7 @@ export default function Vertical() {
               return (
                 <SidebarMenu key={index}>
                   <SidebarMenuItem
-                    className={
-                      !isPageantSelected ? 'pointer-events-none opacity-50' : ''
-                    }
+                    className={!data ? 'pointer-events-none opacity-50' : ''}
                   >
                     <SidebarMenuButton asChild>
                       <Link to={action.url}>

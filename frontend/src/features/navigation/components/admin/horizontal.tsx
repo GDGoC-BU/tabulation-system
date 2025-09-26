@@ -5,13 +5,18 @@ import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 import { useAuthentication } from '@/features/authentication/store/use-authentication'
+import { useSelectedPageantId } from '@/features/pageants/store/use-selected-pageant-id'
 
 export default function Horizontal({ className }: ComponentClassNameProp) {
   const { logout } = useAuthentication((state) => state)
+  const { setSelectedPageantId: setPageantId } = useSelectedPageantId(
+    (state) => state,
+  )
   const navigation = useNavigate()
 
   function logoutAccount() {
     logout()
+    setPageantId(null)
     navigation({ to: '/' })
   }
   return (
