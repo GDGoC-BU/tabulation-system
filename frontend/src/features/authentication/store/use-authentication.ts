@@ -6,7 +6,7 @@ import type { BackendJwtPayload } from '@/types'
 
 export type AuthenticationStore = {
   account: Account | null
-  setAuthentication: (token: string) => void
+  login: (token: string) => void
   logout: () => void
   isAuthenticated: () => boolean
 }
@@ -16,7 +16,7 @@ export const useAuthentication = create<AuthenticationStore>()(
     (set, get) => ({
       account: null,
 
-      setAuthentication: (token: string) => {
+      login: (token: string) => {
         try {
           const { sub, role } = jwtDecode<BackendJwtPayload>(token)
           const account: Account = {
@@ -40,7 +40,7 @@ export const useAuthentication = create<AuthenticationStore>()(
       },
     }),
     {
-      name: 'AUTHENTICATION_STORAGE',
+      name: 'AUTHENTICATION',
       partialize: (state) => ({ account: state.account }),
     },
   ),

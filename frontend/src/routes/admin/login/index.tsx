@@ -47,7 +47,7 @@ function AdminLogin() {
 
   async function onSubmit(values: LoginParameters) {
     const token = await mutateAsync(values)
-    authentication.setAuthentication(token)
+    authentication.login(token)
     navigate({ to: redirectBack })
   }
 
