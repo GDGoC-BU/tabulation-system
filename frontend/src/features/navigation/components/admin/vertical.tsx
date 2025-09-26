@@ -65,20 +65,12 @@ export default function Vertical() {
     <SidebarMenuButton>-</SidebarMenuButton>
   )
 
-  function removeSelectedPageantContext() {
-    setPageant(null)
-  }
-
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="flex h-[65px] flex-col justify-center border-b">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className="h-full hover:cursor-pointer"
-              asChild
-              onClick={removeSelectedPageantContext}
-            >
+            <SidebarMenuButton className="h-full hover:cursor-pointer" asChild>
               <Link to="/admin/console">
                 <Circle />
                 <TextBody className="font-bold">Tabulation</TextBody>
