@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { useAuthentication } from '@/features/authentication/store/use-authentication'
-import { useSelectedPageantId } from '@/features/pageants/store/use-selected-pageant-id'
+import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
+import { useSelectedPageantIdStore } from '@/features/pageants/store/use-selected-pageant-id-store'
 
 const api = axios.create({
   baseURL: `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/api/v1`,
@@ -12,7 +12,7 @@ const api = axios.create({
 
 /* Add token to authenticate request */
 api.interceptors.request.use((config) => {
-  const { account, isAuthenticated } = useAuthentication.getState()
+  const { account, isAuthenticated } = useAuthenticationStore.getState()
   if (isAuthenticated()) {
     config.headers.Authorization = `Bearer ${account?.token}`
   }
@@ -21,7 +21,7 @@ api.interceptors.request.use((config) => {
 
 /* Add pageant id, if available, to the request header  */
 api.interceptors.request.use((config) => {
-  const { selectedPageantId: id } = useSelectedPageantId.getState()
+  const { selectedPageantId: id } = useSelectedPageantIdStore.getState()
   if (!id) {
     return config
   }

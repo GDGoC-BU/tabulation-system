@@ -5,7 +5,7 @@ import { TanstackDevtools } from '@tanstack/react-devtools'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import type { QueryClient } from '@tanstack/react-query'
-import type { AuthenticationStore } from '@/features/authentication/store/use-authentication'
+import type { AuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 
 interface MyRouterContext {
   queryClient: QueryClient

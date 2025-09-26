@@ -20,7 +20,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useLoginMutation } from '@/features/authentication/hooks/use-login-mutation'
-import { useAuthentication } from '@/features/authentication/store/use-authentication'
+import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
 
 export const Route = createFileRoute('/admin/login/')({
@@ -29,7 +29,7 @@ export const Route = createFileRoute('/admin/login/')({
   }),
   beforeLoad: async ({ context, search }) => {
     /* Wait for zustand to load from locale storage */
-    await waitForStoreHydration(useAuthentication)
+    await waitForStoreHydration(useAuthenticationStore)
     /* Redirect if already authenticated */
     const isAuthenticated = context.authentication.isAuthenticated()
     if (isAuthenticated) {

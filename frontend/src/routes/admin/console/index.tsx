@@ -1,13 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { TextHeading } from '@/components/text'
-import { useAuthentication } from '@/features/authentication/store/use-authentication'
+import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 
 export const Route = createFileRoute('/admin/console/')({
   component: AdminConsoleHome,
 })
 
 function AdminConsoleHome() {
-  const { account } = useAuthentication((state) => state)
+  const { account } = useAuthenticationStore((state) => state)
 
   return (
     <div>

@@ -6,7 +6,7 @@ import * as TanStackQueryProvider from './integrations/tanstack-query/root-provi
 import { routeTree } from './routeTree.gen'
 
 import './styles.css'
-import { useAuthentication } from './features/authentication/store/use-authentication.ts'
+import { useAuthenticationStore } from './features/authentication/store/use-authentication-store.ts'
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
 const router = createRouter({
@@ -29,7 +29,7 @@ declare module '@tanstack/react-router' {
 }
 
 function App() {
-  const authentication = useAuthentication()
+  const authentication = useAuthenticationStore()
 
   return (
     <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>

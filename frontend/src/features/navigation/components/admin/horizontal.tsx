@@ -4,12 +4,12 @@ import type { ComponentClassNameProp } from '@/types'
 import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import { useAuthentication } from '@/features/authentication/store/use-authentication'
-import { useSelectedPageantId } from '@/features/pageants/store/use-selected-pageant-id'
+import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
+import { useSelectedPageantIdStore } from '@/features/pageants/store/use-selected-pageant-id-store'
 
 export default function Horizontal({ className }: ComponentClassNameProp) {
-  const { logout } = useAuthentication((state) => state)
-  const { setSelectedPageantId: setPageantId } = useSelectedPageantId(
+  const { logout } = useAuthenticationStore((state) => state)
+  const { setSelectedPageantId: setPageantId } = useSelectedPageantIdStore(
     (state) => state,
   )
   const navigation = useNavigate()

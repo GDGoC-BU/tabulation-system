@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { pageantEditSchema } from '../schemas'
 import useEditPageantMutate from '../hooks/use-edit-pageant-mutate'
 import useDeletePageantMutate from '../hooks/use-delete-pageant-mutate'
-import { useSelectedPageantId } from '../store/use-selected-pageant-id'
+import { useSelectedPageantIdStore } from '../store/use-selected-pageant-id-store'
 import type { PageantEditParameters, PageantSummary } from '../schemas'
 import { Button } from '@/components/ui/button'
 import { TextSub } from '@/components/text'
@@ -49,7 +49,7 @@ export default function PageantEditFormDialog({
     error: deleteError,
   } = useDeletePageantMutate()
   const { selectedPageantId, setSelectedPageantId: setPageantId } =
-    useSelectedPageantId((state) => state)
+    useSelectedPageantIdStore((state) => state)
   const queryClient = useQueryClient()
 
   const form = useForm<PageantEditParameters>({

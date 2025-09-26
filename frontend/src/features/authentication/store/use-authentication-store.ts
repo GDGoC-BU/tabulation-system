@@ -11,7 +11,7 @@ export type AuthenticationStore = {
   isAuthenticated: () => boolean
 }
 
-export const useAuthentication = create<AuthenticationStore>()(
+export const useAuthenticationStore = create<AuthenticationStore>()(
   persist(
     (set, get) => ({
       account: null,

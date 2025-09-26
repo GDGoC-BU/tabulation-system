@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import { useSelectedPageantId } from '../store/use-selected-pageant-id'
+import { useSelectedPageantIdStore } from '../store/use-selected-pageant-id-store'
 import type { PageantSummary } from '../schemas'
 import type { ComponentClassNameAndChildrenProp } from '@/types'
 import { TextBody } from '@/components/text'
@@ -10,7 +10,7 @@ export default function PageantTitle({
   children,
   pageant,
 }: ComponentClassNameAndChildrenProp & { pageant: PageantSummary }) {
-  const { setSelectedPageantId: setPageantId } = useSelectedPageantId(
+  const { setSelectedPageantId: setPageantId } = useSelectedPageantIdStore(
     (state) => state,
   )
   const navigate = useNavigate()
