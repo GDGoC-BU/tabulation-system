@@ -28,8 +28,16 @@ export const pageantAddSchema = z.object({
 })
 
 export const pageantEditSchema = z.object({
-  id: z.string(),
+  id: z.string().min(1, {
+    error: 'Required',
+  }),
   title: z.string().min(1, {
+    error: 'Required',
+  }),
+})
+
+export const pageantDeleteSchema = z.object({
+  id: z.string().min(1, {
     error: 'Required',
   }),
 })

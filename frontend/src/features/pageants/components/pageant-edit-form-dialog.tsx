@@ -6,6 +6,7 @@ import { DialogClose } from '@radix-ui/react-dialog'
 import { useQueryClient } from '@tanstack/react-query'
 import { pageantEditSchema } from '../schemas'
 import useEditPageantMutate from '../hooks/use-edit-pageant-mutate'
+import useDeletePageantMutate from '../hooks/use-delete-pageant-mutate'
 import type z from 'zod'
 import type { PageantSummary } from '../schemas'
 import { Button } from '@/components/ui/button'
@@ -37,10 +38,16 @@ export default function PageantEditFormDialog({
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const {
     mutateAsync: editPageant,
-    isPending,
-    isError,
-    error,
+    isPending: editIsPending,
+    isError: editIsError,
+    error: editError,
   } = useEditPageantMutate()
+  const {
+    mutateAsync: deletePageant,
+    isPending: deleteIsPending,
+    isError: deleteIsError,
+    error: deleteError,
+  } = useDeletePageantMutate()
   const queryClient = useQueryClient()
 
   const form = useForm<z.infer<typeof pageantEditSchema>>({
@@ -63,8 +70,18 @@ export default function PageantEditFormDialog({
     }
   }, [isDialogOpen, pageant, form])
 
-  async function onSubmit(values: z.infer<typeof pageantEditSchema>) {
+  async function onEditSubmit(values: z.infer<typeof pageantEditSchema>) {
     const isSuccess = await editPageant(values)
+    if (isSuccess) {
+      queryClient.invalidateQueries({ queryKey: ['pageants'] })
+      form.clearErrors()
+      setIsDialogOpen(false)
+    }
+  }
+
+  async function onDeleteSubmit() {
+    const values = form.getValues()
+    const isSuccess = await deletePageant({ id: values.id })
     if (isSuccess) {
       queryClient.invalidateQueries({ queryKey: ['pageants'] })
       form.clearErrors()
@@ -83,7 +100,10 @@ export default function PageantEditFormDialog({
       </DialogTrigger>
       <DialogContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onEditSubmit)}
+            className="space-y-4"
+          >
             <DialogHeader>
               <DialogTitle>Edit Pageant</DialogTitle>
               <DialogDescription>
@@ -105,12 +125,29 @@ export default function PageantEditFormDialog({
                 </FormItem>
               )}
             />
-            {isError && <TextSub className="text-destructive">{error}</TextSub>}
+            {editIsError && (
+              <TextSub className="text-destructive">{editError}</TextSub>
+            )}
+            {deleteIsError && (
+              <TextSub className="text-destructive">{deleteError}</TextSub>
+            )}
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit" disabled={isPending} variant="default">
+              <Button
+                onClick={onDeleteSubmit}
+                type="button"
+                disabled={editIsPending || deleteIsPending}
+                variant="destructive"
+              >
+                Delete
+              </Button>
+              <Button
+                type="submit"
+                disabled={editIsPending || deleteIsPending}
+                variant="default"
+              >
                 Save changes
               </Button>
             </DialogFooter>

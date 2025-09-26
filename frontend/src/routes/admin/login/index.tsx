@@ -90,7 +90,7 @@ function AdminLogin() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="123" {...field} />
+                      <Input type="password" placeholder="1234" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -100,7 +100,7 @@ function AdminLogin() {
                 <TextSub className="text-destructive">{error}</TextSub>
               )}
               <Button disabled={isPending} variant="outline" className="w-full">
-                Submit
+                Login
               </Button>
             </form>
           </Form>
