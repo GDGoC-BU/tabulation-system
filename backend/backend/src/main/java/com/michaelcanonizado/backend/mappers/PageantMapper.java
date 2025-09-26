@@ -1,17 +1,33 @@
 package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.pageant.PageantCreateDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantStatusDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
 import com.michaelcanonizado.backend.models.Pageant;
+import com.michaelcanonizado.backend.models.PageantStatus;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface PageantMapper {
     Pageant toEntity(PageantCreateDTO pageantCreateDTO);
-    Pageant toEntity(PageantSummaryDTO pageantSummaryDTO);
+    /* Adding SummaryDTO -> Entity will make the enum mapping more complex.
+       Just omit it for now to reduce complexity. ANd there won't really be
+       a case for this as Summary and Detailed DTOs are response DTOs, they
+       won't really be used in requests.
+
+       Pageant toEntity(PageantSummaryDTO pageantSummaryDTO); */
+    @Mapping(target = "status", qualifiedByName = "mapStatus")
     PageantSummaryDTO toSummary(Pageant pageant);
 
     void updateEntityFromDTO(@MappingTarget Pageant pageant, PageantUpdateDTO pageantUpdateDTO);
+
+    @Named("mapStatus")
+    default PageantStatusDTO mapStatus(PageantStatus status) {
+        if (status == null) return null;
+        return new PageantStatusDTO(status.name(), status.getColor());
+    }
 }

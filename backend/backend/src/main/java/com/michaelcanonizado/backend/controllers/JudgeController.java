@@ -1,6 +1,5 @@
 package com.michaelcanonizado.backend.controllers;
 
-import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.services.JudgeService;
@@ -19,12 +18,6 @@ import java.util.UUID;
 public class JudgeController {
     @Autowired
     private JudgeService service;
-
-    @PostMapping("/judges")
-    private ResponseEntity<JudgeSummaryDTO> addJudge(@RequestBody @Valid JudgeCreateDTO judgeCreateDTO) {
-        JudgeSummaryDTO judge = service.addJudge(judgeCreateDTO);
-        return new ResponseEntity<>(judge, HttpStatus.CREATED);
-    }
 
     @GetMapping("/judges/{id}")
     private ResponseEntity<JudgeSummaryDTO> getJudge(@PathVariable UUID id) {

@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionCreateDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionUpdateDTO;
@@ -37,6 +38,9 @@ public class CriterionService {
     @Autowired
     private CriterionMapper mapper;
 
+    @Autowired
+    private PageantContext pageantContext;
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
@@ -48,6 +52,12 @@ public class CriterionService {
         Segment segment = segmentRepository.findById(segmentId).orElseThrow(() -> {
             return new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
+
+        pageantContext.assertAccess(
+                segment.getPhase()
+                        .getPageant()
+                        .getId()
+        );
 
         Criterion criterion = new Criterion(name, maxScore, segment);
         Criterion savedCriterion = criterionRepository.save(criterion);
@@ -76,6 +86,13 @@ public class CriterionService {
             return new EntityNotFoundException("Can't update! Criterion not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
+        pageantContext.assertAccess(
+                criterion.getSegment()
+                        .getPhase()
+                        .getPageant()
+                        .getId()
+        );
+
         mapper.updateEntityFromDTO(criterion, criterionUpdateDTO);
         return mapper.toSummaryDTO(criterionRepository.save(criterion));
     }
@@ -88,6 +105,13 @@ public class CriterionService {
         Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't delete! Criterion not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
+
+        pageantContext.assertAccess(
+                criterion.getSegment()
+                        .getPhase()
+                        .getPageant()
+                        .getId()
+        );
 
         Segment segment = criterion.getSegment();
         segment.removeCriterion(criterion);

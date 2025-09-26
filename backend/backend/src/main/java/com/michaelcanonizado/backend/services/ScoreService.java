@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.score.ScoreDetailedDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
@@ -30,13 +31,18 @@ public class ScoreService {
     @Autowired
     private ScoreMapper mapper;
 
+    @Autowired
+    private PageantContext pageantContext;
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
     })
     public List<ScoreDetailedDTO> getScores(UUID judgeId, UUID candidateId, UUID criterionId, UUID segmentId) {
+        UUID selectedPageantId = pageantContext.getId();
         return scoreRepository.findAll(
                 Specification.allOf(
+                        ScoreSpecification.hasPageant(selectedPageantId),
                         ScoreSpecification.hasJudge(judgeId),
                         ScoreSpecification.hasCandidate(candidateId),
                         ScoreSpecification.hasCriterion(criterionId),
@@ -56,19 +62,7 @@ public class ScoreService {
             return new EntityNotFoundException("Score not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
-        Criterion criterion = score.getCriterion();
-        if (criterion == null) {
-            throw new EntityNotFoundException("Criterion not found!", ErrorCode.ENTITY_NOT_FOUND);
-        }
-
-        Segment segment = criterion.getSegment();
-        if (segment == null) {
-            throw new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
-        }
-
-        if (segment.getStatus() != PhaseSegmentStatus.ONGOING) {
-            throw new SegmentStatusException("Segment is not ACTIVE! Can't update score.", ErrorCode.SEGMENT_NOT_ACTIVE);
-        }
+        pageantContext.assertAccess(score.getJudge().getPageant().getId());
 
         mapper.updateEntityFromDTO(score, scoreUpdateDTO);
         return mapper.toDetailedDTO(scoreRepository.save(score));

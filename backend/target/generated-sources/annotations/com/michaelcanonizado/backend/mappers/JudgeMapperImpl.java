@@ -1,6 +1,5 @@
 package com.michaelcanonizado.backend.mappers;
 
-import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.models.Judge;
@@ -12,29 +11,11 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-13T00:35:33+0800",
+    date = "2025-09-22T22:53:29+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Oracle Corporation)"
 )
 @Component
 public class JudgeMapperImpl implements JudgeMapper {
-
-    @Override
-    public Judge toEntity(JudgeCreateDTO judgeCreateDTO) {
-        if ( judgeCreateDTO == null ) {
-            return null;
-        }
-
-        String username = null;
-
-        username = judgeCreateDTO.username();
-
-        String passwordHash = null;
-        Pageant pageant = null;
-
-        Judge judge = new Judge( username, passwordHash, pageant );
-
-        return judge;
-    }
 
     @Override
     public Judge toEntity(JudgeSummaryDTO judgeSummaryDTO) {

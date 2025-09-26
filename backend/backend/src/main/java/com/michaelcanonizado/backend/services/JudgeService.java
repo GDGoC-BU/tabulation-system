@@ -2,19 +2,16 @@ package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.contexts.PageantContext;
-import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
-import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
 import com.michaelcanonizado.backend.mappers.JudgeMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,56 +21,10 @@ public class JudgeService {
     private JudgeRepository judgeRepository;
 
     @Autowired
-    private CandidateRepository candidateRepository;
-
-    @Autowired
-    private CriterionRepository criterionRepository;
-
-    @Autowired
-    private ScoreRepository scoreRepository;
-
-    @Autowired
-    private PageantRepository pageantRepository;
-
-    @Autowired
     private JudgeMapper mapper;
 
     @Autowired
     private PageantContext pageantContext;
-
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
-    public JudgeSummaryDTO addJudge(JudgeCreateDTO judgeCreateDTO) {
-        /* Connect the current pageant */
-        /* Connect to the selected pageant */
-        UUID selectedPageantId = pageantContext.getId();
-        Pageant pageant = pageantRepository.findById(selectedPageantId).orElseThrow(() -> {
-            return new PageantAccessDeniedException(
-                    "Pageant not found! Can't perform operation",
-                    ErrorCode.PAGEANT_ACCESS_DENIED
-            );
-        });
-
-        /* Add authentication! Password needs to be hashed:
-           JudgeCreateDTO.password -> Judge.passwordHash */
-        Judge judge = new Judge(judgeCreateDTO.username(), judgeCreateDTO.password(), pageant);
-        Judge savedJudge = judgeRepository.save(judge);
-
-        /* Pre-generate the scores for the new judge */
-        List<Candidate> candidates = candidateRepository.findAll();
-        List<Criterion> criteria = criterionRepository.findAll();
-        List<Score> newScores = new ArrayList<>();
-        candidates.forEach(candidate -> {
-            criteria.forEach(criterion -> {
-                newScores.add(new Score(0, savedJudge, candidate, criterion));
-            });
-        });
-        /* Batch save to minimize insert queries */
-        scoreRepository.saveAll(newScores);
-
-        return mapper.toSummaryDTO(savedJudge);
-    }
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
@@ -84,6 +35,11 @@ public class JudgeService {
             return new EntityNotFoundException("Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
+        pageantContext.assertAccess(
+                judge.getPageant()
+                        .getId()
+        );
+
         return mapper.toSummaryDTO(judge);
     }
 
@@ -92,8 +48,9 @@ public class JudgeService {
             PageantStatus.ONGOING
     })
     public List<JudgeSummaryDTO> getJudges() {
+        UUID selectedPageantId = pageantContext.getId();
         return judgeRepository
-                .findAll()
+                .findAllByPageant_Id(selectedPageantId)
                 .stream()
                 .map(judge -> {
                     return mapper.toSummaryDTO(judge);
@@ -109,6 +66,11 @@ public class JudgeService {
             return new EntityNotFoundException("Can't update. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
+        pageantContext.assertAccess(
+                judge.getPageant()
+                        .getId()
+        );
+
         mapper.updateEntityFromDTO(judge, judgeUpdateDTO);
         return mapper.toSummaryDTO(judgeRepository.save(judge));
     }
@@ -120,6 +82,10 @@ public class JudgeService {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't delete. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
+        pageantContext.assertAccess(
+                judge.getPageant()
+                        .getId()
+        );
         judgeRepository.delete(judge);
     }
 }

@@ -6,11 +6,13 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "account_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public class Account extends Auditable {
+public abstract class Account extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)

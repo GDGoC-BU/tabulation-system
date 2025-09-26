@@ -109,10 +109,14 @@ public class SegmentService {
             PageantStatus.PREPARATION
     })
     public void deleteSegment(UUID id) {
-        if (!segmentRepository.existsById(id)) {
-            throw new EntityNotFoundException("Can't delete! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
-        }
-
+        Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Can't delete! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+        pageantContext.assertAccess(
+                segment.getPhase()
+                        .getPageant()
+                        .getId()
+        );
         segmentRepository.deleteById(id);
     }
 }

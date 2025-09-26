@@ -90,7 +90,7 @@ public class PageantService {
 
     public PageantSummaryDTO updatePageant(UUID id, PageantUpdateDTO pageantUpdateDTO) {
         Pageant pageant = repository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Can't update! Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
+            return new EntityNotFoundException("Can't update! Pageant not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
         mapper.updateEntityFromDTO(pageant, pageantUpdateDTO);
@@ -99,7 +99,7 @@ public class PageantService {
 
     public void deletePageant(UUID id) {
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Can't delete! Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
+            throw new EntityNotFoundException("Can't delete! Pageant not found.", ErrorCode.ENTITY_NOT_FOUND);
         }
 
         repository.deleteById(id);
