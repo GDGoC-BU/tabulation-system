@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
-import type { PageantStatusValue } from '@/features/pageants/schemas'
+import type { PageantStatusValue } from '@/schemas'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 import Console from '@/components/console'
 import { Button } from '@/components/ui/button'
 import { TextBody } from '@/components/text'
 import usePageantStatusChangeMutate from '@/features/pageants/hooks/use-pageant-status-change-mutate'
+import { usePhasesQuery } from '@/features/phases/hooks/use-phases-query'
 
 type PageantStatusMeta = {
   label: string
@@ -52,11 +53,12 @@ export const Route = createFileRoute('/admin/console/dashboard')({
 })
 
 function AdminDashboard() {
-  const { data } = useSelectedPageantQuery()
+  const { data: selectedPageant } = useSelectedPageantQuery()
   const queryClient = useQueryClient()
   const { mutateAsync } = usePageantStatusChangeMutate()
+  const { data: phases, isLoading: isPhasesLoading } = usePhasesQuery()
 
-  if (!data) {
+  if (!selectedPageant) {
     return (
       <Console>
         <Console.Header className="flex flex-row justify-between">
@@ -69,11 +71,11 @@ function AdminDashboard() {
     )
   }
 
-  const pageantMeta = pageantStatusMeta[data.status.value]
+  const pageantMeta = pageantStatusMeta[selectedPageant.status.value]
 
   async function onPageantStatusChange() {
-    if (!pageantMeta.nextAction || !data) return
-    const pageantId = data.id
+    if (!pageantMeta.nextAction || !selectedPageant) return
+    const pageantId = selectedPageant.id
     const pageantStatusChangeEndpoint =
       pageantMeta.nextAction.endpoint(pageantId)
     await mutateAsync(pageantStatusChangeEndpoint)
@@ -84,20 +86,45 @@ function AdminDashboard() {
   return (
     <Console>
       <Console.Header className="flex flex-row gap-4 items-center">
-        <Console.Header.Title>{data.title} Dashboard</Console.Header.Title>
+        <Console.Header.Title>
+          {selectedPageant.title} Dashboard
+        </Console.Header.Title>
         <div
           className="py-2 px-4 rounded-md"
-          style={{ backgroundColor: data.status.color }}
+          style={{ backgroundColor: selectedPageant.status.color }}
         >
-          <TextBody>{data.status.value}</TextBody>
+          <TextBody>{selectedPageant.status.value}</TextBody>
         </div>
       </Console.Header>
       <Console.Content>
         {pageantMeta.nextAction && (
-          <Button onClick={onPageantStatusChange}>
-            {pageantMeta.nextAction.label}
-          </Button>
+          <div className="">
+            <Button onClick={onPageantStatusChange}>
+              {pageantMeta.nextAction.label}
+            </Button>
+          </div>
         )}
+
+        {/* PHASES */}
+        <div className="border rounded-lg p-4 w-fit mt-8">
+          <div>
+            <TextBody>Phases</TextBody>
+          </div>
+          <div>
+            {isPhasesLoading && <TextBody>Loading...</TextBody>}
+            {phases?.map((phase) => {
+              return (
+                <div
+                  key={phase.id}
+                  className="flex flex-row gap-4 justify-between"
+                >
+                  <TextBody>{phase.name}</TextBody>
+                  <TextBody>{phase.status}</TextBody>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </Console.Content>
     </Console>
   )

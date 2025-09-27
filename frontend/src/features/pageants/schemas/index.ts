@@ -1,13 +1,5 @@
 import z from 'zod'
-import { zStringToDate } from '@/schemas'
-
-const pageantStatusValue = z.enum([
-  'PREPARATION',
-  'ONGOING',
-  'FINALIZING',
-  'CLOSED',
-])
-export type PageantStatusValue = z.infer<typeof pageantStatusValue>
+import { pageantStatusValue, zStringToDate } from '@/schemas'
 
 const pageantStatusSchema = z.object({
   value: pageantStatusValue,
