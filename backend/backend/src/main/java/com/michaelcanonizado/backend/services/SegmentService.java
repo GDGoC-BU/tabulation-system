@@ -67,6 +67,38 @@ public class SegmentService {
     }
 
     @RequirePageantStatus({
+            PageantStatus.ONGOING
+    })
+    @Transactional
+    public SegmentDetailedDTO startSegment(UUID id) {
+        Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Cannot start! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
+
+        /* TO-IMPLEMENT: Ensure that only 1 has the state ONGOING */
+
+        segment.setStatus(PhaseSegmentStatus.ONGOING);
+        return mapper.toDetailedDTO(segmentRepository.save(segment));
+    }
+
+    @RequirePageantStatus({
+            PageantStatus.ONGOING
+    })
+    @Transactional
+    public SegmentDetailedDTO closeSegment(UUID id) {
+        Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Cannot close! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
+
+        segment.setStatus(PhaseSegmentStatus.CLOSED);
+        return mapper.toDetailedDTO(segmentRepository.save(segment));
+    }
+
+    @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
     })
