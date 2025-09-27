@@ -10,6 +10,7 @@ import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.PhaseMapper;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.Phase;
+import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.PhaseRepository;
 import jakarta.validation.Valid;
@@ -50,6 +51,33 @@ public class PhaseService {
         return mapper.toDetailedDTO(phaseRepository.save(phase));
     }
 
+    public PhaseDetailedDTO startPhase(UUID id) {
+        Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
+           return new EntityNotFoundException(
+                   "Cannot start! Phase not found.",
+                   ErrorCode.ENTITY_NOT_FOUND
+           );
+        });
+
+        pageantContext.assertAccess(phase.getPageant().getId());
+
+        /* TO-IMPLEMENT: Ensure that only 1 has the state ONGOING */
+
+        phase.setStatus(PhaseSegmentStatus.ONGOING);
+
+        return mapper.toDetailedDTO(phaseRepository.save(phase));
+    }
+
+    public PhaseDetailedDTO closePhase(UUID id) {
+        Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
+           return new EntityNotFoundException(
+                   "Cannot close! Phase not found.",
+                   ErrorCode.ENTITY_NOT_FOUND
+           );
+        });
+        phase.setStatus(PhaseSegmentStatus.CLOSED);
+        return mapper.toDetailedDTO(phaseRepository.save(phase));
+    }
 
     @Transactional
     public PhaseDetailedDTO getPhase(UUID id) {

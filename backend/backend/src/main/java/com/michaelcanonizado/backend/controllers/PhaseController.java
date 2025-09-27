@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.dtos.phase.PhaseCreateDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseDetailedDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseUpdateDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.services.PhaseService;
 import jakarta.validation.Valid;
@@ -30,6 +31,18 @@ public class PhaseController {
     public ResponseEntity<PhaseDetailedDTO> addPhase(@RequestBody @Valid PhaseCreateDTO phaseCreateDTO) {
         PhaseDetailedDTO phase = service.addPhase(phaseCreateDTO);
         return new ResponseEntity<>(phase, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/phases/{id}/start")
+    public ResponseEntity<PhaseDetailedDTO> startPhase(@PathVariable UUID id) {
+        PhaseDetailedDTO phase = service.startPhase(id);
+        return new ResponseEntity<>(phase, HttpStatus.OK);
+    }
+
+    @PostMapping("/phases/{id}/close")
+    public ResponseEntity<PhaseDetailedDTO> closePhase(@PathVariable UUID id) {
+        PhaseDetailedDTO phase = service.closePhase(id);
+        return new ResponseEntity<>(phase, HttpStatus.OK);
     }
 
     @RequirePageantStatus({
