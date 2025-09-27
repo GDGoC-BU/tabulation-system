@@ -36,8 +36,8 @@ public class CandidateSeeder implements DatabaseSeeder {
 
         for (int i = 1; i <= colleges.size(); i++) {
             College college = colleges.get(i-1);
-            candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.FEMALE, 20, college,pageant));
-            candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.MALE, 20, college,pageant));
+            candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.FEMALE, 20, college, pageant));
+            candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.MALE, 20, college, pageant));
         }
     }
 }

@@ -4,23 +4,22 @@ import com.michaelcanonizado.backend.models.Admin;
 import com.michaelcanonizado.backend.repositories.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AdminSeeder implements DatabaseSeeder {
-    private final AdminRepository repository;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+    @Autowired
+    private AdminRepository repository;
 
     @Autowired
-    public AdminSeeder(AdminRepository repository) {
-        this.repository = repository;
-    }
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void seed() {
         String username = "admin";
         String password = "1234";
-        String passwordHash = encoder.encode(password);
-        repository.save(new Admin("admin", passwordHash));
+        String passwordHash = passwordEncoder.encode(password);
+        repository.save(new Admin(username, passwordHash));
     }
 }
