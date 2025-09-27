@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.phase.PhaseCreateDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseDetailedDTO;
@@ -9,6 +10,7 @@ import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.PhaseMapper;
 import com.michaelcanonizado.backend.models.Pageant;
+import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.models.Phase;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
@@ -35,6 +37,9 @@ public class PhaseService {
     @Autowired
     private PageantContext pageantContext;
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+    })
     public PhaseDetailedDTO addPhase(PhaseCreateDTO phaseCreateDTO) {
         Phase phase = mapper.toEntity(phaseCreateDTO);
 
@@ -46,11 +51,15 @@ public class PhaseService {
                     ErrorCode.ENTITY_NOT_FOUND
             );
         });
-        phase.setPageant(pageant);
 
+        phase.setPageant(pageant);
         return mapper.toDetailedDTO(phaseRepository.save(phase));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.ONGOING
+    })
+    @Transactional
     public PhaseDetailedDTO startPhase(UUID id) {
         Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
            return new EntityNotFoundException(
@@ -58,16 +67,16 @@ public class PhaseService {
                    ErrorCode.ENTITY_NOT_FOUND
            );
         });
-
         pageantContext.assertAccess(phase.getPageant().getId());
-
         /* TO-IMPLEMENT: Ensure that only 1 has the state ONGOING */
-
         phase.setStatus(PhaseSegmentStatus.ONGOING);
-
         return mapper.toDetailedDTO(phaseRepository.save(phase));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.ONGOING
+    })
+    @Transactional
     public PhaseDetailedDTO closePhase(UUID id) {
         Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
            return new EntityNotFoundException(
@@ -75,10 +84,15 @@ public class PhaseService {
                    ErrorCode.ENTITY_NOT_FOUND
            );
         });
+        pageantContext.assertAccess(phase.getPageant().getId());
         phase.setStatus(PhaseSegmentStatus.CLOSED);
         return mapper.toDetailedDTO(phaseRepository.save(phase));
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     @Transactional
     public PhaseDetailedDTO getPhase(UUID id) {
         Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
@@ -87,15 +101,16 @@ public class PhaseService {
                    ErrorCode.ENTITY_NOT_FOUND
            );
         });
-
         pageantContext.assertAccess(phase.getPageant().getId());
-
         return mapper.toDetailedDTO(phase);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public List<PhaseSummaryDTO> getPhases() {
         UUID selectedPageantId = pageantContext.getId();
-
         return phaseRepository
                 .findAllByPageant_Id(selectedPageantId)
                 .stream()
@@ -105,31 +120,33 @@ public class PhaseService {
                 .toList();
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+    })
+    public PhaseDetailedDTO updatePhase(UUID id, PhaseUpdateDTO phaseUpdateDTO) {
+        Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Can't update! Phase not found.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+        pageantContext.assertAccess(phase.getPageant().getId());
+        mapper.updateEntityFromDTO(phase, phaseUpdateDTO);
+        return mapper.toDetailedDTO(phaseRepository.save(phase));
+    }
+
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+    })
+    public void deletePhase(UUID id) {
+        Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Can't delete! Phase not found.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+        pageantContext.assertAccess(phase.getPageant().getId());
+        phaseRepository.deleteById(id);
+    }
+
     /* Mapstruct resolver method */
     public Phase findById(UUID id) {
         return phaseRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Phase not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
-    }
-
-    public PhaseDetailedDTO updatePhase(UUID id, PhaseUpdateDTO phaseUpdateDTO) {
-        Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Can't update! Phase not found.", ErrorCode.ENTITY_NOT_FOUND);
-        });
-
-        mapper.updateEntityFromDTO(phase, phaseUpdateDTO);
-
-        return mapper.toDetailedDTO(phaseRepository.save(phase));
-    }
-
-    public void deletePhase(UUID id) {
-        if(!phaseRepository.existsById(id)) {
-            throw new EntityNotFoundException(
-                    "Can't delete! Phase not found.",
-                    ErrorCode.ENTITY_NOT_FOUND
-            );
-        }
-
-        phaseRepository.deleteById(id);
     }
 }
