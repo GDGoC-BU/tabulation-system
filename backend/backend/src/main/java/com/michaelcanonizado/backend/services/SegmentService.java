@@ -109,7 +109,7 @@ public class SegmentService {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
-
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         return mapper.toDetailedDTO(segment);
     }
 
@@ -140,7 +140,7 @@ public class SegmentService {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
-
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         mapper.updateEntityFromDTO(segment, segmentUpdateDTO);
         return mapper.toSummaryDTO(segmentRepository.save(segment));
     }
@@ -152,11 +152,7 @@ public class SegmentService {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't delete! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
-        pageantContext.assertAccess(
-                segment.getPhase()
-                        .getPageant()
-                        .getId()
-        );
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         segmentRepository.deleteById(id);
     }
 }
