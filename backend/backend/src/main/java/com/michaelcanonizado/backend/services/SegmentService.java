@@ -15,7 +15,9 @@ import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationR
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import com.michaelcanonizado.backend.contexts.PageantContext;
+import com.michaelcanonizado.backend.specifications.SegmentSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,11 +119,17 @@ public class SegmentService {
     })
     @Transactional
     public List<SegmentSummaryDTO> getSegments() {
-        return segmentRepository
-                .findAllOrderByPhaseSequenceAndSegmentSequence()
-                .stream()
-                .map(mapper::toSummaryDTO)
-                .toList();
+        UUID selectedPageantId = pageantContext.getId();
+        return segmentRepository.findAll(
+                Specification.allOf(
+                        SegmentSpecification.hasPageant(selectedPageantId)
+                )
+        ).stream().sorted(
+                Comparator.comparing((Segment segment) -> segment.getPhase().getSequence())
+                        .thenComparing(Segment::getSequence)
+        ).map(segment -> {
+            return mapper.toSummaryDTO(segment);
+        }).toList();
     }
 
     @RequirePageantStatus({
