@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { TextBody } from '@/components/text'
 import usePageantStatusChangeMutate from '@/features/pageants/hooks/use-pageant-status-change-mutate'
 import { usePhasesQuery } from '@/features/phases/hooks/use-phases-query'
+import { useSegmentsQuery } from '@/features/segments/hooks/use-phases-query'
 
 type PageantStatusMeta = {
   label: string
@@ -56,7 +57,8 @@ function AdminDashboard() {
   const { data: selectedPageant } = useSelectedPageantQuery()
   const queryClient = useQueryClient()
   const { mutateAsync } = usePageantStatusChangeMutate()
-  const { data: phases, isLoading: isPhasesLoading } = usePhasesQuery()
+  const { data: phases } = usePhasesQuery()
+  const { data: segments } = useSegmentsQuery()
 
   if (!selectedPageant) {
     return (
@@ -105,21 +107,43 @@ function AdminDashboard() {
           </div>
         )}
 
-        {/* PHASES */}
-        <div className="border rounded-lg p-4 w-fit mt-8">
-          <div>
-            <TextBody>Phases</TextBody>
+        {/* Phases and Segments list */}
+        <div className="border rounded-lg w-fit mt-8">
+          <div className="px-4 py-4 border-b">
+            <TextBody>Phases and Segments</TextBody>
           </div>
-          <div>
-            {isPhasesLoading && <TextBody>Loading...</TextBody>}
+          <div className="px-4 pt-4">
             {phases?.map((phase) => {
               return (
-                <div
-                  key={phase.id}
-                  className="flex flex-row gap-4 justify-between"
-                >
-                  <TextBody>{phase.name}</TextBody>
-                  <TextBody>{phase.status}</TextBody>
+                <div className="pb-8 flex flex-col gap-4">
+                  <div
+                    key={phase.id}
+                    className="flex flex-row gap-4 justify-between"
+                  >
+                    <div className="flex flex-row gap-2">
+                      <TextBody>{phase.sequence}</TextBody>
+                      <TextBody>{phase.name}</TextBody>
+                    </div>
+                    <TextBody>{phase.status}</TextBody>
+                  </div>
+                  {segments?.map((segment) => {
+                    if (segment.phase.id === phase.id) {
+                      return (
+                        <div
+                          key={segment.id}
+                          className="ml-8 flex flex-row gap-4 justify-between"
+                        >
+                          <div className="flex flex-row gap-2">
+                            <TextBody>
+                              {phase.sequence}.{segment.sequence}
+                            </TextBody>
+                            <TextBody>{segment.name}</TextBody>
+                          </div>
+                          <TextBody>{segment.status}</TextBody>
+                        </div>
+                      )
+                    }
+                  })}
                 </div>
               )
             })}

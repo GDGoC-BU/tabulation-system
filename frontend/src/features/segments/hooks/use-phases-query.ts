@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import { phasesSchema } from '../schemas'
+import { segmentsSchema } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function usePhasesQuery() {
+export function useSegmentsQuery() {
   return useQuery({
-    queryKey: ['phases'],
+    queryKey: ['segments'],
     queryFn: async () => {
       try {
-        const response = await api.get('/phases')
-        const parsedResponse = phasesSchema.safeParse(response.data)
+        const response = await api.get('/segments')
+        console.log(response.data)
+        const parsedResponse = segmentsSchema.safeParse(response.data)
         if (!parsedResponse.success) {
-          console.error("/phases response doesn't match schema!")
+          console.error("/segments response doesn't match schema!")
           return []
         }
         return parsedResponse.data
