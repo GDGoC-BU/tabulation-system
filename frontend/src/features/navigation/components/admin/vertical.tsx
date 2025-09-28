@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/sidebar'
 import { TextBody } from '@/components/text'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { pageantStatusValue } from '@/schemas'
 
 const pageantAction = [
   {
@@ -55,6 +56,9 @@ const pageantAction = [
 
 export default function Vertical() {
   const { data } = useSelectedPageantQuery()
+
+  const showManagePageantLinks =
+    !data || data.status.value !== pageantStatusValue.enum.PREPARATION
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -118,7 +122,11 @@ export default function Vertical() {
               return (
                 <SidebarMenu key={index}>
                   <SidebarMenuItem
-                    className={!data ? 'pointer-events-none opacity-50' : ''}
+                    className={
+                      showManagePageantLinks
+                        ? 'pointer-events-none opacity-50'
+                        : ''
+                    }
                   >
                     <SidebarMenuButton asChild>
                       <Link to={action.url}>

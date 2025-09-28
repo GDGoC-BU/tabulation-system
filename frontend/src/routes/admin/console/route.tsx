@@ -26,9 +26,9 @@ function ConsoleLayout() {
   return (
     <SidebarProvider defaultOpen={true}>
       <Navigation.Admin.Vertical />
-      <div className="w-full">
+      <div className="w-full flex flex-col">
         <Navigation.Admin.Horizontal />
-        <main>
+        <main className="grow">
           <Outlet />
         </main>
       </div>
