@@ -16,6 +16,7 @@ type ServerFormActionResponse = {
 
 type BackendJwtPayload = {
   role: string
+  account_id: string
 } & JwtPayload
 
 type BackendErrorResponse = {

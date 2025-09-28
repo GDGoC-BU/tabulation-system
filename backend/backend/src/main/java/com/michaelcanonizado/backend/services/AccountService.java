@@ -87,8 +87,6 @@ public class AccountService {
                         ErrorCode.PAGEANT_ACCESS_DENIED
                 );
             }
-
-            extraClaims.put("pageant_id", pageant.getId());
         }
 
         return jwtService.generateToken(account, extraClaims);
