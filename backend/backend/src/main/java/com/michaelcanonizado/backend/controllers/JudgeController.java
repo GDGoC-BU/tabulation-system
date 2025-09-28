@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.services.JudgeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,12 @@ public class JudgeController {
     private ResponseEntity<JudgeSummaryDTO> getJudge(@PathVariable UUID id) {
         JudgeSummaryDTO judge = service.getJudge(id);
         return new ResponseEntity<>(judge, HttpStatus.OK);
+    }
+
+    @GetMapping("/judges/{id}/pageant")
+    private ResponseEntity<PageantSummaryDTO> getJudgeAssignedPageant(@PathVariable UUID id) {
+        PageantSummaryDTO pageant = service.getJudgeAssignedPageant(id);
+        return new ResponseEntity<>(pageant, HttpStatus.OK);
     }
 
     @GetMapping("/judges")
