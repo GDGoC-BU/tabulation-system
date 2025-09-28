@@ -1,11 +1,9 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { accountRoleSchema } from '@/features/authentication/schemas'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
-import { SidebarProvider } from '@/components/ui/sidebar'
-import Navigation from '@/features/navigation/components'
-import { accountRoleSchema } from '@/features/authentication/schemas'
 
-export const Route = createFileRoute('/admin/console')({
+export const Route = createFileRoute('/judge/scoring')({
   beforeLoad: async ({ context, location }) => {
     /* Wait for zustand to load from locale storage */
     await waitForStoreHydration(useAuthenticationStore)
@@ -16,7 +14,7 @@ export const Route = createFileRoute('/admin/console')({
     /* If not authenticated or no role is assigned, redirect to login */
     if (!isAuthenticated || !currentLoggedInAccountRole) {
       throw redirect({
-        to: '/admin/login',
+        to: '/judge/login',
         search: {
           /* But save the currenth location, so they can be redirected back here */
           redirect: location.href,
@@ -25,31 +23,21 @@ export const Route = createFileRoute('/admin/console')({
     }
 
     /* At this point they had valid credentials but is just using the wrong form.
-       So just redirect them to their assign routes */
+           So just redirect them to their assign routes */
 
-    if (currentLoggedInAccountRole === accountRoleSchema.enum.ADMIN) {
+    if (currentLoggedInAccountRole === accountRoleSchema.enum.JUDGE) {
       return
     }
 
-    if (currentLoggedInAccountRole === accountRoleSchema.enum.JUDGE) {
+    if (currentLoggedInAccountRole === accountRoleSchema.enum.ADMIN) {
       throw redirect({
-        to: '/judge/scoring',
+        to: '/admin/console',
       })
     }
   },
-  component: AdminConsoleLayout,
+  component: JudgeScoringLayout,
 })
 
-function AdminConsoleLayout() {
-  return (
-    <SidebarProvider defaultOpen={true}>
-      <Navigation.Admin.Vertical />
-      <div className="w-full flex flex-col">
-        <Navigation.Admin.Horizontal />
-        <main className="grow">
-          <Outlet />
-        </main>
-      </div>
-    </SidebarProvider>
-  )
+function JudgeScoringLayout() {
+  return <Outlet />
 }

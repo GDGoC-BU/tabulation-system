@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JudgeScoringRouteRouteImport } from './routes/judge/scoring/route'
 import { Route as AdminConsoleRouteRouteImport } from './routes/admin/console/route'
 import { Route as JudgeScoringIndexRouteImport } from './routes/judge/scoring/index'
 import { Route as JudgeLoginIndexRouteImport } from './routes/judge/login/index'
@@ -28,15 +29,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JudgeScoringRouteRoute = JudgeScoringRouteRouteImport.update({
+  id: '/judge/scoring',
+  path: '/judge/scoring',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminConsoleRouteRoute = AdminConsoleRouteRouteImport.update({
   id: '/admin/console',
   path: '/admin/console',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JudgeScoringIndexRoute = JudgeScoringIndexRouteImport.update({
-  id: '/judge/scoring/',
-  path: '/judge/scoring/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => JudgeScoringRouteRoute,
 } as any)
 const JudgeLoginIndexRoute = JudgeLoginIndexRouteImport.update({
   id: '/judge/login/',
@@ -92,6 +98,7 @@ const AdminConsoleCandidatesRoute = AdminConsoleCandidatesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
+  '/judge/scoring': typeof JudgeScoringRouteRouteWithChildren
   '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
   '/admin/console/colleges': typeof AdminConsoleCollegesRoute
   '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
@@ -102,7 +109,7 @@ export interface FileRoutesByFullPath {
   '/admin/console/': typeof AdminConsoleIndexRoute
   '/admin/login': typeof AdminLoginIndexRoute
   '/judge/login': typeof JudgeLoginIndexRoute
-  '/judge/scoring': typeof JudgeScoringIndexRoute
+  '/judge/scoring/': typeof JudgeScoringIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -122,6 +129,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
+  '/judge/scoring': typeof JudgeScoringRouteRouteWithChildren
   '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
   '/admin/console/colleges': typeof AdminConsoleCollegesRoute
   '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
@@ -139,6 +147,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin/console'
+    | '/judge/scoring'
     | '/admin/console/candidates'
     | '/admin/console/colleges'
     | '/admin/console/dashboard'
@@ -149,7 +158,7 @@ export interface FileRouteTypes {
     | '/admin/console/'
     | '/admin/login'
     | '/judge/login'
-    | '/judge/scoring'
+    | '/judge/scoring/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin/console'
+    | '/judge/scoring'
     | '/admin/console/candidates'
     | '/admin/console/colleges'
     | '/admin/console/dashboard'
@@ -184,9 +194,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminConsoleRouteRoute: typeof AdminConsoleRouteRouteWithChildren
+  JudgeScoringRouteRoute: typeof JudgeScoringRouteRouteWithChildren
   AdminLoginIndexRoute: typeof AdminLoginIndexRoute
   JudgeLoginIndexRoute: typeof JudgeLoginIndexRoute
-  JudgeScoringIndexRoute: typeof JudgeScoringIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -198,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/judge/scoring': {
+      id: '/judge/scoring'
+      path: '/judge/scoring'
+      fullPath: '/judge/scoring'
+      preLoaderRoute: typeof JudgeScoringRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/console': {
       id: '/admin/console'
       path: '/admin/console'
@@ -207,10 +224,10 @@ declare module '@tanstack/react-router' {
     }
     '/judge/scoring/': {
       id: '/judge/scoring/'
-      path: '/judge/scoring'
-      fullPath: '/judge/scoring'
+      path: '/'
+      fullPath: '/judge/scoring/'
       preLoaderRoute: typeof JudgeScoringIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof JudgeScoringRouteRoute
     }
     '/judge/login/': {
       id: '/judge/login/'
@@ -310,12 +327,23 @@ const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
 const AdminConsoleRouteRouteWithChildren =
   AdminConsoleRouteRoute._addFileChildren(AdminConsoleRouteRouteChildren)
 
+interface JudgeScoringRouteRouteChildren {
+  JudgeScoringIndexRoute: typeof JudgeScoringIndexRoute
+}
+
+const JudgeScoringRouteRouteChildren: JudgeScoringRouteRouteChildren = {
+  JudgeScoringIndexRoute: JudgeScoringIndexRoute,
+}
+
+const JudgeScoringRouteRouteWithChildren =
+  JudgeScoringRouteRoute._addFileChildren(JudgeScoringRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminConsoleRouteRoute: AdminConsoleRouteRouteWithChildren,
+  JudgeScoringRouteRoute: JudgeScoringRouteRouteWithChildren,
   AdminLoginIndexRoute: AdminLoginIndexRoute,
   JudgeLoginIndexRoute: JudgeLoginIndexRoute,
-  JudgeScoringIndexRoute: JudgeScoringIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
