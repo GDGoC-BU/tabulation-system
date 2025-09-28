@@ -22,7 +22,13 @@ export default function PageantPreparationDashboard() {
 
   return (
     <div className="grow grid place-items-center">
-      <Button onClick={onClick}>Start Pageant</Button>
+      <div className="flex flex-col items-center gap-4">
+        <TextBody>
+          Summary of pageant details will be show here. When pageant starts no
+          modification will be allowed.
+        </TextBody>
+        <Button onClick={onClick}>Start Pageant</Button>
+      </div>
     </div>
   )
 }
