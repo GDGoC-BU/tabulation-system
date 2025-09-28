@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { jwtDecode } from 'jwt-decode'
-import type { Account, AccountRole } from '../schemas'
+import type { AccountRole, AccountStore } from '../schemas'
 import type { BackendJwtPayload } from '@/types'
 
 export type AuthenticationStore = {
-  account: Account | null
+  account: AccountStore | null
   login: (token: string) => void
   logout: () => void
   isAuthenticated: () => boolean
@@ -20,7 +20,7 @@ export const useAuthenticationStore = create<AuthenticationStore>()(
       login: (token: string) => {
         try {
           const { sub, role } = jwtDecode<BackendJwtPayload>(token)
-          const account: Account = {
+          const account: AccountStore = {
             username: sub,
             role,
             token,
