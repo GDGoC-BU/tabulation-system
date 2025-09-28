@@ -9,7 +9,10 @@ import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantStatusException;
+import com.michaelcanonizado.backend.exceptions.customs.UnsupportedAccountTypeException;
 import com.michaelcanonizado.backend.mappers.AccountMapper;
+import com.michaelcanonizado.backend.mappers.AdminMapper;
+import com.michaelcanonizado.backend.mappers.JudgeMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.security.AccountPrincipal;
@@ -18,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +49,7 @@ public class AccountService {
     private PageantRepository pageantRepository;
 
     @Autowired
-    private AccountMapper mapper;
+    private AccountMapper accountMapper;
 
     @Autowired
     private PageantContext pageantContext;
@@ -97,7 +100,7 @@ public class AccountService {
         String password = request.password();
         String passwordHash = passwordEncoder.encode(password);
         Admin admin = new Admin(username, passwordHash);
-        return mapper.toSummaryDTO(accountRepository.save(admin));
+        return accountMapper.toSummaryDTO(accountRepository.save(admin));
     }
 
     @RequirePageantStatus({
@@ -138,6 +141,13 @@ public class AccountService {
         /* Batch save to minimize insert queries */
         scoreRepository.saveAll(newScores);
 
-        return mapper.toSummaryDTO(savedAccount);
+        return accountMapper.toSummaryDTO(savedAccount);
+    }
+
+    public AccountSummaryDTO getCurrentAccount() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AccountPrincipal accountPrincipal = (AccountPrincipal) authentication.getPrincipal();
+        Account currentLoggedInAccount = accountPrincipal.getAccount();
+        return accountMapper.toSummaryDTO(currentLoggedInAccount);
     }
 }
