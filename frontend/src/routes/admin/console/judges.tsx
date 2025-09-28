@@ -5,10 +5,10 @@ import { judgeTableColumns } from '@/features/judges/components/pageant-table-co
 import { useJudgesQuery } from '@/features/judges/hooks/use-judges-query'
 
 export const Route = createFileRoute('/admin/console/judges')({
-  component: AdminJudges,
+  component: AdminConsoleJudges,
 })
 
-function AdminJudges() {
+function AdminConsoleJudges() {
   const { data } = useJudgesQuery()
 
   return (

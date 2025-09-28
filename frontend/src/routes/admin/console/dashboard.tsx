@@ -16,10 +16,10 @@ const pageantStatusComponentMap: Record<PageantStatusValue, React.FC> = {
 }
 
 export const Route = createFileRoute('/admin/console/dashboard')({
-  component: AdminDashboard,
+  component: AdminConsoleDashboard,
 })
 
-function AdminDashboard() {
+function AdminConsoleDashboard() {
   const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
   if (isLoading || !selectedPageant) {
     return <TextBody>Loading dashboard...</TextBody>

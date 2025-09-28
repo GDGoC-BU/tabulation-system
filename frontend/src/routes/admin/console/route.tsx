@@ -19,10 +19,10 @@ export const Route = createFileRoute('/admin/console')({
       })
     }
   },
-  component: ConsoleLayout,
+  component: AdminConsoleLayout,
 })
 
-function ConsoleLayout() {
+function AdminConsoleLayout() {
   return (
     <SidebarProvider defaultOpen={true}>
       <Navigation.Admin.Vertical />
