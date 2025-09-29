@@ -49,17 +49,6 @@ public class JudgeService {
         return judgeMapper.toSummaryDTO(judge);
     }
 
-    /* Don't require pageant here! Judges don't even know what pageant
-       they belong to that's why they call this endpoint */
-    @Transactional
-    public PageantSummaryDTO getJudgeAssignedPageant(UUID id) {
-        Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
-        });
-        Pageant pageant = judge.getPageant();
-        return pageantMapper.toSummary(pageant);
-    }
-
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING

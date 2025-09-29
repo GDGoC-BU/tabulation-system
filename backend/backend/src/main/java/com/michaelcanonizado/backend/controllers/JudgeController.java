@@ -26,12 +26,6 @@ public class JudgeController {
         return new ResponseEntity<>(judge, HttpStatus.OK);
     }
 
-    @GetMapping("/judges/{id}/pageant")
-    private ResponseEntity<PageantSummaryDTO> getJudgeAssignedPageant(@PathVariable UUID id) {
-        PageantSummaryDTO pageant = service.getJudgeAssignedPageant(id);
-        return new ResponseEntity<>(pageant, HttpStatus.OK);
-    }
-
     @GetMapping("/judges")
     private ResponseEntity<List<JudgeSummaryDTO>> getJudges() {
         List<JudgeSummaryDTO> judges = service.getJudges();
