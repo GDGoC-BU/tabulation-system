@@ -10,6 +10,7 @@ export type AuthenticationStore = {
   logout: () => void
   isAuthenticated: () => boolean
   getAccountRole: () => AccountRole | null
+  getAccountId: () => string | null
 }
 
 export const useAuthenticationStore = create<AuthenticationStore>()(
@@ -19,8 +20,9 @@ export const useAuthenticationStore = create<AuthenticationStore>()(
 
       login: (token: string) => {
         try {
-          const { sub, role } = jwtDecode<BackendJwtPayload>(token)
+          const { sub, role, account_id } = jwtDecode<BackendJwtPayload>(token)
           const account: AccountStore = {
+            id: account_id,
             username: sub,
             role,
             token,
@@ -43,6 +45,11 @@ export const useAuthenticationStore = create<AuthenticationStore>()(
       getAccountRole: () => {
         const account = get().account
         return account ? account.role : null
+      },
+
+      getAccountId: () => {
+        const account = get().account
+        return account ? account.id : null
       },
     }),
     {

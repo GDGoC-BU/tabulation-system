@@ -15,6 +15,7 @@ export const accountRoleSchema = z.enum(['ADMIN', 'JUDGE', 'ORGANIZER'])
 export type AccountRole = z.infer<typeof accountRoleSchema>
 
 export const accountStoreSchema = z.object({
+  id: z.string(),
   username: z.string(),
   token: z.string(),
   role: accountRoleSchema,
