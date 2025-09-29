@@ -1,4 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
 import { useSelectedPageantIdStore } from '../store/use-selected-pageant-id-store'
 import type { PageantSummary } from '../schemas'
 import type { ComponentClassNameAndChildrenProp } from '@/types'
@@ -10,12 +11,19 @@ export default function PageantTitle({
   children,
   pageant,
 }: ComponentClassNameAndChildrenProp & { pageant: PageantSummary }) {
+  const queryClient = useQueryClient()
   const { setSelectedPageantId: setPageantId } = useSelectedPageantIdStore(
     (state) => state,
   )
   const navigate = useNavigate()
 
   function onClick() {
+    /* Invalidate the pageant-related queries so it refetches the
+       actual entities that belong to that pageant. */
+    queryClient.invalidateQueries({ queryKey: ['judges'] })
+    queryClient.invalidateQueries({ queryKey: ['candidates'] })
+    queryClient.invalidateQueries({ queryKey: ['phases'] })
+    queryClient.invalidateQueries({ queryKey: ['segments'] })
     setPageantId(pageant.id)
     navigate({ to: '/admin/console/dashboard' })
   }
