@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useLoggedInAccountQuery } from '@/features/authentication/hooks/use-logged-in-account-query'
+import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 
 export const Route = createFileRoute('/judge/scoring/')({
   component: JudgeScoring,
 })
 
 function JudgeScoring() {
-  const { data: judgeAccount } = useLoggedInAccountQuery()
+  const { getAccountId } = useAuthenticationStore()
   return <div>Hello "/judge/scoring/"!</div>
 }

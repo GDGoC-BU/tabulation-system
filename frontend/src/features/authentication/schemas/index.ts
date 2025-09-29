@@ -19,6 +19,7 @@ export const accountStoreSchema = z.object({
   username: z.string(),
   token: z.string(),
   role: accountRoleSchema,
+  assigned_pageant_id: z.union([z.null(), z.string()]),
 })
 export type AccountStore = z.infer<typeof accountStoreSchema>
 

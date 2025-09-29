@@ -90,8 +90,11 @@ public class AccountService {
                         ErrorCode.PAGEANT_ACCESS_DENIED
                 );
             }
-        }
 
+            /* Assigned pageant will be available in the token.
+               Use this to fetch the assigned pageant to a judge. */
+            extraClaims.put("assigned_pageant_id", pageant.getId());
+        }
         return jwtService.generateToken(account, extraClaims);
     }
 

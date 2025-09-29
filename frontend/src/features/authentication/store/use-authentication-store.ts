@@ -20,10 +20,14 @@ export const useAuthenticationStore = create<AuthenticationStore>()(
 
       login: (token: string) => {
         try {
-          const { sub, role, account_id } = jwtDecode<BackendJwtPayload>(token)
+          const { sub, role, account_id, assigned_pageant_id } =
+            jwtDecode<BackendJwtPayload>(token)
           const account: AccountStore = {
             id: account_id,
             username: sub,
+            assigned_pageant_id: assigned_pageant_id
+              ? assigned_pageant_id
+              : null,
             role,
             token,
           }
