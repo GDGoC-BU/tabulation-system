@@ -24,9 +24,6 @@ public class PhaseController {
     @Autowired
     private PhaseService service;
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     @PostMapping("/phases")
     public ResponseEntity<PhaseDetailedDTO> addPhase(@RequestBody @Valid PhaseCreateDTO phaseCreateDTO) {
         PhaseDetailedDTO phase = service.addPhase(phaseCreateDTO);
@@ -45,38 +42,24 @@ public class PhaseController {
         return new ResponseEntity<>(phase, HttpStatus.OK);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
-    })
     @GetMapping("/phases/{id}")
     public ResponseEntity<PhaseDetailedDTO> getPhase(@PathVariable UUID id) {
         PhaseDetailedDTO phase = service.getPhase(id);
         return new ResponseEntity<>(phase, HttpStatus.OK);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
-    })
     @GetMapping("/phases")
     public ResponseEntity<List<PhaseSummaryDTO>> getPhases() {
         List<PhaseSummaryDTO> phases = service.getPhases();
         return new ResponseEntity<>(phases, HttpStatus.OK);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     @PutMapping("/phases/{id}")
     public ResponseEntity<PhaseDetailedDTO> updatePhases(@PathVariable UUID id, @RequestBody @Valid PhaseUpdateDTO phaseUpdateDTO) {
         PhaseDetailedDTO phase = service.updatePhase(id, phaseUpdateDTO);
         return new ResponseEntity<>(phase, HttpStatus.OK);
     }
-
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
+    
     @DeleteMapping("/phases/{id}")
     public ResponseEntity<Void> deletePhase(@PathVariable UUID id) {
         service.deletePhase(id);
