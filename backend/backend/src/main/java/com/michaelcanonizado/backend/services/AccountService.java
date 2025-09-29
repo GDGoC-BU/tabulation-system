@@ -6,10 +6,7 @@ import com.michaelcanonizado.backend.dtos.account.AccountCreateDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountLoginDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
-import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
-import com.michaelcanonizado.backend.exceptions.customs.PageantStatusException;
-import com.michaelcanonizado.backend.exceptions.customs.UnsupportedAccountTypeException;
+import com.michaelcanonizado.backend.exceptions.customs.*;
 import com.michaelcanonizado.backend.mappers.AccountMapper;
 import com.michaelcanonizado.backend.mappers.AdminMapper;
 import com.michaelcanonizado.backend.mappers.JudgeMapper;
@@ -47,6 +44,9 @@ public class AccountService {
 
     @Autowired
     private PageantRepository pageantRepository;
+
+    @Autowired
+    private PhaseRepository phaseRepository;
 
     @Autowired
     private AccountMapper accountMapper;
@@ -90,6 +90,14 @@ public class AccountService {
                         ErrorCode.PAGEANT_ACCESS_DENIED
                 );
             }
+
+            /* Check if there is an ongoing phase. Else don't let judge login. */
+            phaseRepository.findByStatus(PhaseSegmentStatus.ONGOING).orElseThrow(() -> {
+                return new PhaseStatusException(
+                        "No phase has started. Please wait for admin to open a phase.",
+                        ErrorCode.ACCESS_DENIED
+                );
+            });
 
             /* Assigned pageant will be available in the token.
                Use this to fetch the assigned pageant to a judge. */
