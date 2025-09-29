@@ -11,6 +11,7 @@ export type AuthenticationStore = {
   isAuthenticated: () => boolean
   getAccountRole: () => AccountRole | null
   getAccountId: () => string | null
+  getAssignedPageantId: () => string | null
 }
 
 export const useAuthenticationStore = create<AuthenticationStore>()(
@@ -54,6 +55,11 @@ export const useAuthenticationStore = create<AuthenticationStore>()(
       getAccountId: () => {
         const account = get().account
         return account ? account.id : null
+      },
+
+      getAssignedPageantId: () => {
+        const account = get().account
+        return account ? account.assigned_pageant_id : null
       },
     }),
     {

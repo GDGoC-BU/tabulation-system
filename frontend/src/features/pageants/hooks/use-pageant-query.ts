@@ -3,7 +3,7 @@ import { pageantSummarySchema } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function usePageantQuery(id: string) {
+export function usePageantQuery(id: string | null | undefined) {
   return useQuery({
     queryKey: ['pageants', id],
     queryFn: async () => {
