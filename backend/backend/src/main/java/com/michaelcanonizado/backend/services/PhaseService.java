@@ -106,6 +106,26 @@ public class PhaseService {
     }
 
     @RequirePageantStatus({
+            PageantStatus.ONGOING
+    })
+    public PhaseDetailedDTO getOngoingPhase() {
+        UUID selectedPageantId = pageantContext.getId();
+        List<Phase> phases =  phaseRepository.findAllByPageant_Id(selectedPageantId);
+
+        /* Revisit this. Might want to add a check to verify that only 1 phase should be ongoing */
+
+        Phase ongoingPhase = phases.stream().filter(phase -> {
+            return phase.getStatus().equals(PhaseSegmentStatus.ONGOING);
+        }).findFirst().orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "No ongoing phase for pageant!",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        });
+        return mapper.toDetailedDTO(ongoingPhase);
+    }
+
+    @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
     })

@@ -48,6 +48,12 @@ public class PhaseController {
         return new ResponseEntity<>(phase, HttpStatus.OK);
     }
 
+    @GetMapping("/phases/ongoing")
+    public ResponseEntity<PhaseDetailedDTO> getOngoingPhase() {
+        PhaseDetailedDTO phase = service.getOngoingPhase();
+        return new ResponseEntity<>(phase, HttpStatus.OK);
+    }
+
     @GetMapping("/phases")
     public ResponseEntity<List<PhaseSummaryDTO>> getPhases() {
         List<PhaseSummaryDTO> phases = service.getPhases();
@@ -59,7 +65,7 @@ public class PhaseController {
         PhaseDetailedDTO phase = service.updatePhase(id, phaseUpdateDTO);
         return new ResponseEntity<>(phase, HttpStatus.OK);
     }
-    
+
     @DeleteMapping("/phases/{id}")
     public ResponseEntity<Void> deletePhase(@PathVariable UUID id) {
         service.deletePhase(id);
