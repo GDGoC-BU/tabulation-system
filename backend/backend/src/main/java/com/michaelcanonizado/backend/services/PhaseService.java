@@ -8,6 +8,7 @@ import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
+import com.michaelcanonizado.backend.exceptions.customs.PhaseStatusException;
 import com.michaelcanonizado.backend.mappers.PhaseMapper;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
@@ -114,14 +115,13 @@ public class PhaseService {
 
         /* Revisit this. Might want to add a check to verify that only 1 phase should be ongoing */
 
-        Phase ongoingPhase = phases.stream().filter(phase -> {
-            return phase.getStatus().equals(PhaseSegmentStatus.ONGOING);
-        }).findFirst().orElseThrow(() -> {
+        Phase ongoingPhase = phaseRepository.findByStatus(PhaseSegmentStatus.ONGOING).orElseThrow(() -> {
             return new EntityNotFoundException(
                     "No ongoing phase for pageant!",
                     ErrorCode.ENTITY_NOT_FOUND
             );
         });
+
         return mapper.toDetailedDTO(ongoingPhase);
     }
 
