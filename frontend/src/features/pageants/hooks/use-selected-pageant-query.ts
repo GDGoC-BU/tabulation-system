@@ -3,5 +3,5 @@ import { usePageantQuery } from './use-pageant-query'
 
 export function useSelectedPageantQuery() {
   const { selectedPageantId: id } = useSelectedPageantIdStore((state) => state)
-  return usePageantQuery(id ?? '')
+  return usePageantQuery(id)
 }
