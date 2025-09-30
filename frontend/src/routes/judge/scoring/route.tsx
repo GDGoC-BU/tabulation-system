@@ -2,6 +2,7 @@ import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { accountRoleSchema } from '@/features/authentication/schemas'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
+import { useStompStore } from '@/store/stomp-store'
 
 export const Route = createFileRoute('/judge/scoring')({
   beforeLoad: async ({ context, location }) => {
@@ -39,5 +40,8 @@ export const Route = createFileRoute('/judge/scoring')({
 })
 
 function JudgeScoringLayout() {
+  const { connect } = useStompStore((state) => state)
+  connect()
+
   return <Outlet />
 }
