@@ -7,8 +7,8 @@ import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
-import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
 import com.michaelcanonizado.backend.mappers.SegmentMapper;
+import com.michaelcanonizado.backend.messages.OngoingSegmentMessage;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CandidateSegmentQualificationRepository;
@@ -18,6 +18,7 @@ import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.specifications.SegmentSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +45,9 @@ public class SegmentService {
 
     @Autowired
     private PageantContext pageantContext;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION
@@ -78,10 +82,18 @@ public class SegmentService {
         });
 
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
+        UUID selectedPageantId = pageantContext.getId();
 
         /* TO-IMPLEMENT: Ensure that only 1 has the state ONGOING */
 
         segment.setStatus(PhaseSegmentStatus.ONGOING);
+
+        /* Notify the client about the new ongoing segment */
+        simpMessagingTemplate.convertAndSend(
+                "/topic/pageants/" + selectedPageantId + "/ongoing-segment",
+                new OngoingSegmentMessage(segment.getId())
+        );
+
         return mapper.toDetailedDTO(segmentRepository.save(segment));
     }
 
@@ -95,8 +107,16 @@ public class SegmentService {
         });
 
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
+        UUID selectedPageantId = pageantContext.getId();
 
         segment.setStatus(PhaseSegmentStatus.CLOSED);
+
+        /* Notify the client about the new ongoing segment */
+        simpMessagingTemplate.convertAndSend(
+                "/topic/pageants/" + selectedPageantId + "/ongoing-segment",
+                new OngoingSegmentMessage(null)
+        );
+
         return mapper.toDetailedDTO(segmentRepository.save(segment));
     }
 
