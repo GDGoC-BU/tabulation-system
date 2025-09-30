@@ -1,6 +1,8 @@
 import z from 'zod'
 import { phaseSegmentStatusValue } from '@/schemas'
 import { phaseSummarySchema } from '@/features/phases/schemas'
+import { criterionSummarySchema } from '@/features/criteria/schemas'
+import { candidateSummarySchema } from '@/features/candidates/schemas'
 
 export const segmentSummarySchema = z.object({
   id: z.string(),
@@ -15,6 +17,19 @@ export const segmentSummarySchema = z.object({
   }),
 })
 export type segmentSummary = z.infer<typeof segmentSummarySchema>
+
+export const segmentDetailedSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  sequence: z.number(),
+  status: phaseSegmentStatusValue,
+  phase: z.lazy(() => {
+    return phaseSummarySchema
+  }),
+  criteria: z.array(criterionSummarySchema),
+  qualifiedCandidates: z.array(candidateSummarySchema),
+})
+export type SegmentDetailed = z.infer<typeof segmentDetailedSchema>
 
 export const segmentsSchema = z.array(segmentSummarySchema)
 export type Segments = z.infer<typeof segmentsSchema>

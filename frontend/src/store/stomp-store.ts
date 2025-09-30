@@ -68,7 +68,7 @@ export const useStompStore = create<StompStore>((set, get) => ({
       return client.subscribe(topic, callback)
     }
 
-    /* If not yet connected. Wait for the handshake to fulfill */
+    /* If not yet connected. Wait for the handshake to fulfill. */
     let subscription: StompSubscription | null = null
     client.onConnect = () => {
       subscription = client.subscribe(topic, callback)
