@@ -32,25 +32,31 @@ const pageantAction = [
     title: 'Judges',
     url: '/admin/console/judges',
     icon: UserRoundPen,
-    badgeValue: 4,
+    badgeValue: 0,
   },
   {
     title: 'Candidates',
     url: '/admin/console/candidates',
     icon: UserStar,
-    badgeValue: 20,
+    badgeValue: 0,
   },
   {
     title: 'Phases',
     url: '/admin/console/phases',
     icon: Layers,
-    badgeValue: 2,
+    badgeValue: 0,
   },
   {
     title: 'Segments',
     url: '/admin/console/segments',
     icon: Route,
-    badgeValue: 5,
+    badgeValue: 0,
+  },
+  {
+    title: 'Awards',
+    url: '/admin/console/awards',
+    icon: Route,
+    badgeValue: 0,
   },
 ]
 
