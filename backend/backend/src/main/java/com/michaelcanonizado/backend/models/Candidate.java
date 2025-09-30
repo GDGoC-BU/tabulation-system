@@ -34,7 +34,7 @@ public class Candidate extends Auditable {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CandidateGender candidateGender;
+    private CandidateGender gender;
 
     @Column(nullable = false)
     private int age;
@@ -78,11 +78,11 @@ public class Candidate extends Auditable {
     )
     private List<Score> scores = new ArrayList<>();
 
-    public Candidate(int number, String firstName, String lastName, CandidateGender candidateGender, int age, College college, Pageant pageant) {
+    public Candidate(int number, String firstName, String lastName, CandidateGender gender, int age, College college, Pageant pageant) {
         this.number = number;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.candidateGender = candidateGender;
+        this.gender = gender;
         this.age = age;
         this.college = college;
         this.pageant = pageant;

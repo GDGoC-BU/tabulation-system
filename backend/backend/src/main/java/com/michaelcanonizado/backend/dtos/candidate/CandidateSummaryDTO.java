@@ -10,7 +10,7 @@ public record CandidateSummaryDTO(
         int number,
         String firstName,
         String lastName,
-        CandidateGender candidateGender,
+        CandidateGender gender,
         int age,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
