@@ -1,4 +1,5 @@
 import { TextBody, TextHeading, textBodyClassName } from '../text'
+import { Badge } from '../ui/badge'
 import type { ComponentClassNameAndChildrenProp } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -123,15 +124,68 @@ function TabsFacadeBodyContent({
   )
 }
 
+function Card({ className, children }: ComponentClassNameAndChildrenProp) {
+  return (
+    <div className={cn('border rounded-lg flex flex-col', className)}>
+      {children}
+    </div>
+  )
+}
+function CardHeader({
+  className,
+  children,
+}: ComponentClassNameAndChildrenProp) {
+  return (
+    <div
+      className={cn('flex flex-row justify-between border-b p-4', className)}
+    >
+      {children}
+    </div>
+  )
+}
+function CardHeaderTitle({
+  className,
+  children,
+}: ComponentClassNameAndChildrenProp) {
+  return <TextBody className={cn('', className)}>{children}</TextBody>
+}
+function CardHeaderBadgeGroup({
+  className,
+  children,
+}: ComponentClassNameAndChildrenProp) {
+  return <div className={cn('flex flex-row gap-4', className)}>{children}</div>
+}
+function CardHeaderBadge({
+  className,
+  children,
+}: ComponentClassNameAndChildrenProp) {
+  return <Badge className={cn('', className)}>{children}</Badge>
+}
+function CardContent({
+  className,
+  children,
+}: ComponentClassNameAndChildrenProp) {
+  return <div className={cn('p-4', className)}>{children}</div>
+}
+
 Header.Title = Title
 Header.Sub = Sub
 Scoring.Header = Header
+
 TabsFacadeList.Trigger = TabsFacadeListTrigger
 TabsFacade.List = TabsFacadeList
 TabsFacadeBody.Title = TabsFacadeBodyTitle
 TabsFacadeBody.Description = TabsFacadeBodyDescription
 TabsFacadeBody.Content = TabsFacadeBodyContent
 TabsFacade.Body = TabsFacadeBody
+
+CardHeader.Badge = CardHeaderBadge
+CardHeader.BadgeGroup = CardHeaderBadgeGroup
+CardHeader.Title = CardHeaderTitle
+Card.Header = CardHeader
+Card.Content = CardContent
+Scoring.Card = Card
+
 Scoring.TabsFacade = TabsFacade
-Scoring.Content = Content
+Scoring.Content = CardContent
 export default Scoring

@@ -91,12 +91,26 @@ function JudgeScoring() {
         Enter scores for each candidates in the segment
       </Scoring.TabsFacade.Body.Description>
       <Scoring.TabsFacade.Body.Content>
-        <div className="p-4 rounded-lg border">1</div>
-        <div className="p-4 rounded-lg border">1</div>
-        <div className="p-4 rounded-lg border">2</div>
-        <div className="p-4 rounded-lg border">2</div>
-        <div className="p-4 rounded-lg border">3</div>
-        <div className="p-4 rounded-lg border">3</div>
+        {ongoingSegment.qualifiedCandidates.map((candidate) => {
+          return (
+            <Scoring.Card>
+              <Scoring.Card.Header>
+                <Scoring.Card.Header.Title>
+                  Candidate {candidate.number}
+                </Scoring.Card.Header.Title>
+                <Scoring.Card.Header.BadgeGroup>
+                  <Scoring.Card.Header.Badge>
+                    {candidate.gender}
+                  </Scoring.Card.Header.Badge>
+                  <Scoring.Card.Header.Badge>
+                    Total Score: 0
+                  </Scoring.Card.Header.Badge>
+                </Scoring.Card.Header.BadgeGroup>
+              </Scoring.Card.Header>
+              <Scoring.Card.Content>asfasf</Scoring.Card.Content>
+            </Scoring.Card>
+          )
+        })}
       </Scoring.TabsFacade.Body.Content>
     </Scoring.TabsFacade.Body>
   ) : (
