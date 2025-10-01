@@ -27,6 +27,7 @@ export const Route = createFileRoute('/judge/scoring')({
            So just redirect them to their assign routes */
 
     if (currentLoggedInAccountRole === accountRoleSchema.enum.JUDGE) {
+      console.log('Authenticated...')
       return
     }
 
@@ -40,6 +41,7 @@ export const Route = createFileRoute('/judge/scoring')({
 })
 
 function JudgeScoringLayout() {
+  console.log('Connecting websockets')
   const { connect } = useStompStore((state) => state)
   connect()
 

@@ -26,7 +26,6 @@ export const useStompStore = create<StompStore>((set, get) => ({
     if (!isAuthenticated()) {
       return
     }
-
     /* Create client */
     const client = new Client({
       webSocketFactory: () =>

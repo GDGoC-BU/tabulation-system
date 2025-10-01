@@ -41,7 +41,6 @@ function JudgeScoring() {
       (message) => {
         try {
           const data = JSON.parse(message.body)
-          console.log('Ongoing segment:', data)
           setOngoingSegmentId(data?.id ?? null)
         } catch (err) {
           console.error('Failed to parse STOMP message', err)

@@ -9,10 +9,9 @@ export function useSegmentQuery(id: string | null | undefined) {
     queryFn: async () => {
       try {
         const response = await api.get(`/segments/${id}`)
-        console.log('Segments: ', response.data)
         const parsedResponse = segmentDetailedSchema.safeParse(response.data)
         if (!parsedResponse.success) {
-          throw new Error(`/segments/id response doesn't match schema!`)
+          throw new Error(`/segments/${id} response doesn't match schema!`)
         }
         return parsedResponse.data
       } catch (error) {
