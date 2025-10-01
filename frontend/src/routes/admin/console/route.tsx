@@ -17,9 +17,11 @@ export const Route = createFileRoute('/admin/console')({
     if (!isAuthenticated || !currentLoggedInAccountRole) {
       throw redirect({
         to: '/admin/login',
+
+        /* Redirect after login */
         search: {
-          /* But save the currenth location, so they can be redirected back here */
-          redirect: location.href,
+          //  redirect: location.href,
+          redirect: '/admin/console',
         },
       })
     }
