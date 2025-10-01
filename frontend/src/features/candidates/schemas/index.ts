@@ -15,3 +15,6 @@ export const candidateSummarySchema = z.object({
   updatedAt: zStringToDate,
 })
 export type CandidateSummary = z.infer<typeof candidateSummarySchema>
+
+export const candidatesSchema = z.array(candidateSummarySchema)
+export type Candidates = z.infer<typeof candidatesSchema>
