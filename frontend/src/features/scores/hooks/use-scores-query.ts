@@ -1,32 +1,36 @@
-import { useQuery } from '@tanstack/react-query'
-import { scoreDetailedSchema } from '../schemas'
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import { scoresSchema } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function useScoresQuery({
-  judgeId,
-  candidateId,
-  criterionId,
-  segmentId,
-}: {
-  judgeId?: string
-  candidateId?: string
-  criterionId?: string
-  segmentId?: string
-}) {
+export function useScoresQuery(
+  params: {
+    judgeId?: string
+    candidateId?: string
+    criterionId?: string
+    segmentId?: string
+  },
+  enabled?: boolean,
+) {
   return useQuery({
-    queryKey: ['scores'],
+    queryKey: [
+      'scores',
+      params.judgeId,
+      params.segmentId,
+      params.candidateId,
+      params.criterionId,
+    ],
     queryFn: async () => {
-      const params = {
-        ...(judgeId && { judgeId }),
-        ...(candidateId && { candidateId }),
-        ...(criterionId && { criterionId }),
-        ...(segmentId && { segmentId }),
+      const parameters = {
+        ...(params.judgeId && { judgeId: params.judgeId }),
+        ...(params.candidateId && { candidateId: params.candidateId }),
+        ...(params.criterionId && { criterionId: params.criterionId }),
+        ...(params.segmentId && { segmentId: params.segmentId }),
       }
-
+      console.log('GETTING SCRORES: ', parameters)
       try {
-        const response = await api.get('/scores', { params })
-        const parsedResponse = scoreDetailedSchema.safeParse(response.data)
+        const response = await api.get('/scores', { params: parameters })
+        const parsedResponse = scoresSchema.safeParse(response.data)
         if (!parsedResponse.success) {
           console.error("/scores response doesn't match schema!")
           return []
@@ -37,5 +41,6 @@ export function useScoresQuery({
       }
     },
     staleTime: 1000 * 60 * 10,
+    enabled,
   })
 }

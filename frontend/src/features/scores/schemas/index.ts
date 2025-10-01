@@ -10,3 +10,13 @@ export const scoreDetailedSchema = z.object({
   criterion: criterionSummarySchema,
 })
 export type ScoreDetailed = z.infer<typeof scoreDetailedSchema>
+
+export const scoresSchema = z.array(scoreDetailedSchema)
+export type Scores = z.infer<typeof scoresSchema>
+
+export const scoreEditFormSchema = z.object({
+  value: z.int().min(0, {
+    error: 'Must be equal or greater than 0',
+  }),
+})
+export type ScoreEditFormSchema = z.infer<typeof scoreEditFormSchema>
