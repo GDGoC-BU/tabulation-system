@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
-import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
+import com.michaelcanonizado.backend.dtos.candidate.CandidateDetailedDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
@@ -15,6 +15,6 @@ public record SegmentDetailedDTO(
         PhaseSegmentStatus status,
         PhaseSummaryDTO phase,
         List<CriterionSummaryDTO> criteria,
-        List<CandidateSummaryDTO> qualifiedCandidates
+        List<CandidateDetailedDTO> qualifiedCandidates
 ) {
 }
