@@ -23,6 +23,7 @@ import { Route as AdminConsoleJudgesRouteImport } from './routes/admin/console/j
 import { Route as AdminConsoleDashboardRouteImport } from './routes/admin/console/dashboard'
 import { Route as AdminConsoleCollegesRouteImport } from './routes/admin/console/colleges'
 import { Route as AdminConsoleCandidatesRouteImport } from './routes/admin/console/candidates'
+import { Route as AdminConsoleAwardsRouteImport } from './routes/admin/console/awards'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -94,11 +95,17 @@ const AdminConsoleCandidatesRoute = AdminConsoleCandidatesRouteImport.update({
   path: '/candidates',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
+const AdminConsoleAwardsRoute = AdminConsoleAwardsRouteImport.update({
+  id: '/awards',
+  path: '/awards',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
   '/judge/scoring': typeof JudgeScoringRouteRouteWithChildren
+  '/admin/console/awards': typeof AdminConsoleAwardsRoute
   '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
   '/admin/console/colleges': typeof AdminConsoleCollegesRoute
   '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/console/awards': typeof AdminConsoleAwardsRoute
   '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
   '/admin/console/colleges': typeof AdminConsoleCollegesRoute
   '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
   '/judge/scoring': typeof JudgeScoringRouteRouteWithChildren
+  '/admin/console/awards': typeof AdminConsoleAwardsRoute
   '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
   '/admin/console/colleges': typeof AdminConsoleCollegesRoute
   '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/console'
     | '/judge/scoring'
+    | '/admin/console/awards'
     | '/admin/console/candidates'
     | '/admin/console/colleges'
     | '/admin/console/dashboard'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/console/awards'
     | '/admin/console/candidates'
     | '/admin/console/colleges'
     | '/admin/console/dashboard'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/console'
     | '/judge/scoring'
+    | '/admin/console/awards'
     | '/admin/console/candidates'
     | '/admin/console/colleges'
     | '/admin/console/dashboard'
@@ -299,10 +311,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleCandidatesRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
+    '/admin/console/awards': {
+      id: '/admin/console/awards'
+      path: '/awards'
+      fullPath: '/admin/console/awards'
+      preLoaderRoute: typeof AdminConsoleAwardsRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
   }
 }
 
 interface AdminConsoleRouteRouteChildren {
+  AdminConsoleAwardsRoute: typeof AdminConsoleAwardsRoute
   AdminConsoleCandidatesRoute: typeof AdminConsoleCandidatesRoute
   AdminConsoleCollegesRoute: typeof AdminConsoleCollegesRoute
   AdminConsoleDashboardRoute: typeof AdminConsoleDashboardRoute
@@ -314,6 +334,7 @@ interface AdminConsoleRouteRouteChildren {
 }
 
 const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
+  AdminConsoleAwardsRoute: AdminConsoleAwardsRoute,
   AdminConsoleCandidatesRoute: AdminConsoleCandidatesRoute,
   AdminConsoleCollegesRoute: AdminConsoleCollegesRoute,
   AdminConsoleDashboardRoute: AdminConsoleDashboardRoute,
