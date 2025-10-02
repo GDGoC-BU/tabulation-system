@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { scoresSchema } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
@@ -15,10 +15,12 @@ export function useScoresQuery(
   return useQuery({
     queryKey: [
       'scores',
-      params.judgeId,
-      params.segmentId,
-      params.candidateId,
-      params.criterionId,
+      {
+        judgeId: params.judgeId,
+        segmentId: params.segmentId,
+        candidateId: params.candidateId,
+        criterionId: params.criterionId,
+      },
     ],
     queryFn: async () => {
       const parameters = {
@@ -27,7 +29,6 @@ export function useScoresQuery(
         ...(params.criterionId && { criterionId: params.criterionId }),
         ...(params.segmentId && { segmentId: params.segmentId }),
       }
-      console.log('GETTING SCRORES: ', parameters)
       try {
         const response = await api.get('/scores', { params: parameters })
         const parsedResponse = scoresSchema.safeParse(response.data)

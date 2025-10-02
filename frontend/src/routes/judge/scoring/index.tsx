@@ -1,18 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import {
-  DialogClose,
-  DialogDescription,
-  DialogTitle,
-} from '@radix-ui/react-dialog'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useEffect, useMemo, useState } from 'react'
 import type { Segments } from '@/features/segments/schemas'
-import type {
-  ScoreDetailed,
-  ScoreEditFormSchema,
-} from '@/features/scores/schemas'
-import type { CriterionSummary } from '@/features/criteria/schemas'
+import type { ScoreDetailed } from '@/features/scores/schemas'
 import type { CandidateSummary } from '@/features/candidates/schemas'
 import { candidateGender } from '@/features/candidates/schemas'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
@@ -26,16 +15,66 @@ import { phaseSegmentStatusValue } from '@/schemas'
 import { useStompStore } from '@/store/stomp-store'
 import { useSegmentQuery } from '@/features/segments/hooks/use-segment-query'
 import { useScoresQuery } from '@/features/scores/hooks/use-scores-query'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { scoreEditFormSchema } from '@/features/scores/schemas'
+import useDebounce from '@/hooks/use-debounce'
+import useEditScoreMutate from '@/features/scores/hooks/use-edit-score-mutate'
+
+function ScoreInputForm({
+  score,
+  updateLocalScores,
+}: {
+  score: ScoreDetailed
+  updateLocalScores: (updatedScore: ScoreDetailed) => void
+}) {
+  const [scoreValue, setScoreValue] = useState(score.value)
+  const [isError, setIsError] = useState(false)
+  const debouncedScore = useDebounce(scoreValue, 2000)
+  const { mutateAsync: editScore } = useEditScoreMutate()
+
+  useEffect(() => {
+    if (isNaN(debouncedScore) || debouncedScore > score.criterion.maxScore) {
+      setIsError(true)
+      return
+    }
+    setIsError(false)
+
+    const changeScore = async () => {
+      const updatedScore = await editScore({
+        id: score.id,
+        value: debouncedScore,
+      })
+      updateLocalScores(updatedScore)
+    }
+    changeScore()
+  }, [debouncedScore])
+
+  return (
+    <div className="flex flex-col items-center ">
+      <div className="grid grid-cols-2 gap-4 items-center">
+        <div className="justify-self-end">
+          <TextBody className="">{score.criterion.name}</TextBody>
+          {isError && (
+            <TextSub className="text-destructive text-end">
+              Invalid Score
+            </TextSub>
+          )}
+        </div>
+        <div className="justify-self-start flex flex-row gap-4 items-center">
+          <div className="w-fit">
+            <Input
+              defaultValue={score.value}
+              type="number"
+              min={0}
+              max={5}
+              onChange={(e) => setScoreValue(parseInt(e.target.value))}
+            />
+          </div>
+          <TextSub>Max: {score.criterion.maxScore}</TextSub>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function CandidateScoreCard({
   candidate,
@@ -44,17 +83,25 @@ function CandidateScoreCard({
   candidate: CandidateSummary
   scores?: Array<ScoreDetailed>
 }) {
-  const form = useForm<ScoreEditFormSchema>({
-    resolver: zodResolver(scoreEditFormSchema),
-    defaultValues: {
-      value: 0,
-    },
-  })
+  /* Should only be used to display the total score! */
+  const [localScores, setLocalScores] = useState<Array<ScoreDetailed>>([])
+  useEffect(() => {
+    setLocalScores(scores)
+  }, [scores])
 
-  function onScoreChange(values: ScoreEditFormSchema) {
-    console.log('Score Values: ', values)
+  /* TEMPORARY PROP DRILL! This will be handled better in the future.
+     But always fetch the scores in the parent and just filter by candidates.
+     Fetching scores is costly! fetching in each CandidateScoreCard will
+     multiply the already expensive score fetches. */
+  const updateLocalScores = (updatedScore: ScoreDetailed) => {
+    setLocalScores((prevScores) =>
+      prevScores.map((score) =>
+        score.id === updatedScore.id ? updatedScore : score,
+      ),
+    )
   }
 
+  /* Determine the badge color for each gender */
   let genderBadgeColorClassName = 'bg-purple-400'
   if (candidate.gender === candidateGender.enum.FEMALE) {
     genderBadgeColorClassName = 'bg-pink-400'
@@ -72,31 +119,21 @@ function CandidateScoreCard({
           <Scoring.Card.Header.Badge className={genderBadgeColorClassName}>
             {candidate.gender}
           </Scoring.Card.Header.Badge>
-          <Scoring.Card.Header.Badge>Total Score: 0</Scoring.Card.Header.Badge>
+          <Scoring.Card.Header.Badge>
+            Total Score:{' '}
+            {localScores.reduce((sum, score) => sum + score.value, 0)}
+          </Scoring.Card.Header.Badge>
         </Scoring.Card.Header.BadgeGroup>
       </Scoring.Card.Header>
       <Scoring.Card.Content>
         <div className="flex flex-col gap-8">
           {scores.map((score) => {
             return (
-              <div className="grid grid-cols-2 gap-4 items-center justify-center">
-                <div className="grow text-end">
-                  <TextBody>{score.criterion.name}</TextBody>
-                </div>
-                <div className="flex flex-row gap-4 items-center">
-                  <div className="">
-                    <Input
-                      type="number"
-                      max={score.criterion.maxScore}
-                      min={0}
-                      className="max-w-[100px]"
-                    />
-                  </div>
-                  <div className="">
-                    <TextSub>Max: {score.criterion.maxScore}</TextSub>
-                  </div>
-                </div>
-              </div>
+              <ScoreInputForm
+                key={score.id}
+                score={score}
+                updateLocalScores={updateLocalScores}
+              />
             )
           })}
         </div>
@@ -105,42 +142,18 @@ function CandidateScoreCard({
   )
 }
 
-{
-  /* <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onScoreChange)}
-            className="space-y-4"
-          >
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {isError && <TextSub className="text-destructive">{error}</TextSub>}
-          </form>
-        </Form> */
-}
-
 export const Route = createFileRoute('/judge/scoring/')({
   component: JudgeScoring,
 })
 
 function JudgeScoring() {
+  const { account, getAssignedPageantId } = useAuthenticationStore()
+  const { setSelectedPageantId } = useSelectedPageantIdStore()
+  const { data: assignedPageant } = usePageantQuery(getAssignedPageantId())
+
   const [currentSegments, setCurrentSegments] = useState<Segments>([])
   const [ongoingSegmentId, setOngoingSegmentId] = useState<string | null>(null)
 
-  const { account, getAssignedPageantId, getAccountId } =
-    useAuthenticationStore()
-  const { data: assignedPageant } = usePageantQuery(getAssignedPageantId())
-  const { setSelectedPageantId } = useSelectedPageantIdStore()
   const { data: currentPhase } = useOngoingPhaseQuery()
   const { data: ongoingSegment } = useSegmentQuery(ongoingSegmentId)
   const { data: scores } = useScoresQuery(
@@ -148,8 +161,22 @@ function JudgeScoring() {
       judgeId: account?.id,
       segmentId: ongoingSegmentId ?? '',
     },
+    /* Only run the query when all parameters are available */
     !!account?.id && !!ongoingSegment?.id,
   )
+
+  /* Group scores by candidate in a map for faster lookup */
+  const scoresByCandidate = useMemo(() => {
+    const map = new Map<string, Array<ScoreDetailed>>()
+    if (!scores) return map
+
+    scores.forEach((score) => {
+      const key = score.candidateId
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)?.push(score)
+    })
+    return map
+  }, [scores])
 
   /* Temporary hack! Backend can return segments for a phase */
   const { data: allSegments } = useSegmentsQuery()
@@ -196,12 +223,11 @@ function JudgeScoring() {
       setCurrentSegments(filtered)
 
       /* On initial load, get the ongoing segment. Websocket will only
-           Ontify changes after subscription. */
+           Notify changes after subscription. */
       const ongoing = filtered.find(
         (segment) => segment.status === phaseSegmentStatusValue.enum.ONGOING,
       )
       if (ongoing) {
-        console.log('ONGOING:', ongoing.name)
         setOngoingSegmentId(ongoing.id)
       }
     }
@@ -223,15 +249,15 @@ function JudgeScoring() {
               <CandidateScoreCard
                 key={candidate.id}
                 candidate={candidate}
-                scores={scores?.filter(
-                  (score) => score.candidateId === candidate.id,
-                )}
+                scores={scoresByCandidate.get(candidate.id)}
               />
             )
           })}
       </Scoring.TabsFacade.Body.Content>
     </Scoring.TabsFacade.Body>
   ) : (
+    /* Temporary body for inactive segments. Special cases apply
+       when all segments are PENDING and CLOSED  */
     <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
       <div className="flex flex-col text-center gap-2">
         <Scoring.TabsFacade.Body.Title>
