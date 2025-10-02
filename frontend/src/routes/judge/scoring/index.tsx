@@ -102,12 +102,24 @@ function CandidateScoreCard({
     )
   }
 
-  /* Determine the badge color for each gender */
-  let genderBadgeColorClassName = 'bg-purple-400'
+  /* Determine the badge for each gender */
+  let GenderBadge = (
+    <Scoring.Card.Header.Badge className="bg-purple-400 font-semibold">
+      Mx.
+    </Scoring.Card.Header.Badge>
+  )
   if (candidate.gender === candidateGender.enum.FEMALE) {
-    genderBadgeColorClassName = 'bg-pink-400'
+    GenderBadge = (
+      <Scoring.Card.Header.Badge className="bg-pink-400 font-semibold">
+        Ms.
+      </Scoring.Card.Header.Badge>
+    )
   } else if (candidate.gender === candidateGender.enum.MALE) {
-    genderBadgeColorClassName = 'bg-blue-400'
+    GenderBadge = (
+      <Scoring.Card.Header.Badge className="bg-blue-400 font-semibold">
+        Mr.
+      </Scoring.Card.Header.Badge>
+    )
   }
 
   return (
@@ -117,9 +129,7 @@ function CandidateScoreCard({
           Candidate {candidate.number}
         </Scoring.Card.Header.Title>
         <Scoring.Card.Header.BadgeGroup>
-          <Scoring.Card.Header.Badge className={genderBadgeColorClassName}>
-            {candidate.gender}
-          </Scoring.Card.Header.Badge>
+          {GenderBadge}
           <Scoring.Card.Header.Badge>
             Total Score:{' '}
             {localScores.reduce((sum, score) => sum + score.value, 0)}
