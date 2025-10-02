@@ -18,6 +18,7 @@ import { useScoresQuery } from '@/features/scores/hooks/use-scores-query'
 import { Input } from '@/components/ui/input'
 import useDebounce from '@/hooks/use-debounce'
 import useEditScoreMutate from '@/features/scores/hooks/use-edit-score-mutate'
+import splitCandidates from '@/features/candidates/lib/split-candidates'
 
 function ScoreInputForm({
   score,
@@ -233,6 +234,17 @@ function JudgeScoring() {
     }
   }, [allSegments, currentPhase])
 
+  const { groupA: candidateGroupA, groupB: candidateGroupB } = useMemo(() => {
+    if (!ongoingSegment) {
+      return {
+        groupA: [],
+        groupB: [],
+      }
+    }
+
+    return splitCandidates(ongoingSegment.qualifiedCandidates)
+  }, [ongoingSegment])
+
   const ScoringContent = ongoingSegment ? (
     <Scoring.TabsFacade.Body>
       <Scoring.TabsFacade.Body.Title>
@@ -241,10 +253,9 @@ function JudgeScoring() {
       <Scoring.TabsFacade.Body.Description>
         Enter scores for each candidates in the segment
       </Scoring.TabsFacade.Body.Description>
-      <Scoring.TabsFacade.Body.Content>
-        {ongoingSegment.qualifiedCandidates
-          .sort((a, b) => a.number - b.number)
-          .map((candidate) => {
+      <Scoring.TabsFacade.Body.Content className="grid grid-cols-2">
+        <div className="grid grid-cols-1 gap-4">
+          {candidateGroupA.map((candidate) => {
             return (
               <CandidateScoreCard
                 key={candidate.id}
@@ -253,6 +264,18 @@ function JudgeScoring() {
               />
             )
           })}
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          {candidateGroupB.map((candidate) => {
+            return (
+              <CandidateScoreCard
+                key={candidate.id}
+                candidate={candidate}
+                scores={scoresByCandidate.get(candidate.id)}
+              />
+            )
+          })}
+        </div>
       </Scoring.TabsFacade.Body.Content>
     </Scoring.TabsFacade.Body>
   ) : (
