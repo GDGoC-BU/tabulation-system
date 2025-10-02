@@ -1,4 +1,4 @@
-import { Settings, Sun } from 'lucide-react'
+import { LogOut, Settings, Sun } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import type { ComponentClassNameProp } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -15,9 +15,13 @@ export default function Horizontal({ className }: ComponentClassNameProp) {
   const navigation = useNavigate()
 
   function logoutAccount() {
-    logout()
-    setPageantId(null)
     navigation({ to: '/' })
+    /* Add short delay so that UI is maintained. Navigation might take
+       sometime for the redirect page to load. This prevents UI teardown */
+    setTimeout(() => {
+      logout()
+      setPageantId(null)
+    }, 200)
   }
   return (
     <div
@@ -37,7 +41,10 @@ export default function Horizontal({ className }: ComponentClassNameProp) {
         <Button variant="ghost">
           <Settings className="size-[18px]" />
         </Button>
-        <Button onClick={logoutAccount}>Logout</Button>
+        <Button onClick={logoutAccount}>
+          <LogOut />
+          Logout
+        </Button>
       </div>
     </div>
   )

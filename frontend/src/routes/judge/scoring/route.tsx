@@ -3,6 +3,7 @@ import { accountRoleSchema } from '@/features/authentication/schemas'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
 import { useStompStore } from '@/store/stomp-store'
+import Navigation from '@/features/navigation/components'
 
 export const Route = createFileRoute('/judge/scoring')({
   beforeLoad: async ({ context, location }) => {
@@ -41,9 +42,15 @@ export const Route = createFileRoute('/judge/scoring')({
 })
 
 function JudgeScoringLayout() {
-  console.log('Connecting websockets')
   const { connect } = useStompStore((state) => state)
   connect()
 
-  return <Outlet />
+  return (
+    <div className="relative">
+      <Navigation.Judge.Horizontal />
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  )
 }
