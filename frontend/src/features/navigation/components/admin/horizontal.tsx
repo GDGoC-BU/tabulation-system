@@ -21,7 +21,7 @@ export default function Horizontal({ className }: ComponentClassNameProp) {
     setTimeout(() => {
       logout()
       setPageantId(null)
-    }, 200)
+    }, 1500)
   }
   return (
     <div

@@ -18,7 +18,7 @@ export default function Horizontal() {
     setTimeout(() => {
       logout()
       setPageantId(null)
-    }, 200)
+    }, 1500)
   }
 
   return (
