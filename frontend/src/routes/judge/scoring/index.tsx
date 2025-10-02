@@ -260,9 +260,15 @@ function JudgeScoring() {
       <Scoring.TabsFacade.Body.Title>
         {ongoingSegment.name}
       </Scoring.TabsFacade.Body.Title>
-      <Scoring.TabsFacade.Body.Description>
-        Enter scores for each candidates in the segment
-      </Scoring.TabsFacade.Body.Description>
+      <div className="">
+        <Scoring.TabsFacade.Body.Description>
+          Enter the scores for each candidate in the segment.
+        </Scoring.TabsFacade.Body.Description>
+        <Scoring.TabsFacade.Body.Description>
+          Note: Scores are saved automatically, just wait for the admin to
+          change the segment
+        </Scoring.TabsFacade.Body.Description>
+      </div>
       <Scoring.TabsFacade.Body.Content className="grid grid-cols-2">
         <div className="grid grid-cols-1 gap-4">
           {candidateGroupA.map((candidate) => {
