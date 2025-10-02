@@ -159,7 +159,7 @@ function CardHeaderTitle({
   className,
   children,
 }: ComponentClassNameAndChildrenProp) {
-  return <TextBody className={cn('bold', className)}>{children}</TextBody>
+  return <TextBody className={cn('font-bold', className)}>{children}</TextBody>
 }
 function CardHeaderBadgeGroup({
   className,
