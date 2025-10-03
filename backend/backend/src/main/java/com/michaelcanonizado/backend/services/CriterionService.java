@@ -10,7 +10,10 @@ import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.CriterionMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
+import com.michaelcanonizado.backend.specifications.CriterionSpecification;
+import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +84,21 @@ public class CriterionService {
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
     })
+    public List<CriterionSummaryDTO> getCriteria() {
+        UUID selectedPageantId = pageantContext.getId();
+        return criterionRepository.findAll(
+                Specification.allOf(
+                        CriterionSpecification.hasPageant(selectedPageantId)
+                )
+        ).stream().map(criterion -> {
+            return mapper.toSummaryDTO(criterion);
+        }).toList();
+    }
+
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public CriterionSummaryDTO updateCriterion(UUID id, CriterionUpdateDTO criterionUpdateDTO) {
         Criterion criterion = criterionRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! Criterion not found.", ErrorCode.ENTITY_NOT_FOUND);
@@ -112,9 +130,5 @@ public class CriterionService {
                         .getPageant()
                         .getId()
         );
-
-        Segment segment = criterion.getSegment();
-        segment.removeCriterion(criterion);
-        criterionRepository.delete(criterion);
     }
 }
