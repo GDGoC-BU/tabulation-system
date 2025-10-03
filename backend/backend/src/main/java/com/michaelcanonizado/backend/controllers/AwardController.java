@@ -34,7 +34,7 @@ public class AwardController {
     }
 
     @GetMapping("/awards")
-    public ResponseEntity<List<AwardSummaryDTO>> getAward() {
+    public ResponseEntity<List<AwardSummaryDTO>> getAwards() {
         List<AwardSummaryDTO> awards = service.getAwards();
         return new ResponseEntity<>(awards, HttpStatus.OK);
     }
