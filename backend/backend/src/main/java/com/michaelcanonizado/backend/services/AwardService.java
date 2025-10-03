@@ -104,6 +104,10 @@ public class AwardService {
         return awardMapper.toSummaryDTO(savedAward);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public List<AwardSummaryDTO> getAwards() {
         UUID selectedPageantId = pageantContext.getId();
 
