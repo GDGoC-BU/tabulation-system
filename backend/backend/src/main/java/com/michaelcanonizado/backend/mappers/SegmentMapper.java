@@ -15,6 +15,7 @@ public interface SegmentMapper {
     SegmentSummaryDTO toSummaryDTO(Segment segment);
     @Mapping(target = "qualifiedCandidates", source = "qualifiedCandidates")
     SegmentDetailedDTO toDetailedDTO(Segment segment);
+    SegmentHierarchyDTO toHierarchyDTO(Segment segment);
 
     void updateEntityFromDTO(@MappingTarget Segment segment, SegmentUpdateDTO segmentUpdateDTO);
 }

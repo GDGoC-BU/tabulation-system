@@ -10,6 +10,8 @@ public record SegmentSummaryDTO(
         String name,
         int sequence,
         PhaseSegmentStatus status,
+        /* FIX THIS. PhaseDetailedDTO shows its segments and the segment shows their phase? unnecessary.
+           But for now keep it, the frontend depends on this relationship. */
         PhaseSummaryDTO phase
 ) {
 }

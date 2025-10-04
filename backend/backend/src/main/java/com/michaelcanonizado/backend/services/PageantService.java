@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.pageant.PageantCreateDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantHierarchyDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
@@ -28,7 +29,7 @@ public class PageantService {
 
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         Pageant pageant = repository.save(mapper.toEntity(pageantCreateDTO));
-        return mapper.toSummary(pageant);
+        return mapper.toSummaryDTO(pageant);
     }
 
     @RequirePageantStatus({
@@ -42,7 +43,7 @@ public class PageantService {
         pageant.setStatus(PageantStatus.ONGOING);
         pageant.setStartedAt(LocalDateTime.now());
 
-        return mapper.toSummary(repository.save(pageant));
+        return mapper.toSummaryDTO(repository.save(pageant));
     }
 
     @RequirePageantStatus({
@@ -55,7 +56,7 @@ public class PageantService {
 
         pageant.setStatus(PageantStatus.FINALIZING);
 
-        return mapper.toSummary(repository.save(pageant));
+        return mapper.toSummaryDTO(repository.save(pageant));
     }
 
     @RequirePageantStatus({
@@ -69,7 +70,7 @@ public class PageantService {
         pageant.setStatus(PageantStatus.CLOSED);
         pageant.setEndedAt(LocalDateTime.now());
 
-        return mapper.toSummary(repository.save(pageant));
+        return mapper.toSummaryDTO(repository.save(pageant));
     }
 
     public PageantSummaryDTO getPageant(UUID id) {
@@ -77,7 +78,14 @@ public class PageantService {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
-        return mapper.toSummary(pageant);
+        return mapper.toSummaryDTO(pageant);
+    }
+    public PageantHierarchyDTO getPageantHierarchy(UUID id) {
+        Pageant pageant = repository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
+        });
+
+        return mapper.toHierarchyDTO(pageant);
     }
 
     public List<PageantSummaryDTO> getPageants() {
@@ -85,7 +93,7 @@ public class PageantService {
         return pageants
                 .stream()
                 .map(pageant -> {
-                    return mapper.toSummary(pageant);
+                    return mapper.toSummaryDTO(pageant);
                 }).toList();
     }
 
@@ -106,7 +114,7 @@ public class PageantService {
         }
 
         mapper.updateEntityFromDTO(pageant, pageantUpdateDTO);
-        return mapper.toSummary(repository.save(pageant));
+        return mapper.toSummaryDTO(repository.save(pageant));
     }
 
     public void deletePageant(UUID id) {
