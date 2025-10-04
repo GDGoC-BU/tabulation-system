@@ -1,7 +1,10 @@
 import z from 'zod'
 import { phaseSegmentStatusValue } from '@/schemas'
 import { phaseSummarySchema } from '@/features/phases/schemas'
-import { criterionSummarySchema } from '@/features/criteria/schemas'
+import {
+  criterionHierarchySchema,
+  criterionSummarySchema,
+} from '@/features/criteria/schemas'
 import { candidateDetailedSchema } from '@/features/candidates/schemas'
 
 export const segmentSummarySchema = z.object({
@@ -30,6 +33,15 @@ export const segmentDetailedSchema = z.object({
   qualifiedCandidates: z.array(candidateDetailedSchema),
 })
 export type SegmentDetailed = z.infer<typeof segmentDetailedSchema>
+
+export const segmentHierarchySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  sequence: z.number(),
+  status: phaseSegmentStatusValue,
+  criteria: z.array(criterionHierarchySchema),
+})
+export type SegmentHierarchy = z.infer<typeof segmentHierarchySchema>
 
 export const segmentsSchema = z.array(segmentSummarySchema)
 export type Segments = z.infer<typeof segmentsSchema>
