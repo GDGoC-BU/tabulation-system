@@ -19,7 +19,7 @@ public interface PageantMapper {
        Pageant toEntity(PageantSummaryDTO pageantSummaryDTO); */
     @Mapping(target = "status", qualifiedByName = "mapStatus")
     PageantSummaryDTO toSummaryDTO(Pageant pageant);
-
+    @Mapping(target = "status", qualifiedByName = "mapStatus")
     PageantHierarchyDTO toHierarchyDTO(Pageant pageant);
 
     void updateEntityFromDTO(@MappingTarget Pageant pageant, PageantUpdateDTO pageantUpdateDTO);
