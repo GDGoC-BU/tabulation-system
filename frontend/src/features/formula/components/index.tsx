@@ -14,7 +14,12 @@ function FormulaButton({
     asChild?: boolean
   }) {
   return (
-    <Button variant="outline" className={cn('', className)} {...props}>
+    <Button
+      type="button"
+      variant="outline"
+      className={cn('', className)}
+      {...props}
+    >
       {children}
     </Button>
   )

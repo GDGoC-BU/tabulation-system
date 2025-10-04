@@ -22,7 +22,7 @@ export const pageantHierarchySchema = z.object({
   id: z.string(),
   title: z.string(),
   status: pageantStatusSchema,
-  phases: phaseHierarchySchema,
+  phases: z.array(phaseHierarchySchema),
 })
 export type PageantHierarchy = z.infer<typeof pageantHierarchySchema>
 

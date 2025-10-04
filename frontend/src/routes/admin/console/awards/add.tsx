@@ -1,8 +1,7 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
 import type { AwardAddForm } from '@/features/awards/schemas'
 import {
   Form,
@@ -18,43 +17,111 @@ import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-
 import { awardAddFormSchema } from '@/features/awards/schemas'
 import Console from '@/components/console'
 import FormulaButton from '@/features/formula/components'
-import { usePhasesQuery } from '@/features/phases/hooks/use-phases-query'
-import { useSegmentsQuery } from '@/features/segments/hooks/use-segments-query'
+import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
+import renderFormulaLabel from '@/features/formula/components/lib/render-formula-label'
+import deleteLastFormulaChunk from '@/features/formula/components/lib/delete-last-formula-chunk'
+import { Textarea } from '@/components/ui/textarea'
+
+type ButtonItem = {
+  className: string | null
+  label: string
+  value: string | null
+}
+
+const mainButtonItems: Array<ButtonItem> = [
+  { className: 'col-span-2', label: '(', value: '(' },
+  { className: 'col-span-2', label: ')', value: ')' },
+  { className: '', label: '7', value: '7' },
+  { className: '', label: '8', value: '8' },
+  { className: '', label: '9', value: '9' },
+  { className: '', label: '/', value: '/' },
+  { className: '', label: '4', value: '4' },
+  { className: '', label: '5', value: '5' },
+  { className: '', label: '6', value: '6' },
+  { className: '', label: '*', value: '*' },
+  { className: '', label: '1', value: '1' },
+  { className: '', label: '2', value: '2' },
+  { className: '', label: '3', value: '3' },
+  { className: '', label: '-', value: '-' },
+  { className: '', label: '0', value: '0' },
+  { className: '', label: '.', value: '.' },
+  { className: 'display-hidden', label: '', value: null },
+  { className: '', label: '+', value: '+' },
+]
 
 export const Route = createFileRoute('/admin/console/awards/add')({
   component: AdminConsoleAwardsAdd,
 })
 
 function AdminConsoleAwardsAdd() {
-  const { data: selectedPageant } = useSelectedPageantQuery()
-  const { data: phases } = usePhasesQuery()
-  const { data: segments } = useSegmentsQuery()
+  const [rawFormula, setRawFormula] = useState('')
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const queryClient = useQueryClient()
+  const { data: selectedPageant } = useSelectedPageantQuery()
+  const { data: pageantHierarchy } = usePageantHierarchyQuery(
+    selectedPageant?.id,
+  )
   const navigate = useNavigate()
 
-  const form = useForm<AwardAddForm>({
+  const form = useForm({
     resolver: zodResolver(awardAddFormSchema),
     defaultValues: {
       name: '',
-      candidateLimit: 0,
+      candidateLimit: '' as unknown as number,
       formula: '',
     },
   })
 
-  async function onSubmit(values: AwardAddForm) {
-    console.log('Award Values: ', values)
-  }
-
-  const onOpenChange = (open: boolean) => {
-    setIsDialogOpen(open)
-  }
+  const criteriaButtonItems = useMemo(() => {
+    if (!pageantHierarchy) return []
+    const buttonItems: Array<ButtonItem> = []
+    pageantHierarchy.phases.forEach((phase) => {
+      phase.segments.forEach((segment) => {
+        segment.criteria.forEach((criterion) => {
+          const item: ButtonItem = {
+            className: '',
+            label: `${phase.name} : ${segment.name} : ${criterion.name}`,
+            value: criterion.id,
+          }
+          buttonItems.push(item)
+        })
+      })
+    })
+    return buttonItems
+  }, [pageantHierarchy])
 
   if (!selectedPageant) {
     navigate({
       to: '/admin/console/pageants',
     })
+  }
+
+  const criterionMap = new Map<string, string>()
+  pageantHierarchy?.phases.forEach((phase) => {
+    phase.segments.forEach((segment) => {
+      segment.criteria.forEach((criterion) => {
+        const key = criterion.id
+        const value = `<${phase.name} : ${segment.name} : ${criterion.name}>`
+        criterionMap.set(key, value)
+      })
+    })
+  })
+
+  const handleButtonInput = (button: ButtonItem) => {
+    if (!button.value) return
+
+    const updatedFormula = rawFormula + button.value
+    setRawFormula(updatedFormula)
+    form.setValue('formula', updatedFormula)
+  }
+
+  const handleButtonDelete = () => {
+    const newRawFormula = deleteLastFormulaChunk(rawFormula)
+    setRawFormula(newRawFormula)
+    form.setValue('formula', newRawFormula)
+  }
+
+  function onSubmit(values: AwardAddForm) {
+    console.log('Award Values: ', values)
   }
 
   const NameFormField = (
@@ -97,7 +164,7 @@ function AdminConsoleAwardsAdd() {
         </Console.Header.Title>
       </Console.Header>
       <Console.Content>
-        <div className="max-w-[1000px] w-full">
+        <div className="w-fit">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -108,47 +175,64 @@ function AdminConsoleAwardsAdd() {
                 <FormField
                   control={form.control}
                   name="formula"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Formula</FormLabel>
-                      <FormControl>
-                        <div className="border rounded-lg">
-                          <Input
+
+                      <div className="border rounded-lg">
+                        <FormControl>
+                          <Textarea
+                            value={renderFormulaLabel(rawFormula, criterionMap)}
                             className="rounded-none border-x-0 border-t-0"
-                            {...field}
+                            // readOnly
                           />
-                          <div className="p-4 flex flex-row gap-4">
-                            <div className="grid grid-cols-4 gap-1 max-w-[300px]">
-                              <FormulaButton className="col-span-2">
-                                {'('}
+                        </FormControl>
+                        <FormMessage className="px-4 pt-2" />
+                        <div className="p-4 flex flex-row gap-4">
+                          <div className="grid grid-cols-4 gap-1">
+                            <div className="col-span-4 grid grid-cols-3 gap-1">
+                              <FormulaButton disabled={true}>
+                                {'<-'}
                               </FormulaButton>
-                              <FormulaButton className="col-span-2">
-                                {')'}
+                              <FormulaButton disabled={true}>
+                                {'->'}
                               </FormulaButton>
-                              <FormulaButton className="">7</FormulaButton>
-                              <FormulaButton className="">8</FormulaButton>
-                              <FormulaButton className="">9</FormulaButton>
-                              <FormulaButton className="">/</FormulaButton>
-                              <FormulaButton className="">4</FormulaButton>
-                              <FormulaButton className="">5</FormulaButton>
-                              <FormulaButton className="">6</FormulaButton>
-                              <FormulaButton className="">*</FormulaButton>
-                              <FormulaButton className="">1</FormulaButton>
-                              <FormulaButton className="">2</FormulaButton>
-                              <FormulaButton className="">3</FormulaButton>
-                              <FormulaButton className="">-</FormulaButton>
-                              <FormulaButton className="">0</FormulaButton>
-                              <FormulaButton className="">.</FormulaButton>
-                              <div />
-                              <FormulaButton className="">+</FormulaButton>
+                              <FormulaButton onClick={handleButtonDelete}>
+                                DEL
+                              </FormulaButton>
                             </div>
-                            <div className="overflow-y-scroll">
-                              asdasdasdasdasdasdsdasdasdasdasdasd
-                            </div>
+
+                            {mainButtonItems.map((button, index) => {
+                              return (
+                                <FormulaButton
+                                  className={
+                                    button.className ? button.className : ''
+                                  }
+                                  key={index}
+                                  onClick={() => handleButtonInput(button)}
+                                >
+                                  {button.label}
+                                </FormulaButton>
+                              )
+                            })}
+                          </div>
+                          <div className="overflow-y-scroll gap-1 flex flex-col h-[235px]">
+                            {criteriaButtonItems.map((button, index) => {
+                              return (
+                                <FormulaButton
+                                  className={
+                                    button.className ? button.className : ''
+                                  }
+                                  key={index}
+                                  onClick={() => handleButtonInput(button)}
+                                >
+                                  {button.label}
+                                </FormulaButton>
+                              )
+                            })}
                           </div>
                         </div>
-                      </FormControl>
-                      <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />

@@ -15,9 +15,11 @@ export const awardAddFormSchema = z.object({
   name: z.string().min(1, {
     error: 'Name is required',
   }),
-  candidateLimit: z.int().min(1, {
-    error: 'Candidate limit should be greater than 0',
-  }),
+  candidateLimit: z.coerce
+    .number({ message: 'Only positive numbers are allowed' })
+    .min(1, {
+      message: 'Enter how many candidates will get this award',
+    }),
   formula: z.string().min(1, {
     error: 'Formula is required',
   }),
