@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
@@ -19,10 +19,11 @@ import { awardAddFormSchema } from '@/features/awards/schemas'
 import Console from '@/components/console'
 import FormulaButton from '@/features/formula/components/formula-button'
 import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
-import renderFormulaLabel from '@/features/formula/lib/render-formula-label'
 import deleteLastFormulaChunk from '@/features/formula/lib/delete-last-formula-chunk'
-import { Textarea } from '@/components/ui/textarea'
 import useAddAwardMutate from '@/features/awards/hooks/use-add-award-mutate'
+import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
+import FormulaBadgeRenderer from '@/features/formula/components/formula-label-renderer'
+import FormulaRenderer from '@/features/formula/components/formula-renderer'
 
 type ButtonItem = {
   className: string | null
@@ -65,6 +66,9 @@ function AdminConsoleAwardsAdd() {
   const { data: pageantHierarchy } = usePageantHierarchyQuery(
     selectedPageant?.id,
   )
+  const criterionLookup = useFormulaCriterionLookup(
+    pageantHierarchy?.phases ?? [],
+  )
 
   const form = useForm({
     resolver: zodResolver(awardAddFormSchema),
@@ -74,24 +78,6 @@ function AdminConsoleAwardsAdd() {
       formula: '',
     },
   })
-
-  const criteriaButtonItems = useMemo(() => {
-    if (!pageantHierarchy) return []
-    const buttonItems: Array<ButtonItem> = []
-    pageantHierarchy.phases.forEach((phase) => {
-      phase.segments.forEach((segment) => {
-        segment.criteria.forEach((criterion) => {
-          const item: ButtonItem = {
-            className: '',
-            label: `${phase.name} : ${segment.name} : ${criterion.name}`,
-            value: criterion.id,
-          }
-          buttonItems.push(item)
-        })
-      })
-    })
-    return buttonItems
-  }, [pageantHierarchy])
 
   if (!selectedPageant) {
     navigate({
@@ -110,10 +96,10 @@ function AdminConsoleAwardsAdd() {
     })
   })
 
-  const handleButtonInput = (button: ButtonItem) => {
-    if (!button.value) return
+  const handleButtonInput = (value: string | null) => {
+    if (!value) return
 
-    const updatedFormula = rawFormula + button.value
+    const updatedFormula = rawFormula + value
     setRawFormula(updatedFormula)
     form.setValue('formula', updatedFormula)
   }
@@ -125,7 +111,6 @@ function AdminConsoleAwardsAdd() {
   }
 
   async function onSubmit(values: AwardAddForm) {
-    console.log('Award Values: ', values)
     const isSuccess = await addAward(values)
     if (isSuccess) {
       form.reset()
@@ -175,7 +160,7 @@ function AdminConsoleAwardsAdd() {
         </Console.Header.Title>
       </Console.Header>
       <Console.Content>
-        <div className="w-fit">
+        <div className="">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -191,13 +176,12 @@ function AdminConsoleAwardsAdd() {
                       <FormLabel>Formula</FormLabel>
 
                       <div className="border rounded-lg">
-                        <FormControl>
-                          <Textarea
-                            value={renderFormulaLabel(rawFormula, criterionMap)}
-                            className="rounded-none border-x-0 border-t-0"
-                            readOnly
+                        <div className="p-4 min-h-[150px] overflow-x-scroll border-b">
+                          <FormulaRenderer
+                            formula={rawFormula}
+                            criterionLookup={criterionLookup}
                           />
-                        </FormControl>
+                        </div>
                         <FormMessage className="px-4 pt-2" />
                         <div className="p-4 flex flex-row gap-4">
                           <div className="grid grid-cols-4 gap-1">
@@ -220,7 +204,9 @@ function AdminConsoleAwardsAdd() {
                                     button.className ? button.className : ''
                                   }
                                   key={index}
-                                  onClick={() => handleButtonInput(button)}
+                                  onClick={() =>
+                                    handleButtonInput(button.value)
+                                  }
                                 >
                                   {button.label}
                                 </FormulaButton>
@@ -228,19 +214,27 @@ function AdminConsoleAwardsAdd() {
                             })}
                           </div>
                           <div className="overflow-y-scroll gap-1 flex flex-col h-[235px]">
-                            {criteriaButtonItems.map((button, index) => {
-                              return (
-                                <FormulaButton
-                                  className={
-                                    button.className ? button.className : ''
-                                  }
-                                  key={index}
-                                  onClick={() => handleButtonInput(button)}
-                                >
-                                  {button.label}
-                                </FormulaButton>
-                              )
-                            })}
+                            {Object.values(criterionLookup).map(
+                              (criterionRelationship) => {
+                                return (
+                                  <FormulaButton
+                                    key={criterionRelationship.criterion.id}
+                                    onClick={() =>
+                                      handleButtonInput(
+                                        criterionRelationship.criterion.id,
+                                      )
+                                    }
+                                  >
+                                    <FormulaBadgeRenderer
+                                      simplified={false}
+                                      criterionRelationship={
+                                        criterionRelationship
+                                      }
+                                    />
+                                  </FormulaButton>
+                                )
+                              },
+                            )}
                           </div>
                         </div>
                       </div>
@@ -249,12 +243,14 @@ function AdminConsoleAwardsAdd() {
                 />
               </div>
               {/* {isError && <TextSub className="text-destructive">{error}</TextSub>} */}
-              <Button variant="outline">
-                <Link to="/admin/console/awards">Cancel</Link>
-              </Button>
-              <Button type="submit" variant="default">
-                Create
-              </Button>
+              <div className="flex flex-row gap-4">
+                <Button variant="outline">
+                  <Link to="/admin/console/awards">Cancel</Link>
+                </Button>
+                <Button type="submit" variant="default">
+                  Create
+                </Button>
+              </div>
             </form>
           </Form>
         </div>
