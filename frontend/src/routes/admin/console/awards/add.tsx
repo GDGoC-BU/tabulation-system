@@ -2,6 +2,7 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import type { AwardAddForm } from '@/features/awards/schemas'
 import {
   Form,
@@ -16,11 +17,12 @@ import { Button } from '@/components/ui/button'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 import { awardAddFormSchema } from '@/features/awards/schemas'
 import Console from '@/components/console'
-import FormulaButton from '@/features/formula/components'
+import FormulaButton from '@/features/formula/components/formula-button'
 import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
-import renderFormulaLabel from '@/features/formula/components/lib/render-formula-label'
-import deleteLastFormulaChunk from '@/features/formula/components/lib/delete-last-formula-chunk'
+import renderFormulaLabel from '@/features/formula/lib/render-formula-label'
+import deleteLastFormulaChunk from '@/features/formula/lib/delete-last-formula-chunk'
 import { Textarea } from '@/components/ui/textarea'
+import useAddAwardMutate from '@/features/awards/hooks/use-add-award-mutate'
 
 type ButtonItem = {
   className: string | null
@@ -55,12 +57,14 @@ export const Route = createFileRoute('/admin/console/awards/add')({
 
 function AdminConsoleAwardsAdd() {
   const [rawFormula, setRawFormula] = useState('')
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
+  const { mutateAsync: addAward } = useAddAwardMutate()
   const { data: selectedPageant } = useSelectedPageantQuery()
   const { data: pageantHierarchy } = usePageantHierarchyQuery(
     selectedPageant?.id,
   )
-  const navigate = useNavigate()
 
   const form = useForm({
     resolver: zodResolver(awardAddFormSchema),
@@ -120,8 +124,15 @@ function AdminConsoleAwardsAdd() {
     form.setValue('formula', newRawFormula)
   }
 
-  function onSubmit(values: AwardAddForm) {
+  async function onSubmit(values: AwardAddForm) {
     console.log('Award Values: ', values)
+    const isSuccess = await addAward(values)
+    if (isSuccess) {
+      form.reset()
+      form.clearErrors()
+      queryClient.invalidateQueries({ queryKey: ['awards'] })
+      navigate({ to: '/admin/console/awards' })
+    }
   }
 
   const NameFormField = (
@@ -184,7 +195,7 @@ function AdminConsoleAwardsAdd() {
                           <Textarea
                             value={renderFormulaLabel(rawFormula, criterionMap)}
                             className="rounded-none border-x-0 border-t-0"
-                            // readOnly
+                            readOnly
                           />
                         </FormControl>
                         <FormMessage className="px-4 pt-2" />

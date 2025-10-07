@@ -46,7 +46,7 @@ function AdminConsoleLayout() {
   return (
     <SidebarProvider defaultOpen={true}>
       <Navigation.Admin.Vertical />
-      <div className="w-full flex flex-col">
+      <div className="w-full flex flex-col overflow-hidden">
         <Navigation.Admin.Horizontal />
         <main className="grow">
           <Outlet />

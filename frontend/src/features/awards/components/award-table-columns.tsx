@@ -25,7 +25,11 @@ export const awardTableColumns: Array<ColumnDef<AwardSummary>> = [
     header: 'Formula',
     cell: ({ row }) => {
       const formula: AwardSummary['formula'] = row.getValue('formula')
-      return <TextBody>{formula}</TextBody>
+      return (
+        <TextBody className="max-w-[1000px] whitespace-normal">
+          {formula}
+        </TextBody>
+      )
     },
   },
 ]

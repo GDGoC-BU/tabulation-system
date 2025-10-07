@@ -4,7 +4,7 @@ import type { VariantProps } from 'class-variance-authority'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-function FormulaButton({
+export default function FormulaButton({
   className,
   children,
   ...props
@@ -24,5 +24,3 @@ function FormulaButton({
     </Button>
   )
 }
-
-export default FormulaButton
