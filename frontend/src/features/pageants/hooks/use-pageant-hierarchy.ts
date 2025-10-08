@@ -9,14 +9,12 @@ export function usePageantHierarchyQuery(id: string | null | undefined) {
     queryFn: async () => {
       try {
         const response = await api.get(`/pageants/${id}/hierarchy`)
-        console.log('res: ', response.data)
         const parsedResponse = pageantHierarchySchema.safeParse(response.data)
         if (!parsedResponse.success) {
           throw new Error(
             `/pageant/id/hierarchy response doesn't match schema!`,
           )
         }
-        console.log('parsed: ', parsedResponse.data)
         return parsedResponse.data
       } catch (error) {
         console.log(error)

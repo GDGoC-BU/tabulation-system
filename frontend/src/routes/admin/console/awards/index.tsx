@@ -39,7 +39,6 @@ function AdminConsoleAwards() {
   /* Converts the formula to a more readable format just like in admin/console/awards/add */
   const processedAwards = useMemo(() => {
     if (!awards) return []
-    console.log('A: ', awards[0].formula)
     return awards.map((award) => ({
       ...award,
       formula: renderFormulaLabel(award.formula, criterionMap),
