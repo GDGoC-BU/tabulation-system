@@ -8,11 +8,13 @@ export default function deleteLastFormulaChunk(formula: string): string {
   const pattern = new RegExp(
     [
       // UUID regex (match whole UUID at end)
-      '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+      '\\s[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
       // Number regex (with optional decimal, including leading dot)
       '\\d*\\.?\\d+$',
       // Single operator or parenthesis
-      '[+\\-*/()]$',
+      '\\s[+\\-*/()]\\s$',
+      // Just a trailing space (in case it’s left behind)
+      '\\s$',
     ].join('|'),
   )
 

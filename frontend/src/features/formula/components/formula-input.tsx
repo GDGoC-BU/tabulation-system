@@ -15,24 +15,24 @@ type ButtonItem = {
 }
 
 const mainButtonItems: Array<ButtonItem> = [
-  { className: 'col-span-2', label: '(', value: '(' },
-  { className: 'col-span-2', label: ')', value: ')' },
+  { className: 'col-span-2', label: '(', value: ' ( ' },
+  { className: 'col-span-2', label: ')', value: ' ) ' },
   { className: '', label: '7', value: '7' },
   { className: '', label: '8', value: '8' },
   { className: '', label: '9', value: '9' },
-  { className: '', label: '/', value: '/' },
+  { className: '', label: '/', value: ' / ' },
   { className: '', label: '4', value: '4' },
   { className: '', label: '5', value: '5' },
   { className: '', label: '6', value: '6' },
-  { className: '', label: '*', value: '*' },
+  { className: '', label: '*', value: ' * ' },
   { className: '', label: '1', value: '1' },
   { className: '', label: '2', value: '2' },
   { className: '', label: '3', value: '3' },
-  { className: '', label: '-', value: '-' },
+  { className: '', label: '-', value: ' - ' },
   { className: '', label: '0', value: '0' },
   { className: '', label: '.', value: '.' },
   { className: 'display-hidden', label: '', value: null },
-  { className: '', label: '+', value: '+' },
+  { className: '', label: '+', value: ' + ' },
 ]
 
 export default function FormulaInput({
@@ -67,10 +67,15 @@ export default function FormulaInput({
   const handleButtonInput = (value: string | null) => {
     if (!value) return
     field.onChange(formula + value)
+    console.log('Formula MAIN:', '"', formula + value, '"')
+    // console.log('------------------------------')
   }
 
   const handleButtonDelete = () => {
+    console.log('Formula A:', '"', formula, '"')
     field.onChange(deleteLastFormulaChunk(formula))
+    console.log('Formula B:', '"', field.value, '"')
+    console.log('-----------------------------')
   }
 
   return (
@@ -105,7 +110,7 @@ export default function FormulaInput({
               <FormulaButton
                 key={criterionRelationship.criterion.id}
                 onClick={() =>
-                  handleButtonInput(criterionRelationship.criterion.id)
+                  handleButtonInput(` ${criterionRelationship.criterion.id}`)
                 }
               >
                 <FormulaBadgeRenderer

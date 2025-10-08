@@ -15,10 +15,10 @@ export default function FormulaRenderer({
 
   return (
     <div className="flex flex-row gap-2 items-center flex-wrap">
-      {tokens.map((token) => {
+      {tokens.map((token, index) => {
         if (token.type === 'uuid') {
           return (
-            <Badge variant="outline" className="bg-muted">
+            <Badge key={index} variant="outline" className="bg-muted">
               <FormulaBadgeRenderer
                 simplified={true}
                 criterionRelationship={criterionLookup[token.value]}

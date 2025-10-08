@@ -79,7 +79,7 @@ function AdminConsoleAwardsAdd() {
         <FormItem>
           <FormLabel>Number of Candidates</FormLabel>
           <FormControl>
-            <Input min={1} {...field} />
+            <Input type="number" min={1} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -117,7 +117,7 @@ function AdminConsoleAwardsAdd() {
               </div>
               {/* {isError && <TextSub className="text-destructive">{error}</TextSub>} */}
               <div className="flex flex-row gap-4">
-                <Button variant="outline">
+                <Button type="button" variant="outline">
                   <Link to="/admin/console/awards">Cancel</Link>
                 </Button>
                 <Button type="submit" variant="default">
