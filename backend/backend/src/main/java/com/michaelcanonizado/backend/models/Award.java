@@ -29,7 +29,7 @@ public class Award {
     @Column(nullable = false)
     private int candidateLimit;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String formula;
 
     @JsonBackReference
