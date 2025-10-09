@@ -33,6 +33,12 @@ public class AwardController {
         return new ResponseEntity<>(leaderboard, HttpStatus.OK);
     }
 
+    @GetMapping("/awards/{id}")
+    public ResponseEntity<AwardSummaryDTO> getAward(@PathVariable UUID id) {
+        AwardSummaryDTO award = service.getAward(id);
+        return new ResponseEntity<>(award, HttpStatus.OK);
+    }
+
     @GetMapping("/awards")
     public ResponseEntity<List<AwardSummaryDTO>> getAwards() {
         List<AwardSummaryDTO> awards = service.getAwards();

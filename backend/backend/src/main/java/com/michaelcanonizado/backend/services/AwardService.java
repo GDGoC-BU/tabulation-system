@@ -108,6 +108,27 @@ public class AwardService {
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
     })
+    public AwardSummaryDTO getAward(UUID id) {
+        UUID selectedPageantId = pageantContext.getId();
+
+        Award award = awardRepository.findByPageant_Id(selectedPageantId).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "Award not found!",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        });
+
+        String encodedFormula = award.getFormula();
+        String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
+        award.setFormula(decodedFormula);
+
+        return awardMapper.toSummaryDTO(award);
+    }
+
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING
+    })
     public List<AwardSummaryDTO> getAwards() {
         UUID selectedPageantId = pageantContext.getId();
 
