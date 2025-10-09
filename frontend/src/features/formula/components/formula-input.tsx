@@ -67,15 +67,12 @@ export default function FormulaInput({
   const handleButtonInput = (value: string | null) => {
     if (!value) return
     field.onChange(formula + value)
-    console.log('Formula MAIN:', '"', formula + value, '"')
-    // console.log('------------------------------')
+    // console.log('Formula MAIN:', '"', formula + value, '"')
   }
 
   const handleButtonDelete = () => {
-    console.log('Formula A:', '"', formula, '"')
+    // console.log('Formula:', '"', formula, '"')
     field.onChange(deleteLastFormulaChunk(formula))
-    console.log('Formula B:', '"', field.value, '"')
-    console.log('-----------------------------')
   }
 
   return (

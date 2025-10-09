@@ -2,12 +2,18 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { AwardSummary } from '../schemas'
 import { TextBody } from '@/components/text'
 
-export const awardTableColumns: Array<ColumnDef<AwardSummary>> = [
+export type AwardSummaryWithRenderedFormula = Omit<AwardSummary, 'formula'> & {
+  formula: React.ReactNode
+}
+
+export const awardTableColumns: Array<
+  ColumnDef<AwardSummaryWithRenderedFormula>
+> = [
   {
     accessorKey: 'name',
     header: 'Name',
     cell: ({ row }) => {
-      const name: AwardSummary['name'] = row.getValue('name')
+      const name: AwardSummaryWithRenderedFormula['name'] = row.getValue('name')
       return <TextBody>{name}</TextBody>
     },
   },
@@ -15,7 +21,7 @@ export const awardTableColumns: Array<ColumnDef<AwardSummary>> = [
     accessorKey: 'candidateLimit',
     header: 'Candidate Limit',
     cell: ({ row }) => {
-      const candidateLimit: AwardSummary['candidateLimit'] =
+      const candidateLimit: AwardSummaryWithRenderedFormula['candidateLimit'] =
         row.getValue('candidateLimit')
       return <TextBody>{candidateLimit}</TextBody>
     },
@@ -24,7 +30,8 @@ export const awardTableColumns: Array<ColumnDef<AwardSummary>> = [
     accessorKey: 'formula',
     header: 'Formula',
     cell: ({ row }) => {
-      const formula: AwardSummary['formula'] = row.getValue('formula')
+      const formula: AwardSummaryWithRenderedFormula['formula'] =
+        row.getValue('formula')
       return (
         <TextBody className="max-w-[1000px] whitespace-normal">
           {formula}

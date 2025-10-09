@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { awardTableColumns } from '@/features/awards/components/award-table-columns'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
-import renderFormulaLabel from '@/features/formula/lib/render-formula-label'
+import FormulaRenderer from '@/features/formula/components/formula-renderer'
+import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 
 export const Route = createFileRoute('/admin/console/awards/')({
   component: AdminConsoleAwards,
@@ -18,6 +19,9 @@ function AdminConsoleAwards() {
   const { data: selectedPageant } = useSelectedPageantQuery()
   const { data: pageantHierarchy } = usePageantHierarchyQuery(
     selectedPageant?.id,
+  )
+  const criterionLookup = useFormulaCriterionLookup(
+    pageantHierarchy?.phases ?? [],
   )
 
   const criterionMap = useMemo(() => {
@@ -39,10 +43,20 @@ function AdminConsoleAwards() {
   /* Converts the formula to a more readable format just like in admin/console/awards/add */
   const processedAwards = useMemo(() => {
     if (!awards) return []
-    return awards.map((award) => ({
-      ...award,
-      formula: renderFormulaLabel(award.formula, criterionMap),
-    }))
+    return awards.map((award) => {
+      const rawFormula = award.formula
+
+      return {
+        ...award,
+        /* Really patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
+        formula: (
+          <FormulaRenderer
+            formula={rawFormula}
+            criterionLookup={criterionLookup}
+          />
+        ),
+      }
+    })
   }, [awards, criterionMap])
 
   return (
