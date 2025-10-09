@@ -1,13 +1,10 @@
 package com.michaelcanonizado.backend.dtos.award;
 
-import com.michaelcanonizado.backend.models.CandidateGender;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.UUID;
-
-public record AwardCreateDTO(
+public record AwardUpdateDTO(
         @NotBlank(message = "required")
         String name,
 

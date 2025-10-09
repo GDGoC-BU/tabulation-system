@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.controllers;
 import com.michaelcanonizado.backend.dtos.AwardLeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
 import com.michaelcanonizado.backend.services.AwardService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,15 @@ public class AwardController {
     @GetMapping("/awards/{id}")
     public ResponseEntity<AwardSummaryDTO> getAward(@PathVariable UUID id) {
         AwardSummaryDTO award = service.getAward(id);
+        return new ResponseEntity<>(award, HttpStatus.OK);
+    }
+
+    @PutMapping("/awards/{id}")
+    public ResponseEntity<AwardSummaryDTO> updateAward(
+            @PathVariable UUID id,
+            @RequestBody @Valid AwardUpdateDTO awardUpdateDTO
+    ) {
+        AwardSummaryDTO award = service.updateAward(id, awardUpdateDTO);
         return new ResponseEntity<>(award, HttpStatus.OK);
     }
 

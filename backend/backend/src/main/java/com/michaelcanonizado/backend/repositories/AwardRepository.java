@@ -10,6 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface AwardRepository extends JpaRepository<Award, UUID> {
-    Optional<Award> findByPageant_Id(UUID pageantId);
     List<Award> findAllByPageant_Id(UUID pageantId);
 }

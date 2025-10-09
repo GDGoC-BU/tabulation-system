@@ -4,6 +4,7 @@ import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.AwardLeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.AwardLeaderboardMapper;
@@ -109,14 +110,14 @@ public class AwardService {
             PageantStatus.ONGOING
     })
     public AwardSummaryDTO getAward(UUID id) {
-        UUID selectedPageantId = pageantContext.getId();
-
-        Award award = awardRepository.findByPageant_Id(selectedPageantId).orElseThrow(() -> {
+        Award award = awardRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException(
                     "Award not found!",
                     ErrorCode.ENTITY_NOT_FOUND
             );
         });
+
+        pageantContext.assertAccess(award.getPageant().getId());
 
         String encodedFormula = award.getFormula();
         String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
@@ -297,5 +298,23 @@ public class AwardService {
                     return awardLeaderboardMapper.toSummaryDTO(candidateRow);
                 })
                 .toList();
+    }
+
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
+    public AwardSummaryDTO updateAward(UUID id, AwardUpdateDTO awardUpdateDTO) {
+        System.out.println("EDITING AWARD!");
+        Award award = awardRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "Can't update! Award not found.",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        });
+
+        pageantContext.assertAccess(award.getPageant().getId());
+
+        awardMapper.updateEntityFromDTO(award, awardUpdateDTO);
+        return awardMapper.toSummaryDTO(awardRepository.save(award));
     }
 }
