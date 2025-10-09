@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/react-router'
+import { Ellipsis } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { AwardSummary } from '../schemas'
 import { TextBody } from '@/components/text'
@@ -32,10 +34,20 @@ export const awardTableColumns: Array<
     cell: ({ row }) => {
       const formula: AwardSummaryWithRenderedFormula['formula'] =
         row.getValue('formula')
+      return <div className="max-w-[1000px] whitespace-normal">{formula}</div>
+    },
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const award = row.original
       return (
-        <TextBody className="max-w-[1000px] whitespace-normal">
-          {formula}
-        </TextBody>
+        <Link
+          to={'/admin/console/awards/$awardId/edit'}
+          params={{ awardId: award.id }}
+        >
+          <Ellipsis />
+        </Link>
       )
     },
   },

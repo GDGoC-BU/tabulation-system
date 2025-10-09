@@ -25,6 +25,7 @@ import { Route as AdminConsoleCollegesRouteImport } from './routes/admin/console
 import { Route as AdminConsoleCandidatesRouteImport } from './routes/admin/console/candidates'
 import { Route as AdminConsoleAwardsIndexRouteImport } from './routes/admin/console/awards/index'
 import { Route as AdminConsoleAwardsAddRouteImport } from './routes/admin/console/awards/add'
+import { Route as AdminConsoleAwardsAwardIdEditRouteImport } from './routes/admin/console/awards/$awardId.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -106,6 +107,12 @@ const AdminConsoleAwardsAddRoute = AdminConsoleAwardsAddRouteImport.update({
   path: '/awards/add',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
+const AdminConsoleAwardsAwardIdEditRoute =
+  AdminConsoleAwardsAwardIdEditRouteImport.update({
+    id: '/awards/$awardId/edit',
+    path: '/awards/$awardId/edit',
+    getParentRoute: () => AdminConsoleRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/judge/scoring/': typeof JudgeScoringIndexRoute
   '/admin/console/awards/add': typeof AdminConsoleAwardsAddRoute
   '/admin/console/awards': typeof AdminConsoleAwardsIndexRoute
+  '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -140,6 +148,7 @@ export interface FileRoutesByTo {
   '/judge/scoring': typeof JudgeScoringIndexRoute
   '/admin/console/awards/add': typeof AdminConsoleAwardsAddRoute
   '/admin/console/awards': typeof AdminConsoleAwardsIndexRoute
+  '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -159,6 +168,7 @@ export interface FileRoutesById {
   '/judge/scoring/': typeof JudgeScoringIndexRoute
   '/admin/console/awards/add': typeof AdminConsoleAwardsAddRoute
   '/admin/console/awards/': typeof AdminConsoleAwardsIndexRoute
+  '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/judge/scoring/'
     | '/admin/console/awards/add'
     | '/admin/console/awards'
+    | '/admin/console/awards/$awardId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/judge/scoring'
     | '/admin/console/awards/add'
     | '/admin/console/awards'
+    | '/admin/console/awards/$awardId/edit'
   id:
     | '__root__'
     | '/'
@@ -213,6 +225,7 @@ export interface FileRouteTypes {
     | '/judge/scoring/'
     | '/admin/console/awards/add'
     | '/admin/console/awards/'
+    | '/admin/console/awards/$awardId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -337,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleAwardsAddRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
+    '/admin/console/awards/$awardId/edit': {
+      id: '/admin/console/awards/$awardId/edit'
+      path: '/awards/$awardId/edit'
+      fullPath: '/admin/console/awards/$awardId/edit'
+      preLoaderRoute: typeof AdminConsoleAwardsAwardIdEditRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
   }
 }
 
@@ -351,6 +371,7 @@ interface AdminConsoleRouteRouteChildren {
   AdminConsoleIndexRoute: typeof AdminConsoleIndexRoute
   AdminConsoleAwardsAddRoute: typeof AdminConsoleAwardsAddRoute
   AdminConsoleAwardsIndexRoute: typeof AdminConsoleAwardsIndexRoute
+  AdminConsoleAwardsAwardIdEditRoute: typeof AdminConsoleAwardsAwardIdEditRoute
 }
 
 const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
@@ -364,6 +385,7 @@ const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
   AdminConsoleIndexRoute: AdminConsoleIndexRoute,
   AdminConsoleAwardsAddRoute: AdminConsoleAwardsAddRoute,
   AdminConsoleAwardsIndexRoute: AdminConsoleAwardsIndexRoute,
+  AdminConsoleAwardsAwardIdEditRoute: AdminConsoleAwardsAwardIdEditRoute,
 }
 
 const AdminConsoleRouteRouteWithChildren =

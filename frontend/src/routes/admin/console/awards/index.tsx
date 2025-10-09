@@ -25,8 +25,9 @@ function AdminConsoleAwards() {
   )
 
   const criterionMap = useMemo(() => {
-    if (!pageantHierarchy) return new Map()
     const map = new Map<string, string>()
+    if (!pageantHierarchy) return map
+
     pageantHierarchy.phases.forEach((phase) => {
       phase.segments.forEach((segment) => {
         segment.criteria.forEach((criterion) => {
@@ -45,7 +46,6 @@ function AdminConsoleAwards() {
     if (!awards) return []
     return awards.map((award) => {
       const rawFormula = award.formula
-
       return {
         ...award,
         /* Really patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
@@ -57,7 +57,7 @@ function AdminConsoleAwards() {
         ),
       }
     })
-  }, [awards, criterionMap])
+  }, [awards, criterionMap, criterionLookup])
 
   return (
     <Console>

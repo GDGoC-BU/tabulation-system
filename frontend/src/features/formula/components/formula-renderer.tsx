@@ -11,6 +11,10 @@ export default function FormulaRenderer({
   formula: string
   criterionLookup: FormulaCriterionLookup
 }) {
+  if (Object.keys(criterionLookup).length === 0) {
+    return
+  }
+
   const tokens = tokenizeFormula(formula)
 
   return (
