@@ -14,6 +14,11 @@ public record SegmentCreateDTO(
         @Min(value = 1, message = ">= 1")
         int sequence,
 
+        @Min(value = 1, message = ">= 1")
+        Integer candidateLimit,
+        
+        String formula,
+
         @NotNull(message = "required")
         UUID phaseId
 ) {

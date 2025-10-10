@@ -304,7 +304,6 @@ public class AwardService {
             PageantStatus.PREPARATION
     })
     public AwardSummaryDTO updateAward(UUID id, AwardUpdateDTO awardUpdateDTO) {
-        System.out.println("EDITING AWARD!");
         Award award = awardRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException(
                     "Can't update! Award not found.",

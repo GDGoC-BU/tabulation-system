@@ -10,6 +10,8 @@ public record SegmentHierarchyDTO(
         UUID id,
         String name,
         int sequence,
+        Integer candidateLimit,
+        String formula,
         PhaseSegmentStatus status,
         List<CriterionHierarchyDTO> criteria
 ) {

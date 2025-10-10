@@ -26,11 +26,11 @@ public class SegmentSeeder implements DatabaseSeeder {
         List<Phase> phases = phaseRepository.findAll();
 
         List<Segment> segments = Arrays.asList(
-                new Segment("Interview Proper", 1, phases.get(0)),
-                new Segment("Swimwear", 1, phases.get(1)),
-                new Segment("Formal Attire", 2, phases.get(1)),
-                new Segment("Question and Answer", 3, phases.get(1)),
-                new Segment("Final Round", 4, phases.get(1))
+                new Segment("Interview Proper", 1, null, null, phases.get(0)),
+                new Segment("Swimwear", 1, null, null, phases.get(1)),
+                new Segment("Formal Attire", 2, null, null, phases.get(1)),
+                new Segment("Question and Answer", 3, 10, "Change this formula", phases.get(1)),
+                new Segment("Final Round", 4, 5, "Change this formula", phases.get(1))
         );
 
         segments.forEach(segmentRepository::save);
