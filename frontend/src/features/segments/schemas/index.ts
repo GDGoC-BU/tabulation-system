@@ -21,7 +21,7 @@ export const segmentSummarySchema = z.object({
     return phaseSummarySchema
   }),
 })
-export type segmentSummary = z.infer<typeof segmentSummarySchema>
+export type SegmentSummary = z.infer<typeof segmentSummarySchema>
 
 export const segmentDetailedSchema = z.object({
   id: z.string(),

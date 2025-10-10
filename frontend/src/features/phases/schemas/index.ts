@@ -18,7 +18,7 @@ export const phaseDetailedSchema = z.object({
   name: z.string(),
   sequence: z.number().int(),
   status: phaseSegmentStatusValue,
-  segments: z.array(segmentSummarySchema),
+  segments: z.array(z.lazy(() => segmentSummarySchema)),
 })
 export type PhaseDetailed = z.infer<typeof phaseDetailedSchema>
 
@@ -27,7 +27,7 @@ export const phaseHierarchySchema = z.object({
   name: z.string(),
   sequence: z.number().int(),
   status: phaseSegmentStatusValue,
-  segments: z.array(segmentHierarchySchema),
+  segments: z.array(z.lazy(() => segmentHierarchySchema)),
 })
 export type PhaseHierarchy = z.infer<typeof phaseHierarchySchema>
 
