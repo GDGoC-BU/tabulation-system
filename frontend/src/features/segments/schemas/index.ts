@@ -11,6 +11,8 @@ export const segmentSummarySchema = z.object({
   id: z.string(),
   name: z.string(),
   sequence: z.number(),
+  candidateLimit: z.union([z.null(), z.number()]),
+  formula: z.union([z.null(), z.string()]),
   status: phaseSegmentStatusValue,
   phase: z.lazy(() => {
     /* Circular import patch! segments/schema imports from phases/schema.
@@ -25,6 +27,8 @@ export const segmentDetailedSchema = z.object({
   id: z.string(),
   name: z.string(),
   sequence: z.number(),
+  candidateLimit: z.union([z.null(), z.number()]),
+  formula: z.union([z.null(), z.string()]),
   status: phaseSegmentStatusValue,
   phase: z.lazy(() => {
     return phaseSummarySchema
@@ -38,6 +42,8 @@ export const segmentHierarchySchema = z.object({
   id: z.string(),
   name: z.string(),
   sequence: z.number(),
+  candidateLimit: z.union([z.null(), z.number()]),
+  formula: z.union([z.null(), z.string()]),
   status: phaseSegmentStatusValue,
   criteria: z.array(criterionHierarchySchema),
 })
