@@ -13,7 +13,7 @@ import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
-import com.michaelcanonizado.backend.utilities.AwardFormulaEncoder;
+import com.michaelcanonizado.backend.utilities.FormulaEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.expression.Expression;
@@ -54,7 +54,7 @@ public class AwardService {
     private PageantContext pageantContext;
 
     @Autowired
-    private AwardFormulaEncoder formulaEncoder;
+    private FormulaEncoder formulaEncoder;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,

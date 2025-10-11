@@ -16,6 +16,7 @@ import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.SegmentRepository;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.specifications.SegmentSpecification;
+import com.michaelcanonizado.backend.utilities.FormulaEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -48,6 +50,9 @@ public class SegmentService {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+
+    @Autowired
+    private FormulaEncoder formulaEncoder;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION
@@ -82,13 +87,14 @@ public class SegmentService {
         });
 
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
-        UUID selectedPageantId = pageantContext.getId();
+
+        /* Determine the qualified candidates for the segment. */
 
         /* TO-IMPLEMENT: Ensure that only 1 has the state ONGOING */
-
         segment.setStatus(PhaseSegmentStatus.ONGOING);
 
         /* Notify the client about the new ongoing segment */
+        UUID selectedPageantId = pageantContext.getId();
         simpMessagingTemplate.convertAndSend(
                 "/topic/pageants/" + selectedPageantId + "/ongoing-segment",
                 new OngoingSegmentMessage(segment.getId())

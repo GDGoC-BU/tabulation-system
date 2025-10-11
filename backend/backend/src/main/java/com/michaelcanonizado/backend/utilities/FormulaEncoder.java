@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
    Frontend receives formula: "0f0f0f0f-1e1e-2d2d-3c3c-4b4b4b4b4b4b / 0.5"
     Frontend simply can't do: "0F0f0F0f-1e1E-2D2D-3c3c-4B4b4B4b4b4b" === "0f0f0f0f-1e1e-2d2d-3c3c-4b4b4b4b4b4b" */
 @Component
-public class AwardFormulaEncoder {
+public class FormulaEncoder {
 
     private final String PREFIX = "C";
     private final String DASH_REPLACEMENT = "_";
