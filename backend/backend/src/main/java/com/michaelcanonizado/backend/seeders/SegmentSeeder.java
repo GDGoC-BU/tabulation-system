@@ -29,8 +29,8 @@ public class SegmentSeeder implements DatabaseSeeder {
                 new Segment("Interview Proper", 1, null, null, phases.get(0)),
                 new Segment("Swimwear", 1, null, null, phases.get(1)),
                 new Segment("Formal Attire", 2, null, null, phases.get(1)),
-                new Segment("Question and Answer", 3, 10, "Change this formula", phases.get(1)),
-                new Segment("Final Round", 4, 5, "Change this formula", phases.get(1))
+                new Segment("Question and Answer", 3, 10, "(1 + 2) + ((3 - 4) / 5 - (6 * 7))", phases.get(1)),
+                new Segment("Final Round", 4, 5, "(1 + (2 - 3) * (4 / 5))", phases.get(1))
         );
 
         segments.forEach(segmentRepository::save);

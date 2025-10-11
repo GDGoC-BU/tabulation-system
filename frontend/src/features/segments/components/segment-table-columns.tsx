@@ -1,13 +1,25 @@
+import { Link } from '@tanstack/react-router'
+import { Ellipsis } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { SegmentSummary } from '../schemas'
 import { TextBody } from '@/components/text'
 
-export const segmentTableColumns: Array<ColumnDef<SegmentSummary>> = [
+export type SegmentSummaryWithRenderedFormula = Omit<
+  SegmentSummary,
+  'formula'
+> & {
+  formula: React.ReactNode
+}
+
+export const segmentTableColumns: Array<
+  ColumnDef<SegmentSummaryWithRenderedFormula>
+> = [
   {
     accessorKey: 'name',
     header: 'Name',
     cell: ({ row }) => {
-      const name: SegmentSummary['name'] = row.getValue('name')
+      const name: SegmentSummaryWithRenderedFormula['name'] =
+        row.getValue('name')
       return <TextBody>{name}</TextBody>
     },
   },
@@ -15,7 +27,8 @@ export const segmentTableColumns: Array<ColumnDef<SegmentSummary>> = [
     accessorKey: 'phase',
     header: 'Phase',
     cell: ({ row }) => {
-      const phase: SegmentSummary['phase'] = row.getValue('phase')
+      const phase: SegmentSummaryWithRenderedFormula['phase'] =
+        row.getValue('phase')
 
       return <TextBody>{phase.name}</TextBody>
     },
@@ -24,7 +37,8 @@ export const segmentTableColumns: Array<ColumnDef<SegmentSummary>> = [
     accessorKey: 'sequence',
     header: 'Sequence',
     cell: ({ row }) => {
-      const sequence: SegmentSummary['sequence'] = row.getValue('sequence')
+      const sequence: SegmentSummaryWithRenderedFormula['sequence'] =
+        row.getValue('sequence')
 
       return <TextBody>{sequence}</TextBody>
     },
@@ -34,7 +48,7 @@ export const segmentTableColumns: Array<ColumnDef<SegmentSummary>> = [
     accessorKey: 'candidateLimit',
     header: 'Candidate Limit',
     cell: ({ row }) => {
-      const candidateLimit: SegmentSummary['candidateLimit'] =
+      const candidateLimit: SegmentSummaryWithRenderedFormula['candidateLimit'] =
         row.getValue('candidateLimit')
       const label = candidateLimit ? candidateLimit : 'None'
 
@@ -49,13 +63,27 @@ export const segmentTableColumns: Array<ColumnDef<SegmentSummary>> = [
     accessorKey: 'formula',
     header: 'Formula',
     cell: ({ row }) => {
-      const formula: SegmentSummary['formula'] = row.getValue('formula')
+      const formula: SegmentSummaryWithRenderedFormula['formula'] =
+        row.getValue('formula')
 
-      /* Must be rendered properly! */
+      if (!formula) {
+        return <TextBody>None</TextBody>
+      }
+
+      return <div className="max-w-[1000px] whitespace-normal">{formula}</div>
+    },
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const segment = row.original
       return (
-        <div className="mx-2 w-fit rounded-md px-4 py-2 text-center">
-          <TextBody>{formula}</TextBody>
-        </div>
+        <Link
+          to={'/admin/console/segments/$segmentId/edit'}
+          params={{ segmentId: segment.id }}
+        >
+          <Ellipsis />
+        </Link>
       )
     },
   },
