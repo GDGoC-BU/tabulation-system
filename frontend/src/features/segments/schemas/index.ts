@@ -51,3 +51,19 @@ export type SegmentHierarchy = z.infer<typeof segmentHierarchySchema>
 
 export const segmentsSchema = z.array(segmentSummarySchema)
 export type Segments = z.infer<typeof segmentsSchema>
+
+export const segmentEditFormSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  candidateLimit: z.union([
+    z.null(),
+    z.coerce.number({
+      message: 'Invalid value! Only positive numbers are allowed',
+    }),
+    // .min(1, {
+    //   message: 'Enter how many candidates will be qualified for this segment',
+    // }),
+  ]),
+  formula: z.union([z.null(), z.string()]),
+})
+export type SegmentEditForm = z.infer<typeof segmentEditFormSchema>

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import type { AwardAddForm, AwardEditForm } from '@/features/awards/schemas'
+import type { AwardEditForm } from '@/features/awards/schemas'
 import { useAwardQuery } from '@/features/awards/hooks/use-award-query'
 import {
   Form,
