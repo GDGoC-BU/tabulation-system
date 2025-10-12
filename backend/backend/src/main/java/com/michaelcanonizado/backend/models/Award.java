@@ -46,8 +46,6 @@ public class Award {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
     private List<AwardLeaderboard> leaderboard = new ArrayList<>();
 
     public Award(String name, int candidateLimit, String formula, Pageant pageant) {

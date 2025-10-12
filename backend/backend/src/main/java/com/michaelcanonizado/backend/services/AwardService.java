@@ -1,7 +1,8 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
-import com.michaelcanonizado.backend.dtos.AwardLeaderboardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.award.AwardDetailedDTO;
+import com.michaelcanonizado.backend.dtos.awardLeaderboard.AwardLeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
@@ -127,8 +128,11 @@ public class AwardService {
                 .toList();
     }
 
+    @RequirePageantStatus({
+            PageantStatus.FINALIZING
+    })
     @Transactional
-    public List<AwardLeaderboardSummaryDTO> getAwardResult(UUID id) {
+    public AwardDetailedDTO calculateAwardResult(UUID id) {
         UUID selectedPageantId = pageantContext.getId();
 
         /* Get award */
@@ -270,14 +274,7 @@ public class AwardService {
         /* Save updated leaderboard */
         List<AwardLeaderboard> updatedLeaderboard = awardLeaderboardRepository.saveAll(candidateRowsInLeaderboard.values());
 
-        return updatedLeaderboard
-                .stream()
-                .sorted(Comparator.comparing(AwardLeaderboard::getScore).reversed())
-                .limit(award.getCandidateLimit())
-                .map(candidateRow -> {
-                    return awardLeaderboardMapper.toSummaryDTO(candidateRow);
-                })
-                .toList();
+        return awardMapper.toDetailedDTO(award);
     }
 
     @RequirePageantStatus({

@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.controllers;
 
-import com.michaelcanonizado.backend.dtos.AwardLeaderboardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.award.AwardDetailedDTO;
+import com.michaelcanonizado.backend.dtos.awardLeaderboard.AwardLeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
@@ -26,12 +27,11 @@ public class AwardController {
         AwardSummaryDTO award = service.addAward(awardCreateDTO);
         return new ResponseEntity<>(award, HttpStatus.CREATED);
     }
-
-    /* TEMPORARY ENDPOINT */
-    @GetMapping("/awards/{id}/results")
-    public ResponseEntity<List<AwardLeaderboardSummaryDTO>> getAwardResults(@PathVariable UUID id) {
-        List<AwardLeaderboardSummaryDTO> leaderboard = service.getAwardResult(id);
-        return new ResponseEntity<>(leaderboard, HttpStatus.OK);
+    
+    @PostMapping("/awards/{id}/calculate")
+    public ResponseEntity<AwardDetailedDTO> calculateAwardResult(@PathVariable UUID id) {
+        AwardDetailedDTO award = service.calculateAwardResult(id);
+        return new ResponseEntity<>(award, HttpStatus.OK);
     }
 
     @GetMapping("/awards/{id}")

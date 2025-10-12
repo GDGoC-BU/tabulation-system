@@ -1,4 +1,4 @@
-package com.michaelcanonizado.backend.dtos;
+package com.michaelcanonizado.backend.dtos.awardLeaderboard;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 
