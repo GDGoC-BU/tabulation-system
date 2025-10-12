@@ -79,6 +79,12 @@ public class SegmentService {
         /* Check if phase being connected actually belongs to the pageant */
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
 
+        if (segment.getFormula() != null) {
+            String rawFormula = segment.getFormula();
+            String encodedFormula = formulaEncoder.encodeFormula(rawFormula);
+            segment.setFormula(encodedFormula);
+        }
+
         Segment savedSegment = segmentRepository.save(segment);
 
         /* Get current candidates and qualify them to the new segment */
@@ -109,8 +115,17 @@ public class SegmentService {
             Set<UUID> criteriaIdsInFormula = formulaEncoder.extractEncodedUUIDs(segment.getFormula());
 
             /* Get candidates */
-            List<UUID> candidateIds = candidateRepository
-                    .findAllByPageant_Id(selectedPageantId)
+            List<Candidate> candidates = candidateRepository
+                    .findAllByPageant_Id(selectedPageantId);
+
+            Map<UUID, CandidateGender> candidateGenders = candidates
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Candidate::getId,
+                            Candidate::getGender
+                    ));
+
+            List<UUID> candidateIds = candidates
                     .stream()
                     .map(Candidate::getId)
                     .toList();
@@ -167,7 +182,8 @@ public class SegmentService {
             /* Parse the formula and reuse it. Parsing is expensive! */
             Expression expression = parser.parseExpression(segment.getFormula());
             /* Collect the results */
-            List<CandidateResult> candidateResults = new ArrayList<>();
+            List<CandidateResult> femaleCandidateResults = new ArrayList<>();
+            List<CandidateResult> maleCandidateResults = new ArrayList<>();
             /* Loop through all candidates and use their criterion averages to fill the formula */
             candidateCriterionAverages.forEach((candidateId, criterionAverages) -> {
                 /* Load the criterion averages into context */
@@ -177,15 +193,28 @@ public class SegmentService {
                 /* Evaluate the expression */
                 Double result = expression.getValue(context, Double.class);
                 /* Push the result to the candidate result list */
-                candidateResults.add(new CandidateResult(candidateId, result));
+                if (candidateGenders.get(candidateId).equals(CandidateGender.FEMALE)) {
+                    femaleCandidateResults.add(new CandidateResult(candidateId, result));
+                } else if (candidateGenders.get(candidateId).equals(CandidateGender.MALE)) {
+                    maleCandidateResults.add(new CandidateResult(candidateId, result));
+                }
             });
 
             /* Sort results in descending order */
-            candidateResults.sort((a, b) -> {
+            femaleCandidateResults.sort((a, b) -> {
                 return Double.compare(b.getResult(), a.getResult());
             });
+            maleCandidateResults.sort((a, b) -> {
+                return Double.compare(b.getResult(), a.getResult());
+            });
+
             /* Get the qualified candidates */
-            Set<UUID> qualifiedCandidateIds = candidateResults
+            Set<UUID> qualifiedFemaleCandidateIds = femaleCandidateResults
+                    .stream()
+                    .limit(segment.getCandidateLimit())
+                    .map(CandidateResult::getCandidateId)
+                    .collect(Collectors.toSet());
+            Set<UUID> qualifiedMaleCandidateIds = maleCandidateResults
                     .stream()
                     .limit(segment.getCandidateLimit())
                     .map(CandidateResult::getCandidateId)
@@ -195,7 +224,9 @@ public class SegmentService {
             List<CandidateSegmentQualification> updatedCSQs = new ArrayList<>();
             for (CandidateSegmentQualification csq : candidateSegmentQualificationMap.values()) {
                 UUID candidateId = csq.getCandidate().getId();
-                if (qualifiedCandidateIds.contains(candidateId)) {
+                if (qualifiedFemaleCandidateIds.contains(candidateId)) {
+                    csq.setQualified(true);
+                } else if (qualifiedMaleCandidateIds.contains(candidateId)) {
                     csq.setQualified(true);
                 } else {
                     csq.setQualified(false);
@@ -254,7 +285,7 @@ public class SegmentService {
 
         if (segment.getFormula() != null) {
             String encodedFormula = segment.getFormula();
-            String decodedFormula = formulaEncoder.encodeFormula(encodedFormula);
+            String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
             segment.setFormula(decodedFormula);
         }
 
@@ -278,7 +309,7 @@ public class SegmentService {
         ).map(segment -> {
             if (segment.getFormula() != null) {
                 String encodedFormula = segment.getFormula();
-                String decodedFormula = formulaEncoder.encodeFormula(encodedFormula);
+                String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
                 segment.setFormula(decodedFormula);
             }
             return mapper.toSummaryDTO(segment);

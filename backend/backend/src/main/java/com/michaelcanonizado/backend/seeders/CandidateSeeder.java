@@ -39,7 +39,7 @@ public class CandidateSeeder implements DatabaseSeeder {
 
         List<CandidateGender> genders = Arrays.asList(CandidateGender.FEMALE, CandidateGender.MALE, CandidateGender.OTHER);
         Random random = new Random();
-        double diverseGenderProbability = 0.4;
+        double diverseGenderProbability = 0;
 
         for (int i = 1; i <= colleges.size(); i++) {
             College college = colleges.get(i-1);
