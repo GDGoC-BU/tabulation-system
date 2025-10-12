@@ -22,10 +22,10 @@ import splitCandidates from '@/features/candidates/lib/split-candidates'
 
 function ScoreInputForm({
   score,
-  updateLocalScores,
+  onChangeScore,
 }: {
   score: ScoreDetailed
-  updateLocalScores: (updatedScore: ScoreDetailed) => void
+  onChangeScore: (id: string, value: number) => void
 }) {
   const [scoreValue, setScoreValue] = useState(score.value)
   const [isError, setIsError] = useState(false)
@@ -44,7 +44,7 @@ function ScoreInputForm({
         id: score.id,
         value: debouncedScore,
       })
-      updateLocalScores(updatedScore)
+      onChangeScore(score.id, updatedScore.value)
     }
     changeScore()
   }, [debouncedScore])
@@ -84,23 +84,22 @@ function CandidateScoreCard({
   candidate: CandidateSummary
   scores?: Array<ScoreDetailed>
 }) {
-  /* Should only be used to display the total score! */
-  const [localScores, setLocalScores] = useState<Array<ScoreDetailed>>([])
-  useEffect(() => {
-    setLocalScores(scores)
-  }, [scores])
+  const [scoreValues, setScoreValues] = useState(() =>
+    Object.fromEntries(scores.map((score) => [score.id, score.value])),
+  )
 
-  /* TEMPORARY PROP DRILL! This will be handled better in the future.
-     But always fetch the scores in the parent and just filter by candidates.
-     Fetching scores is costly! fetching in each CandidateScoreCard will
-     multiply the already expensive score fetches. */
-  const updateLocalScores = (updatedScore: ScoreDetailed) => {
-    setLocalScores((prevScores) =>
-      prevScores.map((score) =>
-        score.id === updatedScore.id ? updatedScore : score,
-      ),
-    )
+  /* Prop drill and handle total score count client side to minimize expensive score fetching and keep it simple. */
+  const handleScoreChange = (id: string, value: number) => {
+    setScoreValues((prev) => ({
+      ...prev,
+      [id]: value,
+    }))
   }
+
+  const totalScore = Object.values(scoreValues).reduce(
+    (sum, val) => sum + (isNaN(val) ? 0 : val),
+    0,
+  )
 
   /* Determine the badge for each gender */
   let GenderBadge = (
@@ -131,8 +130,7 @@ function CandidateScoreCard({
         <Scoring.Card.Header.BadgeGroup>
           {GenderBadge}
           <Scoring.Card.Header.Badge>
-            Total Score:{' '}
-            {localScores.reduce((sum, score) => sum + score.value, 0)}
+            Total Score: {totalScore}
           </Scoring.Card.Header.Badge>
         </Scoring.Card.Header.BadgeGroup>
       </Scoring.Card.Header>
@@ -143,7 +141,7 @@ function CandidateScoreCard({
               <ScoreInputForm
                 key={score.id}
                 score={score}
-                updateLocalScores={updateLocalScores}
+                onChangeScore={handleScoreChange}
               />
             )
           })}
