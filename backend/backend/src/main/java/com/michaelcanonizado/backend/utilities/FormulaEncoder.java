@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.utilities;
 
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashSet;
@@ -61,7 +62,12 @@ public class FormulaEncoder {
             );
 
     /* Main encode method */
+    @Named("encodeFormula")
     public String encodeFormula(String rawFormula) {
+        if (rawFormula == null) {
+            return null;
+        }
+
         /* Identify the UUIDs */
         Matcher matcher = RAW_UUID_PATTERN.matcher(rawFormula);
 
@@ -84,7 +90,12 @@ public class FormulaEncoder {
     }
 
     /* Main decode method */
+    @Named("decodeFormula")
     public String decodeFormula(String encodedFormula) {
+        if (encodedFormula == null) {
+            return null;
+        }
+
         /* Identify the encoded UUIDs */
         Matcher matcher = ENCODED_PATTERN.matcher(encodedFormula);
 

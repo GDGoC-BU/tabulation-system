@@ -79,12 +79,6 @@ public class SegmentService {
         /* Check if phase being connected actually belongs to the pageant */
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
 
-        if (segment.getFormula() != null) {
-            String rawFormula = segment.getFormula();
-            String encodedFormula = formulaEncoder.encodeFormula(rawFormula);
-            segment.setFormula(encodedFormula);
-        }
-
         Segment savedSegment = segmentRepository.save(segment);
 
         /* Get current candidates and qualify them to the new segment */
@@ -282,13 +276,6 @@ public class SegmentService {
             return new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
-
-        if (segment.getFormula() != null) {
-            String encodedFormula = segment.getFormula();
-            String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
-            segment.setFormula(decodedFormula);
-        }
-
         return mapper.toDetailedDTO(segment);
     }
 
@@ -307,11 +294,6 @@ public class SegmentService {
                 Comparator.comparing((Segment segment) -> segment.getPhase().getSequence())
                         .thenComparing(Segment::getSequence)
         ).map(segment -> {
-            if (segment.getFormula() != null) {
-                String encodedFormula = segment.getFormula();
-                String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
-                segment.setFormula(decodedFormula);
-            }
             return mapper.toSummaryDTO(segment);
         }).toList();
     }
@@ -328,13 +310,8 @@ public class SegmentService {
 
         mapper.updateEntityFromDTO(segment, segmentUpdateDTO);
 
-        if (segment.getFormula() != null) {
-            String rawFormula = segment.getFormula();
-            String encodedFormula = formulaEncoder.encodeFormula(rawFormula);
-            segment.setFormula(encodedFormula);
-        }
-
-        return mapper.toSummaryDTO(segmentRepository.save(segment));
+        Segment savedSegment = segmentRepository.save(segment);
+        return mapper.toSummaryDTO(savedSegment);
     }
 
     @RequirePageantStatus({

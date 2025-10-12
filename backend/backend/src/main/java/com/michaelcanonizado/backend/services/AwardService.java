@@ -73,11 +73,6 @@ public class AwardService {
         });
         award.setPageant(pageant);
 
-        /* Encode formula to SpEL safe format */
-        String rawFormula = award.getFormula();
-        String encodedFormula = formulaEncoder.encodeFormula(rawFormula);
-        award.setFormula(encodedFormula);
-
         /* Save Award */
         Award savedAward = awardRepository.save(award);
 
@@ -97,11 +92,6 @@ public class AwardService {
         /* Batch save to minimize insert queries */
         awardLeaderboardRepository.saveAll(awardLeaderboards);
 
-        /* Decode formula back to raw form since
-           created award will be returned back. */
-        encodedFormula = savedAward.getFormula();
-        String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
-        savedAward.setFormula(decodedFormula);
         return awardMapper.toSummaryDTO(savedAward);
     }
 
@@ -119,10 +109,6 @@ public class AwardService {
 
         pageantContext.assertAccess(award.getPageant().getId());
 
-        String encodedFormula = award.getFormula();
-        String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
-        award.setFormula(decodedFormula);
-
         return awardMapper.toSummaryDTO(award);
     }
 
@@ -137,13 +123,7 @@ public class AwardService {
 
         return awards
                 .stream()
-                .map(award -> {
-                    String encodedFormula = award.getFormula();
-                    String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
-                    award.setFormula(decodedFormula);
-
-                    return awardMapper.toSummaryDTO(award);
-                })
+                .map(award -> awardMapper.toSummaryDTO(award))
                 .toList();
     }
 
