@@ -98,7 +98,9 @@ public class AwardService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public AwardDetailedDTO getAward(UUID id) {
         Award award = awardRepository.findById(id).orElseThrow(() -> {
@@ -115,7 +117,9 @@ public class AwardService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public List<AwardSummaryDTO> getAwards() {
         UUID selectedPageantId = pageantContext.getId();
