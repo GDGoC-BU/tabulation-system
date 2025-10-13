@@ -100,7 +100,7 @@ public class AwardService {
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
     })
-    public AwardSummaryDTO getAward(UUID id) {
+    public AwardDetailedDTO getAward(UUID id) {
         Award award = awardRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException(
                     "Award not found!",
@@ -110,7 +110,7 @@ public class AwardService {
 
         pageantContext.assertAccess(award.getPageant().getId());
 
-        return awardMapper.toSummaryDTO(award);
+        return awardMapper.toDetailedDTO(award);
     }
 
     @RequirePageantStatus({

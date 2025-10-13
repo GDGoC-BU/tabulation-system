@@ -35,9 +35,15 @@ public class AwardController {
     }
 
     @GetMapping("/awards/{id}")
-    public ResponseEntity<AwardSummaryDTO> getAward(@PathVariable UUID id) {
-        AwardSummaryDTO award = service.getAward(id);
+    public ResponseEntity<AwardDetailedDTO> getAward(@PathVariable UUID id) {
+        AwardDetailedDTO award = service.getAward(id);
         return new ResponseEntity<>(award, HttpStatus.OK);
+    }
+
+    @GetMapping("/awards")
+    public ResponseEntity<List<AwardSummaryDTO>> getAwards() {
+        List<AwardSummaryDTO> awards = service.getAwards();
+        return new ResponseEntity<>(awards, HttpStatus.OK);
     }
 
     @PutMapping("/awards/{id}")
@@ -47,11 +53,5 @@ public class AwardController {
     ) {
         AwardSummaryDTO award = service.updateAward(id, awardUpdateDTO);
         return new ResponseEntity<>(award, HttpStatus.OK);
-    }
-
-    @GetMapping("/awards")
-    public ResponseEntity<List<AwardSummaryDTO>> getAwards() {
-        List<AwardSummaryDTO> awards = service.getAwards();
-        return new ResponseEntity<>(awards, HttpStatus.OK);
     }
 }
