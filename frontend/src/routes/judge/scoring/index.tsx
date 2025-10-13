@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import type { Segments } from '@/features/segments/schemas'
 import type { ScoreDetailed } from '@/features/scores/schemas'
 import type { CandidateSummary } from '@/features/candidates/schemas'
+import type { PhaseDetailed } from '@/features/phases/schemas'
 import { candidateGender } from '@/features/candidates/schemas'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 import { usePageantQuery } from '@/features/pageants/hooks/use-pageant-query'
@@ -29,7 +31,7 @@ function ScoreInputForm({
 }) {
   const [scoreValue, setScoreValue] = useState(score.value)
   const [isError, setIsError] = useState(false)
-  const debouncedScore = useDebounce(scoreValue, 2000)
+  const debouncedScore = useDebounce(scoreValue, 1500)
   const { mutateAsync: editScore } = useEditScoreMutate()
 
   useEffect(() => {
@@ -151,11 +153,47 @@ function CandidateScoreCard({
   )
 }
 
+function NoActiveSegmentRenderer() {
+  const { data: currentPhase } = useOngoingPhaseQuery()
+
+  if (!currentPhase) return
+
+  let title = 'No active segment'
+  let body = 'Kindly wait for admin to start the next segment'
+
+  const PENDING = phaseSegmentStatusValue.enum.PENDING
+  const ONGOING = phaseSegmentStatusValue.enum.ONGOING
+  const CLOSED = phaseSegmentStatusValue.enum.CLOSED
+
+  if (currentPhase.segments.every((segment) => segment.status === CLOSED)) {
+    title = `${currentPhase.name} has completed!`
+    body = 'Thank you for participating in this pageant.'
+  } else if (
+    currentPhase.segments.every((segment) => segment.status === PENDING)
+  ) {
+    title = `${currentPhase.name} has not started`
+    body = 'Kindly wait for admin to start a segment'
+  }
+
+  return (
+    <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
+      <div className="flex flex-col text-center gap-2">
+        <Scoring.TabsFacade.Body.Title>{title}</Scoring.TabsFacade.Body.Title>
+        <Scoring.TabsFacade.Body.Description>
+          {body}
+        </Scoring.TabsFacade.Body.Description>
+      </div>
+    </Scoring.TabsFacade.Body>
+  )
+}
+
 export const Route = createFileRoute('/judge/scoring/')({
   component: JudgeScoring,
 })
 
 function JudgeScoring() {
+  const queryClient = useQueryClient()
+
   const { account, getAssignedPageantId } = useAuthenticationStore()
   const { setSelectedPageantId } = useSelectedPageantIdStore()
   const { data: assignedPageant } = usePageantQuery(getAssignedPageantId())
@@ -203,6 +241,7 @@ function JudgeScoring() {
         try {
           const data = JSON.parse(message.body)
           setOngoingSegmentId(data?.id ?? null)
+          queryClient.invalidateQueries({ queryKey: ['phases', 'ongoing'] })
         } catch (err) {
           console.error('Failed to parse STOMP message', err)
         }
@@ -263,8 +302,10 @@ function JudgeScoring() {
           Enter the scores for each candidate in the segment.
         </Scoring.TabsFacade.Body.Description>
         <Scoring.TabsFacade.Body.Description>
-          Note: Scores are saved automatically, just wait for the admin to
-          change the segment
+          {'->'} ❗Scores are saved automatically
+        </Scoring.TabsFacade.Body.Description>
+        <Scoring.TabsFacade.Body.Description>
+          {'->'} ❗Scoring will automatically close when a segment finishes
         </Scoring.TabsFacade.Body.Description>
       </div>
       <Scoring.TabsFacade.Body.Content className="grid grid-cols-2">
@@ -295,16 +336,7 @@ function JudgeScoring() {
   ) : (
     /* Temporary body for inactive segments. Special cases apply
        when all segments are PENDING and CLOSED  */
-    <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
-      <div className="flex flex-col text-center gap-2">
-        <Scoring.TabsFacade.Body.Title>
-          No ongoing segment.
-        </Scoring.TabsFacade.Body.Title>
-        <Scoring.TabsFacade.Body.Description>
-          Summary of previous segment/s can be shown to the judges here.
-        </Scoring.TabsFacade.Body.Description>
-      </div>
-    </Scoring.TabsFacade.Body>
+    <NoActiveSegmentRenderer />
   )
 
   return (

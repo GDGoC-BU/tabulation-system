@@ -62,7 +62,7 @@ function JudgeLogin() {
     <div className="grid h-screen place-items-center">
       <div className="flex flex-col items-center gap-4 rounded-lg border px-8 py-8">
         <div>
-          <TextHeading>Judge (Temporary)</TextHeading>
+          <TextHeading>Judge</TextHeading>
         </div>
         <div className="flex flex-col items-center gap-2">
           <Form {...form}>
@@ -77,7 +77,7 @@ function JudgeLogin() {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input placeholder="judge 1" {...field} />
+                      <Input placeholder="judge_1" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
