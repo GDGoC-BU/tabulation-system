@@ -44,9 +44,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(request ->
                         request.requestMatchers(
                                 /* Allow unauthenticated access to these routes */
-                                "api/v1/accounts/login"
-                                )
-                                .permitAll()
+                                "api/v1/accounts/login",
+                                        /* Allow the initial http websocket handshake */
+                                        "/ws/**"
+                                ).permitAll()
                                 /* Everything else, authenticate */
                                 .anyRequest()
                                 .authenticated()

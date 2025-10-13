@@ -1,14 +1,17 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { jwtDecode } from 'jwt-decode'
-import type { Account } from '../schemas'
+import type { AccountRole, AccountStore } from '../schemas'
 import type { BackendJwtPayload } from '@/types'
 
 export type AuthenticationStore = {
-  account: Account | null
+  account: AccountStore | null
   login: (token: string) => void
   logout: () => void
   isAuthenticated: () => boolean
+  getAccountRole: () => AccountRole | null
+  getAccountId: () => string | null
+  getAssignedPageantId: () => string | null
 }
 
 export const useAuthenticationStore = create<AuthenticationStore>()(
@@ -18,9 +21,14 @@ export const useAuthenticationStore = create<AuthenticationStore>()(
 
       login: (token: string) => {
         try {
-          const { sub, role } = jwtDecode<BackendJwtPayload>(token)
-          const account: Account = {
+          const { sub, role, account_id, assigned_pageant_id } =
+            jwtDecode<BackendJwtPayload>(token)
+          const account: AccountStore = {
+            id: account_id,
             username: sub,
+            assigned_pageant_id: assigned_pageant_id
+              ? assigned_pageant_id
+              : null,
             role,
             token,
           }
@@ -37,6 +45,21 @@ export const useAuthenticationStore = create<AuthenticationStore>()(
 
       isAuthenticated: () => {
         return get().account !== null
+      },
+
+      getAccountRole: () => {
+        const account = get().account
+        return account ? account.role : null
+      },
+
+      getAccountId: () => {
+        const account = get().account
+        return account ? account.id : null
+      },
+
+      getAssignedPageantId: () => {
+        const account = get().account
+        return account ? account.assigned_pageant_id : null
       },
     }),
     {

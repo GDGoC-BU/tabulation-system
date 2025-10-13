@@ -27,6 +27,18 @@ public class SegmentController {
         return new ResponseEntity<>(segment, HttpStatus.CREATED);
     }
 
+    @PostMapping("/segments/{id}/start")
+    public ResponseEntity<SegmentDetailedDTO> startSegment(@PathVariable UUID id) {
+        SegmentDetailedDTO segment = service.startSegment(id);
+        return new ResponseEntity<>(segment, HttpStatus.OK);
+    }
+
+    @PostMapping("/segments/{id}/close")
+    public ResponseEntity<SegmentDetailedDTO> closeSegment(@PathVariable UUID id) {
+        SegmentDetailedDTO segment = service.closeSegment(id);
+        return new ResponseEntity<>(segment, HttpStatus.OK);
+    }
+
     @GetMapping("/segments/{id}")
     public ResponseEntity<SegmentDetailedDTO> getSegment(@PathVariable UUID id) {
         SegmentDetailedDTO segment = service.getSegment(id);

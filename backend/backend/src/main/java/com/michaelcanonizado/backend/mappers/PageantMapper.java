@@ -1,9 +1,6 @@
 package com.michaelcanonizado.backend.mappers;
 
-import com.michaelcanonizado.backend.dtos.pageant.PageantCreateDTO;
-import com.michaelcanonizado.backend.dtos.pageant.PageantStatusDTO;
-import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
-import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
+import com.michaelcanonizado.backend.dtos.pageant.*;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
 import org.mapstruct.Mapper;
@@ -21,7 +18,9 @@ public interface PageantMapper {
 
        Pageant toEntity(PageantSummaryDTO pageantSummaryDTO); */
     @Mapping(target = "status", qualifiedByName = "mapStatus")
-    PageantSummaryDTO toSummary(Pageant pageant);
+    PageantSummaryDTO toSummaryDTO(Pageant pageant);
+    @Mapping(target = "status", qualifiedByName = "mapStatus")
+    PageantHierarchyDTO toHierarchyDTO(Pageant pageant);
 
     void updateEntityFromDTO(@MappingTarget Pageant pageant, PageantUpdateDTO pageantUpdateDTO);
 

@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.services.JudgeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

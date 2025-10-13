@@ -31,7 +31,7 @@ public class PageantContext {
     public UUID getId() {
         if (selectedPageant == null) {
             throw new PageantContextMissingException(
-                    "Cannot get pageant.id! No pageant is selected for this request.",
+                    "Cannot get pageant.id! No pageant is selected for this request or usage of PageantContext without @RequirePageantStatus",
                     ErrorCode.PAGEANT_CONTEXT_MISSING
             );
         }
@@ -41,7 +41,7 @@ public class PageantContext {
     public PageantStatus getStatus() {
         if (selectedPageant == null) {
             throw new PageantContextMissingException(
-                    "Cannot get pageant.status! No pageant is selected for this request",
+                    "Cannot get pageant.status! No pageant is selected for this request or usage of PageantContext without @RequirePageantStatus",
                     ErrorCode.PAGEANT_CONTEXT_MISSING
             );
         }

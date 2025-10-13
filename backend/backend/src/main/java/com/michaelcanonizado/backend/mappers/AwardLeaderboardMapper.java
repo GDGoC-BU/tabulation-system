@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.mappers;
 
-import com.michaelcanonizado.backend.dtos.AwardLeaderboardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.awardLeaderboard.AwardLeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.models.AwardLeaderboard;
 import org.mapstruct.Mapper;
 

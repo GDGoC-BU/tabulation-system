@@ -26,6 +26,12 @@ public class Segment {
     @Column(nullable = false)
     private int sequence;
 
+    @Column(nullable = true)
+    private Integer candidateLimit;
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String formula;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PhaseSegmentStatus status = PhaseSegmentStatus.PENDING;
@@ -47,7 +53,6 @@ public class Segment {
     )
     private List<Criterion> criteria = new ArrayList<>();
 
-
     /* Temporary list. CandidateSegmentQualifications is just an
     associative table for the many-to-many relationship of Candidates
     and Segments. We still need the real Candidate object with their
@@ -63,9 +68,11 @@ public class Segment {
     @Getter(AccessLevel.NONE)
     private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
 
-    public Segment(String name, int sequence, Phase phase) {
+    public Segment(String name, int sequence, Integer candidateLimit, String formula, Phase phase) {
         this.name = name;
         this.sequence = sequence;
+        this.candidateLimit = candidateLimit;
+        this.formula = formula;
         this.phase = phase;
     }
 

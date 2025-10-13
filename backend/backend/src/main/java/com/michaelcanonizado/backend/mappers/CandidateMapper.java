@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.mappers;
 
 import com.michaelcanonizado.backend.dtos.candidate.CandidateCreateDTO;
+import com.michaelcanonizado.backend.dtos.candidate.CandidateDetailedDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateSummaryDTO;
 import com.michaelcanonizado.backend.dtos.candidate.CandidateUpdateDTO;
 import com.michaelcanonizado.backend.models.Candidate;
@@ -14,6 +15,7 @@ public interface CandidateMapper {
     @Mapping(target = "college", source = "collegeId")
     Candidate toEntity(CandidateCreateDTO candidateCreateDTO);
     CandidateSummaryDTO toSummaryDTO(Candidate candidate);
+    CandidateDetailedDTO toDetailedDTO(Candidate candidate);
 
     void updateEntityFromDTO(@MappingTarget Candidate candidate, CandidateUpdateDTO candidateUpdateDTO);
 }

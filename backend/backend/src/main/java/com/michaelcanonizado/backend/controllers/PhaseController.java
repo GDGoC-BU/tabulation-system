@@ -5,6 +5,7 @@ import com.michaelcanonizado.backend.dtos.phase.PhaseCreateDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseDetailedDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseUpdateDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.services.PhaseService;
 import jakarta.validation.Valid;
@@ -23,47 +24,48 @@ public class PhaseController {
     @Autowired
     private PhaseService service;
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     @PostMapping("/phases")
     public ResponseEntity<PhaseDetailedDTO> addPhase(@RequestBody @Valid PhaseCreateDTO phaseCreateDTO) {
         PhaseDetailedDTO phase = service.addPhase(phaseCreateDTO);
         return new ResponseEntity<>(phase, HttpStatus.CREATED);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
-    })
+    @PostMapping("/phases/{id}/start")
+    public ResponseEntity<PhaseDetailedDTO> startPhase(@PathVariable UUID id) {
+        PhaseDetailedDTO phase = service.startPhase(id);
+        return new ResponseEntity<>(phase, HttpStatus.OK);
+    }
+
+    @PostMapping("/phases/{id}/close")
+    public ResponseEntity<PhaseDetailedDTO> closePhase(@PathVariable UUID id) {
+        PhaseDetailedDTO phase = service.closePhase(id);
+        return new ResponseEntity<>(phase, HttpStatus.OK);
+    }
+
     @GetMapping("/phases/{id}")
     public ResponseEntity<PhaseDetailedDTO> getPhase(@PathVariable UUID id) {
         PhaseDetailedDTO phase = service.getPhase(id);
         return new ResponseEntity<>(phase, HttpStatus.OK);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
-    })
+    @GetMapping("/phases/ongoing")
+    public ResponseEntity<PhaseDetailedDTO> getOngoingPhase() {
+        PhaseDetailedDTO phase = service.getOngoingPhase();
+        return new ResponseEntity<>(phase, HttpStatus.OK);
+    }
+
     @GetMapping("/phases")
     public ResponseEntity<List<PhaseSummaryDTO>> getPhases() {
         List<PhaseSummaryDTO> phases = service.getPhases();
         return new ResponseEntity<>(phases, HttpStatus.OK);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     @PutMapping("/phases/{id}")
     public ResponseEntity<PhaseDetailedDTO> updatePhases(@PathVariable UUID id, @RequestBody @Valid PhaseUpdateDTO phaseUpdateDTO) {
         PhaseDetailedDTO phase = service.updatePhase(id, phaseUpdateDTO);
         return new ResponseEntity<>(phase, HttpStatus.OK);
     }
 
-    @RequirePageantStatus({
-            PageantStatus.PREPARATION
-    })
     @DeleteMapping("/phases/{id}")
     public ResponseEntity<Void> deletePhase(@PathVariable UUID id) {
         service.deletePhase(id);

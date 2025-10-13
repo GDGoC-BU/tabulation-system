@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.utilities;
 
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashSet;
@@ -32,7 +33,7 @@ import java.util.regex.Pattern;
    Frontend receives formula: "0f0f0f0f-1e1e-2d2d-3c3c-4b4b4b4b4b4b / 0.5"
     Frontend simply can't do: "0F0f0F0f-1e1E-2D2D-3c3c-4B4b4B4b4b4b" === "0f0f0f0f-1e1e-2d2d-3c3c-4b4b4b4b4b4b" */
 @Component
-public class AwardFormulaEncoder {
+public class FormulaEncoder {
 
     private final String PREFIX = "C";
     private final String DASH_REPLACEMENT = "_";
@@ -61,7 +62,12 @@ public class AwardFormulaEncoder {
             );
 
     /* Main encode method */
+    @Named("encodeFormula")
     public String encodeFormula(String rawFormula) {
+        if (rawFormula == null) {
+            return null;
+        }
+
         /* Identify the UUIDs */
         Matcher matcher = RAW_UUID_PATTERN.matcher(rawFormula);
 
@@ -84,7 +90,12 @@ public class AwardFormulaEncoder {
     }
 
     /* Main decode method */
+    @Named("decodeFormula")
     public String decodeFormula(String encodedFormula) {
+        if (encodedFormula == null) {
+            return null;
+        }
+
         /* Identify the encoded UUIDs */
         Matcher matcher = ENCODED_PATTERN.matcher(encodedFormula);
 

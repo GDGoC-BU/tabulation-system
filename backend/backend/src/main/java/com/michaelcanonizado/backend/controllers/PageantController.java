@@ -1,8 +1,10 @@
 package com.michaelcanonizado.backend.controllers;
 
 import com.michaelcanonizado.backend.dtos.pageant.PageantCreateDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantHierarchyDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseHierarchyDTO;
 import com.michaelcanonizado.backend.services.PageantService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,12 @@ public class PageantController {
     @GetMapping("/pageants/{id}")
     public ResponseEntity<PageantSummaryDTO> getPageant(@PathVariable UUID id) {
         PageantSummaryDTO pageant = service.getPageant(id);
+        return new ResponseEntity<>(pageant, HttpStatus.OK);
+    }
+
+    @GetMapping("/pageants/{id}/hierarchy")
+    public ResponseEntity<PageantHierarchyDTO> getPageantHierarchy(@PathVariable UUID id) {
+        PageantHierarchyDTO pageant = service.getPageantHierarchy(id);
         return new ResponseEntity<>(pageant, HttpStatus.OK);
     }
 

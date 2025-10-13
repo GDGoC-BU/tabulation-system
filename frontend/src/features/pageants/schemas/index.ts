@@ -1,13 +1,6 @@
 import z from 'zod'
-import { zStringToDate } from '@/schemas'
-
-const pageantStatusValue = z.enum([
-  'PREPARATION',
-  'ONGOING',
-  'FINALIZING',
-  'CLOSED',
-])
-export type PageantStatusValue = z.infer<typeof pageantStatusValue>
+import { pageantStatusValue, zStringToDate } from '@/schemas'
+import { phaseHierarchySchema } from '@/features/phases/schemas'
 
 const pageantStatusSchema = z.object({
   value: pageantStatusValue,
@@ -24,6 +17,14 @@ export const pageantSummarySchema = z.object({
   updatedAt: zStringToDate,
 })
 export type PageantSummary = z.infer<typeof pageantSummarySchema>
+
+export const pageantHierarchySchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  status: pageantStatusSchema,
+  phases: z.array(phaseHierarchySchema),
+})
+export type PageantHierarchy = z.infer<typeof pageantHierarchySchema>
 
 export const pageantsSchema = z.array(pageantSummarySchema)
 export type Pageants = z.infer<typeof pageantsSchema>

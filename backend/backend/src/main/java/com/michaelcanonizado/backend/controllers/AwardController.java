@@ -1,8 +1,10 @@
 package com.michaelcanonizado.backend.controllers;
 
-import com.michaelcanonizado.backend.dtos.AwardLeaderboardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.award.AwardDetailedDTO;
+import com.michaelcanonizado.backend.dtos.awardLeaderboard.AwardLeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
 import com.michaelcanonizado.backend.services.AwardService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +27,31 @@ public class AwardController {
         AwardSummaryDTO award = service.addAward(awardCreateDTO);
         return new ResponseEntity<>(award, HttpStatus.CREATED);
     }
+    
+    @PostMapping("/awards/{id}/calculate")
+    public ResponseEntity<AwardDetailedDTO> calculateAwardResult(@PathVariable UUID id) {
+        AwardDetailedDTO award = service.calculateAwardResult(id);
+        return new ResponseEntity<>(award, HttpStatus.OK);
+    }
 
-    /* TEMPORARY ENDPOINT */
-    @GetMapping("/awards/{id}/results")
-    public ResponseEntity<List<AwardLeaderboardSummaryDTO>> getAwardResults(@PathVariable UUID id) {
-        List<AwardLeaderboardSummaryDTO> leaderboard = service.getAwardResult(id);
-        return new ResponseEntity<>(leaderboard, HttpStatus.OK);
+    @GetMapping("/awards/{id}")
+    public ResponseEntity<AwardDetailedDTO> getAward(@PathVariable UUID id) {
+        AwardDetailedDTO award = service.getAward(id);
+        return new ResponseEntity<>(award, HttpStatus.OK);
     }
 
     @GetMapping("/awards")
-    public ResponseEntity<List<AwardSummaryDTO>> getAward() {
+    public ResponseEntity<List<AwardSummaryDTO>> getAwards() {
         List<AwardSummaryDTO> awards = service.getAwards();
         return new ResponseEntity<>(awards, HttpStatus.OK);
+    }
+
+    @PutMapping("/awards/{id}")
+    public ResponseEntity<AwardSummaryDTO> updateAward(
+            @PathVariable UUID id,
+            @RequestBody @Valid AwardUpdateDTO awardUpdateDTO
+    ) {
+        AwardSummaryDTO award = service.updateAward(id, awardUpdateDTO);
+        return new ResponseEntity<>(award, HttpStatus.OK);
     }
 }

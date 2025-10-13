@@ -3,7 +3,11 @@ import type { ComponentClassNameAndChildrenProp } from '@/types'
 import { cn } from '@/lib/utils'
 
 function Console({ className, children }: ComponentClassNameAndChildrenProp) {
-  return <div className={cn('p-4', className)}>{children}</div>
+  return (
+    <div className={cn('p-4 flex flex-col min-h-full', className)}>
+      {children}
+    </div>
+  )
 }
 
 function Header({ className, children }: ComponentClassNameAndChildrenProp) {

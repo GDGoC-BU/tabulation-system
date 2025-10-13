@@ -12,7 +12,7 @@ public record AwardCreateDTO(
         String name,
 
         @NotNull(message = "required")
-        @Min(value = 0, message = ">= 1")
+        @Min(value = 1, message = ">= 1")
         int candidateLimit,
 
         @NotBlank(message = "required")

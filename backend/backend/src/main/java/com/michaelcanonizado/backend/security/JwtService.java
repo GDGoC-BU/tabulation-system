@@ -45,6 +45,7 @@ public class JwtService {
         String role = getRole(account);
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
+        claims.put("account_id", account.getId());
         claims.putAll(extraClaims);
 
         Date issuedAt = Date.from(Instant.now());

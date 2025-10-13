@@ -4,13 +4,16 @@ import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.JudgeMapper;
+import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +24,10 @@ public class JudgeService {
     private JudgeRepository judgeRepository;
 
     @Autowired
-    private JudgeMapper mapper;
+    private JudgeMapper judgeMapper;
+
+    @Autowired
+    private PageantMapper pageantMapper;
 
     @Autowired
     private PageantContext pageantContext;
@@ -40,7 +46,7 @@ public class JudgeService {
                         .getId()
         );
 
-        return mapper.toSummaryDTO(judge);
+        return judgeMapper.toSummaryDTO(judge);
     }
 
     @RequirePageantStatus({
@@ -53,7 +59,7 @@ public class JudgeService {
                 .findAllByPageant_Id(selectedPageantId)
                 .stream()
                 .map(judge -> {
-                    return mapper.toSummaryDTO(judge);
+                    return judgeMapper.toSummaryDTO(judge);
                 })
                 .toList();
     }
@@ -71,8 +77,8 @@ public class JudgeService {
                         .getId()
         );
 
-        mapper.updateEntityFromDTO(judge, judgeUpdateDTO);
-        return mapper.toSummaryDTO(judgeRepository.save(judge));
+        judgeMapper.updateEntityFromDTO(judge, judgeUpdateDTO);
+        return judgeMapper.toSummaryDTO(judgeRepository.save(judge));
     }
 
     @RequirePageantStatus({

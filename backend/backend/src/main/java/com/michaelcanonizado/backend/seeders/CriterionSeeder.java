@@ -27,6 +27,9 @@ public class CriterionSeeder implements DatabaseSeeder {
     private final CriterionRepository criterionRepository;
 
     private final List<CriterionItem> criteria = Arrays.asList(
+            new CriterionItem("Interview Criterion 1", 5, "Interview Proper"),
+            new CriterionItem("Interview Criterion 2", 5, "Interview Proper"),
+            new CriterionItem("Interview Criterion 3", 5, "Interview Proper"),
             new CriterionItem("Beauty of Figure", 5, "Swimwear"),
             new CriterionItem("Stage Presence", 5, "Swimwear"),
             new CriterionItem("Poise and Personality", 5, "Swimwear"),

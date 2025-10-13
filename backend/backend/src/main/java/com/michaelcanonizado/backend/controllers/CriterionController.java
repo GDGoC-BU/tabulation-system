@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -23,6 +24,12 @@ public class CriterionController {
     public ResponseEntity<CriterionSummaryDTO> addCriterion(@RequestBody @Valid CriterionCreateDTO criterionCreateDTO) {
         CriterionSummaryDTO criterion = service.addCriterion(criterionCreateDTO);
         return new ResponseEntity<>(criterion, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/criteria")
+    public ResponseEntity<List<CriterionSummaryDTO>> getCriteria() {
+        List<CriterionSummaryDTO> criteria = service.getCriteria();
+        return new ResponseEntity<>(criteria, HttpStatus.OK);
     }
 
     @PutMapping("/criteria/{id}")

@@ -29,7 +29,7 @@ public class Award {
     @Column(nullable = false)
     private int candidateLimit;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String formula;
 
     @JsonBackReference
@@ -46,8 +46,6 @@ public class Award {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
     private List<AwardLeaderboard> leaderboard = new ArrayList<>();
 
     public Award(String name, int candidateLimit, String formula, Pageant pageant) {

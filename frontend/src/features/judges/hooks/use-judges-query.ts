@@ -9,7 +9,6 @@ export function useJudgesQuery() {
     queryFn: async () => {
       try {
         const response = await api.get('/judges')
-        console.log('Judges: ', response.data)
         const parsedResponse = judgesSchema.safeParse(response.data)
         if (!parsedResponse.success) {
           console.error("/judges response doesn't match schema!")

@@ -1,9 +1,11 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
-import com.michaelcanonizado.backend.dtos.AwardLeaderboardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.award.AwardDetailedDTO;
+import com.michaelcanonizado.backend.dtos.awardLeaderboard.AwardLeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
+import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.AwardLeaderboardMapper;
@@ -12,7 +14,7 @@ import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
-import com.michaelcanonizado.backend.utilities.AwardFormulaEncoder;
+import com.michaelcanonizado.backend.utilities.FormulaEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.expression.Expression;
@@ -53,7 +55,7 @@ public class AwardService {
     private PageantContext pageantContext;
 
     @Autowired
-    private AwardFormulaEncoder formulaEncoder;
+    private FormulaEncoder formulaEncoder;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
@@ -71,11 +73,6 @@ public class AwardService {
             );
         });
         award.setPageant(pageant);
-
-        /* Encode formula to SpEL safe format */
-        String rawFormula = award.getFormula();
-        String encodedFormula = formulaEncoder.encodeFormula(rawFormula);
-        award.setFormula(encodedFormula);
 
         /* Save Award */
         Award savedAward = awardRepository.save(award);
@@ -96,14 +93,34 @@ public class AwardService {
         /* Batch save to minimize insert queries */
         awardLeaderboardRepository.saveAll(awardLeaderboards);
 
-        /* Decode formula back to raw form since
-           created award will be returned back. */
-        encodedFormula = savedAward.getFormula();
-        String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
-        savedAward.setFormula(decodedFormula);
         return awardMapper.toSummaryDTO(savedAward);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
+    })
+    public AwardDetailedDTO getAward(UUID id) {
+        Award award = awardRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "Award not found!",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        });
+
+        pageantContext.assertAccess(award.getPageant().getId());
+
+        return awardMapper.toDetailedDTO(award);
+    }
+
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
+    })
     public List<AwardSummaryDTO> getAwards() {
         UUID selectedPageantId = pageantContext.getId();
 
@@ -111,18 +128,15 @@ public class AwardService {
 
         return awards
                 .stream()
-                .map(award -> {
-                    String encodedFormula = award.getFormula();
-                    String decodedFormula = formulaEncoder.decodeFormula(encodedFormula);
-                    award.setFormula(decodedFormula);
-
-                    return awardMapper.toSummaryDTO(award);
-                })
+                .map(award -> awardMapper.toSummaryDTO(award))
                 .toList();
     }
 
+    @RequirePageantStatus({
+            PageantStatus.FINALIZING
+    })
     @Transactional
-    public List<AwardLeaderboardSummaryDTO> getAwardResult(UUID id) {
+    public AwardDetailedDTO calculateAwardResult(UUID id) {
         UUID selectedPageantId = pageantContext.getId();
 
         /* Get award */
@@ -264,13 +278,23 @@ public class AwardService {
         /* Save updated leaderboard */
         List<AwardLeaderboard> updatedLeaderboard = awardLeaderboardRepository.saveAll(candidateRowsInLeaderboard.values());
 
-        return updatedLeaderboard
-                .stream()
-                .sorted(Comparator.comparing(AwardLeaderboard::getScore).reversed())
-                .limit(award.getCandidateLimit())
-                .map(candidateRow -> {
-                    return awardLeaderboardMapper.toSummaryDTO(candidateRow);
-                })
-                .toList();
+        return awardMapper.toDetailedDTO(award);
+    }
+
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION
+    })
+    public AwardSummaryDTO updateAward(UUID id, AwardUpdateDTO awardUpdateDTO) {
+        Award award = awardRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "Can't update! Award not found.",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        });
+
+        pageantContext.assertAccess(award.getPageant().getId());
+
+        awardMapper.updateEntityFromDTO(award, awardUpdateDTO);
+        return awardMapper.toSummaryDTO(awardRepository.save(award));
     }
 }

@@ -25,36 +25,46 @@ import {
 } from '@/components/ui/sidebar'
 import { TextBody } from '@/components/text'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { pageantStatusValue } from '@/schemas'
 
 const pageantAction = [
   {
     title: 'Judges',
     url: '/admin/console/judges',
     icon: UserRoundPen,
-    badgeValue: 4,
+    badgeValue: 0,
   },
   {
     title: 'Candidates',
     url: '/admin/console/candidates',
     icon: UserStar,
-    badgeValue: 20,
+    badgeValue: 0,
   },
   {
     title: 'Phases',
     url: '/admin/console/phases',
     icon: Layers,
-    badgeValue: 2,
+    badgeValue: 0,
   },
   {
     title: 'Segments',
     url: '/admin/console/segments',
     icon: Route,
-    badgeValue: 5,
+    badgeValue: 0,
+  },
+  {
+    title: 'Awards',
+    url: '/admin/console/awards',
+    icon: Route,
+    badgeValue: 0,
   },
 ]
 
 export default function Vertical() {
   const { data } = useSelectedPageantQuery()
+
+  const showManagePageantLinks =
+    !data || data.status.value !== pageantStatusValue.enum.PREPARATION
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -118,7 +128,11 @@ export default function Vertical() {
               return (
                 <SidebarMenu key={index}>
                   <SidebarMenuItem
-                    className={!data ? 'pointer-events-none opacity-50' : ''}
+                    className={
+                      showManagePageantLinks
+                        ? 'pointer-events-none opacity-50'
+                        : ''
+                    }
                   >
                     <SidebarMenuButton asChild>
                       <Link to={action.url}>

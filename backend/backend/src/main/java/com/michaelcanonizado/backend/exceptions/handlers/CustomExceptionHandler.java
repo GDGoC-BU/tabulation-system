@@ -10,6 +10,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class CustomExceptionHandler {
+    @ExceptionHandler(UnauthorizedWebsocketConnection.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedWebsocketConnection(
+            UnauthorizedWebsocketConnection exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
             EntityNotFoundException exception,
@@ -47,6 +64,23 @@ public class CustomExceptionHandler {
     @ExceptionHandler(PageantStatusException.class)
     public ResponseEntity<ErrorResponse> handlePageantStatusException(
             PageantStatusException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.LOCKED;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
+    @ExceptionHandler(PhaseStatusException.class)
+    public ResponseEntity<ErrorResponse> handlePhaseStatusException(
+            PhaseStatusException exception,
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.LOCKED;

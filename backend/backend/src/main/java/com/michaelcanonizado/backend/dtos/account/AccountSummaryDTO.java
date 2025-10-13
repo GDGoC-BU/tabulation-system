@@ -6,7 +6,6 @@ import java.util.UUID;
 public record AccountSummaryDTO(
         UUID id,
         String username,
-        String role,
         boolean isOnline,
         LocalDateTime lastSeenAt
 ) {

@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/admin/console/phases')({
-  component: RouteComponent,
+  component: AdminConsolePhases,
 })
 
-function RouteComponent() {
+function AdminConsolePhases() {
   return <div>Hello "/admin/console/phases"!</div>
 }
