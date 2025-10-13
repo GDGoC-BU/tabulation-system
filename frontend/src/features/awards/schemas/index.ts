@@ -1,4 +1,11 @@
 import z from 'zod'
+import { candidateSummarySchema } from '@/features/candidates/schemas'
+
+export const awardLeaderboardSummarySchema = z.object({
+  id: z.string(),
+  candidate: candidateSummarySchema,
+  score: z.number(),
+})
 
 export const awardSummarySchema = z.object({
   id: z.string(),
@@ -7,6 +14,15 @@ export const awardSummarySchema = z.object({
   formula: z.string(),
 })
 export type AwardSummary = z.infer<typeof awardSummarySchema>
+
+export const awardDetailedSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  candidateLimit: z.int(),
+  formula: z.string(),
+  leaderboard: z.array(awardLeaderboardSummarySchema),
+})
+export type AwardDetailed = z.infer<typeof awardDetailedSchema>
 
 export const awardsSchema = z.array(awardSummarySchema)
 export type Awards = z.infer<typeof awardsSchema>
