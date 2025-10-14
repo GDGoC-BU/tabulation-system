@@ -15,6 +15,16 @@ import java.util.List;
 @Getter
 @Setter
 public class Judge extends Account {
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Honorific honorific;
+
     @JsonBackReference
     @ManyToOne(
             optional = false,
@@ -32,9 +42,12 @@ public class Judge extends Account {
     )
     private List<Score> scores  = new ArrayList<>();
 
-    public Judge(String username, String passwordHash, Pageant pageant) {
+    public Judge(String username, String passwordHash, String firstName, String lastName, Honorific honorific, Pageant pageant) {
         super(username, passwordHash);
         this.pageant = pageant;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.honorific = honorific;
     }
 
     public void addScore(Score score) {
