@@ -27,8 +27,7 @@ public class PhaseSeeder implements DatabaseSeeder {
         Pageant pageant = pageantRepository.findAll().getFirst();
 
         List<Phase> phases = Arrays.asList(
-                new Phase("Close-Door Interview", 1, pageant),
-                new Phase("Coronation Night", 2, pageant)
+                new Phase("Coronation Night", 1, pageant)
         );
 
         phaseRepository.saveAll(phases);

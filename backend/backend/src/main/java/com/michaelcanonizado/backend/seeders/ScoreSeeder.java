@@ -40,10 +40,11 @@ public class ScoreSeeder implements DatabaseSeeder {
             criteria.forEach(criterion -> {
                 judges.forEach(judge -> {
                     Score score = new Score(
-                            faker.number().numberBetween(
-                                    0,
-                                    criterion.getMaxScore()
-                            ),
+                            0,
+//                            ),aker.number().numberBetween(
+//                                    0,
+//                                    criterion.getMaxScore()
+//                            ),
                             judge,
                             candidate,
                             criterion
