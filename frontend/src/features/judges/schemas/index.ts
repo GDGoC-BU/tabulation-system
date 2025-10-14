@@ -1,9 +1,12 @@
 import z from 'zod'
-import { zStringToDate } from '@/schemas'
+import { honorificSchema, zStringToDate } from '@/schemas'
 
 export const judgeSummarySchema = z.object({
   id: z.string(),
   username: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  honorific: honorificSchema,
   isOnline: z.boolean(),
   lastSeenAt: z.union([z.null(), zStringToDate]),
   createdAt: zStringToDate,

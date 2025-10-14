@@ -77,7 +77,7 @@ function JudgeLogin() {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input placeholder="judge_1" {...field} />
+                      <Input placeholder="JUDGE_1" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

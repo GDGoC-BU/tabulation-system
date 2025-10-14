@@ -21,6 +21,8 @@ import { Input } from '@/components/ui/input'
 import useDebounce from '@/hooks/use-debounce'
 import useEditScoreMutate from '@/features/scores/hooks/use-edit-score-mutate'
 import splitCandidates from '@/features/candidates/lib/split-candidates'
+import capitalizeWords from '@/lib/capitalize-words'
+import { useJudgeQuery } from '@/features/judges/hooks/use-judge-query'
 
 function ScoreInputForm({
   score,
@@ -195,6 +197,7 @@ function JudgeScoring() {
   const queryClient = useQueryClient()
 
   const { account, getAssignedPageantId } = useAuthenticationStore()
+  const { data: judge } = useJudgeQuery(account?.id)
   const { setSelectedPageantId } = useSelectedPageantIdStore()
   const { data: assignedPageant } = usePageantQuery(getAssignedPageantId())
 
@@ -344,7 +347,11 @@ function JudgeScoring() {
       <Scoring.Header>
         <TextDisplay>{assignedPageant?.title}</TextDisplay>
         <Scoring.Header.Title>{currentPhase?.name}</Scoring.Header.Title>
-        <Scoring.Header.Sub>Welcome, {account?.username}</Scoring.Header.Sub>
+        <Scoring.Header.Sub>
+          Welcome, {capitalizeWords(judge?.honorific ?? '') + '.'}{' '}
+          {capitalizeWords(judge?.firstName ?? '')}{' '}
+          {capitalizeWords(judge?.lastName ?? '')}
+        </Scoring.Header.Sub>
       </Scoring.Header>
       <Scoring.Content>
         <Scoring.TabsFacade>

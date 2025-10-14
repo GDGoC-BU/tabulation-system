@@ -12,6 +12,17 @@ export const zStringToDate = z.string().transform((val, ctx) => {
   return date
 })
 
+export const honorificSchema = z.enum([
+  'MR',
+  'MS',
+  'MX',
+  'MRS',
+  'HON',
+  'DR',
+  'PROF',
+])
+export type Honorific = z.infer<typeof honorificSchema>
+
 export const pageantStatusValue = z.enum([
   'PREPARATION',
   'ONGOING',

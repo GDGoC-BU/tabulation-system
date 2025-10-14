@@ -12,6 +12,30 @@ export const judgeTableColumns: Array<ColumnDef<JudgeSummary>> = [
     },
   },
   {
+    accessorKey: 'honorific',
+    header: 'honorific',
+    cell: ({ row }) => {
+      const honorific: JudgeSummary['honorific'] = row.getValue('honorific')
+      return <TextBody>{honorific}</TextBody>
+    },
+  },
+  {
+    accessorKey: 'firstName',
+    header: 'First Name',
+    cell: ({ row }) => {
+      const firstName: JudgeSummary['firstName'] = row.getValue('firstName')
+      return <TextBody>{firstName}</TextBody>
+    },
+  },
+  {
+    accessorKey: 'lastName',
+    header: 'Last Name',
+    cell: ({ row }) => {
+      const lastName: JudgeSummary['lastName'] = row.getValue('lastName')
+      return <TextBody>{lastName}</TextBody>
+    },
+  },
+  {
     accessorKey: 'isOnline',
     header: 'Online',
     cell: ({ row }) => {
