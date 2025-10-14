@@ -31,9 +31,7 @@ public class CandidateSeeder implements DatabaseSeeder {
         this.pageantRepository = pageantRepository;
     }
 
-    @Transactional
-    @Override
-    public void seed() {
+    private void seedRandom() {
         Pageant pageant = pageantRepository.findAll().getFirst();
         List<College> colleges =  collegeRepository.findAll();
 
@@ -59,5 +57,47 @@ public class CandidateSeeder implements DatabaseSeeder {
                 candidateRepository.save(new Candidate(i, faker.name().firstName(), faker.name().lastName(), CandidateGender.MALE, 20, college, pageant));
             }
         }
+    }
+
+    private void seedRealData() {
+        Pageant pageant = pageantRepository.findAll().getFirst();
+        List<College> colleges =  collegeRepository.findAll();
+        College selectedCollege = colleges.stream()
+                .filter(college -> college.getCode().equals("BUCIT"))
+                .findFirst().orElseThrow(() -> {
+                    return new RuntimeException("Candidate is being seeded on a college that doesn't exist!");
+                });
+
+        List<Candidate> candidates = Arrays.asList(
+                new Candidate(1, "KC", "Luces", CandidateGender.FEMALE, 20, selectedCollege, pageant),
+                new Candidate(1, "Harry", "Clemente", CandidateGender.MALE, 20, selectedCollege, pageant),
+
+                new Candidate(2, "Kyla Mae", "Caceres", CandidateGender.FEMALE, 20, selectedCollege, pageant),
+                new Candidate(2, "Aries Carl", "Aycardo", CandidateGender.MALE, 20, selectedCollege, pageant),
+
+                new Candidate(3, "Rea Nicole", "Antivola", CandidateGender.FEMALE, 20, selectedCollege, pageant),
+                new Candidate(3, "Jay Rich", "Bañadera", CandidateGender.MALE, 20, selectedCollege, pageant),
+
+                new Candidate(4, "Trisha", "Paliza", CandidateGender.FEMALE, 20, selectedCollege, pageant),
+                new Candidate(4, "Hans", "Balete", CandidateGender.MALE, 20, selectedCollege, pageant),
+
+                new Candidate(5, "Sushmita", "Singh", CandidateGender.FEMALE, 20, selectedCollege, pageant),
+                new Candidate(5, "Hans Sedric", "Basallote", CandidateGender.MALE, 20, selectedCollege, pageant),
+
+                new Candidate(6, "Mary Grace", "Sarabia", CandidateGender.FEMALE, 20, selectedCollege, pageant),
+                new Candidate(6, "Mckile", "Magdaong", CandidateGender.MALE, 20, selectedCollege, pageant),
+
+                new Candidate(7, "Pearl Amirey", "Espinili", CandidateGender.FEMALE, 20, selectedCollege, pageant),
+                new Candidate(7, "Andrei Hartzel", "Lirio", CandidateGender.MALE, 20, selectedCollege, pageant)
+        );
+
+        candidateRepository.saveAll(candidates);
+    }
+
+    @Transactional
+    @Override
+    public void seed() {
+        if (false) seedRandom();
+        if (true) seedRealData();
     }
 }

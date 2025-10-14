@@ -17,8 +17,8 @@ public class AdminSeeder implements DatabaseSeeder {
 
     @Override
     public void seed() {
-        String username = "admin";
-        String password = "1234";
+        String username = "gdgoc_admin";
+        String password = "4321";
         String passwordHash = passwordEncoder.encode(password);
         repository.save(new Admin(username, passwordHash));
     }
