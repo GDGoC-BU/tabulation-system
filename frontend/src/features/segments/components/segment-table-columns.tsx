@@ -79,6 +79,20 @@ export const segmentTableColumns: Array<
       const segment = row.original
       return (
         <Link
+          to={'/admin/console/segments/$segmentId/scores'}
+          params={{ segmentId: segment.id }}
+        >
+          View Scores
+        </Link>
+      )
+    },
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const segment = row.original
+      return (
+        <Link
           to={'/admin/console/segments/$segmentId/edit'}
           params={{ segmentId: segment.id }}
         >

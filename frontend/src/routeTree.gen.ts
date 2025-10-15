@@ -25,6 +25,7 @@ import { Route as AdminConsoleCandidatesRouteImport } from './routes/admin/conso
 import { Route as AdminConsoleSegmentsIndexRouteImport } from './routes/admin/console/segments/index'
 import { Route as AdminConsoleAwardsIndexRouteImport } from './routes/admin/console/awards/index'
 import { Route as AdminConsoleAwardsAddRouteImport } from './routes/admin/console/awards/add'
+import { Route as AdminConsoleSegmentsSegmentIdScoresRouteImport } from './routes/admin/console/segments/$segmentId.scores'
 import { Route as AdminConsoleSegmentsSegmentIdEditRouteImport } from './routes/admin/console/segments/$segmentId.edit'
 import { Route as AdminConsoleAwardsAwardIdEditRouteImport } from './routes/admin/console/awards/$awardId.edit'
 
@@ -109,6 +110,12 @@ const AdminConsoleAwardsAddRoute = AdminConsoleAwardsAddRouteImport.update({
   path: '/awards/add',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
+const AdminConsoleSegmentsSegmentIdScoresRoute =
+  AdminConsoleSegmentsSegmentIdScoresRouteImport.update({
+    id: '/segments/$segmentId/scores',
+    path: '/segments/$segmentId/scores',
+    getParentRoute: () => AdminConsoleRouteRoute,
+  } as any)
 const AdminConsoleSegmentsSegmentIdEditRoute =
   AdminConsoleSegmentsSegmentIdEditRouteImport.update({
     id: '/segments/$segmentId/edit',
@@ -141,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/admin/console/segments': typeof AdminConsoleSegmentsIndexRoute
   '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
   '/admin/console/segments/$segmentId/edit': typeof AdminConsoleSegmentsSegmentIdEditRoute
+  '/admin/console/segments/$segmentId/scores': typeof AdminConsoleSegmentsSegmentIdScoresRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -159,6 +167,7 @@ export interface FileRoutesByTo {
   '/admin/console/segments': typeof AdminConsoleSegmentsIndexRoute
   '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
   '/admin/console/segments/$segmentId/edit': typeof AdminConsoleSegmentsSegmentIdEditRoute
+  '/admin/console/segments/$segmentId/scores': typeof AdminConsoleSegmentsSegmentIdScoresRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -180,6 +189,7 @@ export interface FileRoutesById {
   '/admin/console/segments/': typeof AdminConsoleSegmentsIndexRoute
   '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
   '/admin/console/segments/$segmentId/edit': typeof AdminConsoleSegmentsSegmentIdEditRoute
+  '/admin/console/segments/$segmentId/scores': typeof AdminConsoleSegmentsSegmentIdScoresRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/admin/console/segments'
     | '/admin/console/awards/$awardId/edit'
     | '/admin/console/segments/$segmentId/edit'
+    | '/admin/console/segments/$segmentId/scores'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/admin/console/segments'
     | '/admin/console/awards/$awardId/edit'
     | '/admin/console/segments/$segmentId/edit'
+    | '/admin/console/segments/$segmentId/scores'
   id:
     | '__root__'
     | '/'
@@ -240,6 +252,7 @@ export interface FileRouteTypes {
     | '/admin/console/segments/'
     | '/admin/console/awards/$awardId/edit'
     | '/admin/console/segments/$segmentId/edit'
+    | '/admin/console/segments/$segmentId/scores'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -364,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleAwardsAddRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
+    '/admin/console/segments/$segmentId/scores': {
+      id: '/admin/console/segments/$segmentId/scores'
+      path: '/segments/$segmentId/scores'
+      fullPath: '/admin/console/segments/$segmentId/scores'
+      preLoaderRoute: typeof AdminConsoleSegmentsSegmentIdScoresRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
     '/admin/console/segments/$segmentId/edit': {
       id: '/admin/console/segments/$segmentId/edit'
       path: '/segments/$segmentId/edit'
@@ -394,6 +414,7 @@ interface AdminConsoleRouteRouteChildren {
   AdminConsoleSegmentsIndexRoute: typeof AdminConsoleSegmentsIndexRoute
   AdminConsoleAwardsAwardIdEditRoute: typeof AdminConsoleAwardsAwardIdEditRoute
   AdminConsoleSegmentsSegmentIdEditRoute: typeof AdminConsoleSegmentsSegmentIdEditRoute
+  AdminConsoleSegmentsSegmentIdScoresRoute: typeof AdminConsoleSegmentsSegmentIdScoresRoute
 }
 
 const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
@@ -410,6 +431,8 @@ const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
   AdminConsoleAwardsAwardIdEditRoute: AdminConsoleAwardsAwardIdEditRoute,
   AdminConsoleSegmentsSegmentIdEditRoute:
     AdminConsoleSegmentsSegmentIdEditRoute,
+  AdminConsoleSegmentsSegmentIdScoresRoute:
+    AdminConsoleSegmentsSegmentIdScoresRoute,
 }
 
 const AdminConsoleRouteRouteWithChildren =
