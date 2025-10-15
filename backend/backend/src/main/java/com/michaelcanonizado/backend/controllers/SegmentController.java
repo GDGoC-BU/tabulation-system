@@ -40,6 +40,12 @@ public class SegmentController {
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 
+    @PostMapping("/segments/{id}/calculate-qualified-candidates")
+    public ResponseEntity<SegmentDetailedDTO> calculateQualifiedCandidates(@PathVariable UUID id) {
+        SegmentDetailedDTO segment = service.caclculateQualifiedCandidates(id);
+        return new ResponseEntity<>(segment, HttpStatus.OK);
+    }
+
     @GetMapping("/segments/{id}")
     public ResponseEntity<SegmentDetailedDTO> getSegment(@PathVariable UUID id) {
         SegmentDetailedDTO segment = service.getSegment(id);

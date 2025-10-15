@@ -267,6 +267,165 @@ public class SegmentService {
     }
 
     @RequirePageantStatus({
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED,
+    })
+    public SegmentDetailedDTO caclculateQualifiedCandidates(UUID id) {
+        Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException("Cannot start! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
+        });
+
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
+        UUID selectedPageantId = pageantContext.getId();
+
+        /* Determine the qualified candidates for the segment if a formula and candidate limit is present. */
+        if (segment.getFormula() != null && segment.getCandidateLimit() != null) {
+            /* Extract criterion ids from formula */
+            Set<UUID> criteriaIdsInFormula = formulaEncoder.extractEncodedUUIDs(segment.getFormula());
+
+            /* Get candidates */
+            List<Candidate> candidates = candidateRepository
+                    .findAllByPageant_Id(selectedPageantId);
+
+            Map<UUID, CandidateGender> candidateGenders = candidates
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Candidate::getId,
+                            Candidate::getGender
+                    ));
+
+            Map<UUID, String> candidateLastNames = candidates
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Candidate::getId,
+                            Candidate::getLastName
+                    ));
+
+            List<UUID> candidateIds = candidates
+                    .stream()
+                    .map(Candidate::getId)
+                    .toList();
+
+            /* Fetch relevant scores: */
+            List<Score> scores = scoreRepository.findAll(
+                    Specification.allOf(
+                            /* Scores that belong to the selected pageant */
+                            ScoreSpecification.hasPageant(selectedPageantId),
+                            /* Scores that belong to the fetched candidates */
+                            ScoreSpecification.hasCandidates(candidateIds),
+                            /* Scores for criteria that is included in the formula */
+                            ScoreSpecification.hasCriteria(new ArrayList<>(criteriaIdsInFormula))
+                    )
+            );
+
+            /* Aggregate. Group the criterion averages per candidate */
+            Map<UUID, Map<String, Double>> candidateCriterionAverages = scores
+                    .stream()
+                    .collect(
+                            Collectors.groupingBy(
+                                    score -> {
+                                        return score.getCandidate().getId();
+                                    },
+                                    Collectors.groupingBy(score -> {
+                                                return formulaEncoder.encodeUUID(score.getCriterion().getId());
+                                            },
+                                            Collectors.averagingInt(Score::getValue)
+                                    )
+                            )
+                    );
+
+            /* Get candidateSegmentQualification rows for the candidates */
+            List<CandidateSegmentQualification> candidateSegmentQualifications = csqRepository.findAll(
+                    Specification.allOf(
+                            CandidateSegmentQualificationSpecification.hasSegment(segment.getId()),
+                            CandidateSegmentQualificationSpecification.hasCandidates(candidateIds)
+                    )
+            );
+
+            /* Turn the csq rows from a list to map for O(1) lookup */
+            Map<UUID, CandidateSegmentQualification> candidateSegmentQualificationMap =
+                    candidateSegmentQualifications
+                            .stream()
+                            .collect(
+                                    Collectors.toMap(
+                                            csqRow -> csqRow.getCandidate().getId(),
+                                            Function.identity()
+                                    )
+                            );
+
+            /* Create shared parser */
+            ExpressionParser parser = new SpelExpressionParser();
+            /* Parse the formula and reuse it. Parsing is expensive! */
+            Expression expression = parser.parseExpression(segment.getFormula());
+            /* Collect the results */
+            List<CandidateResult> femaleCandidateResults = new ArrayList<>();
+            List<CandidateResult> maleCandidateResults = new ArrayList<>();
+            /* Loop through all candidates and use their criterion averages to fill the formula */
+            candidateCriterionAverages.forEach((candidateId, criterionAverages) -> {
+                /* Load the criterion averages into context */
+                StandardEvaluationContext context = new StandardEvaluationContext(criterionAverages);
+                /* Substitute the criterion score average in the formula */
+                criterionAverages.forEach(context::setVariable);
+                /* Evaluate the expression */
+                Double result = expression.getValue(context, Double.class);
+                /* Push the result to the candidate result list */
+                if (candidateGenders.get(candidateId).equals(CandidateGender.FEMALE)) {
+                    femaleCandidateResults.add(new CandidateResult(candidateId, result));
+                } else if (candidateGenders.get(candidateId).equals(CandidateGender.MALE)) {
+                    maleCandidateResults.add(new CandidateResult(candidateId, result));
+                }
+
+                String substitutedFormula = segment.getFormula();
+                for (Map.Entry<String, Double> entry : criterionAverages.entrySet()) {
+                    substitutedFormula = substitutedFormula.replace(
+                            "#" + entry.getKey(),
+                            entry.getValue().toString()
+                    );
+                }
+                System.out.println(candidateLastNames.get(candidateId) + " : " + substitutedFormula + " = " + result);
+            });
+
+            /* Sort results in descending order */
+            femaleCandidateResults.sort((a, b) -> {
+                return Double.compare(b.getResult(), a.getResult());
+            });
+            maleCandidateResults.sort((a, b) -> {
+                return Double.compare(b.getResult(), a.getResult());
+            });
+
+            /* Get the qualified candidates */
+            Set<UUID> qualifiedFemaleCandidateIds = femaleCandidateResults
+                    .stream()
+                    .limit(segment.getCandidateLimit())
+                    .map(CandidateResult::getCandidateId)
+                    .collect(Collectors.toSet());
+            Set<UUID> qualifiedMaleCandidateIds = maleCandidateResults
+                    .stream()
+                    .limit(segment.getCandidateLimit())
+                    .map(CandidateResult::getCandidateId)
+                    .collect(Collectors.toSet());
+
+            /* Update the CSQs. Batch save to lessen db queries */
+            List<CandidateSegmentQualification> updatedCSQs = new ArrayList<>();
+            for (CandidateSegmentQualification csq : candidateSegmentQualificationMap.values()) {
+                UUID candidateId = csq.getCandidate().getId();
+                if (qualifiedFemaleCandidateIds.contains(candidateId)) {
+                    csq.setQualified(true);
+                } else if (qualifiedMaleCandidateIds.contains(candidateId)) {
+                    csq.setQualified(true);
+                } else {
+                    csq.setQualified(false);
+                }
+                updatedCSQs.add(csq);
+            }
+            csqRepository.saveAll(updatedCSQs);
+        }
+
+        return mapper.toDetailedDTO(segmentRepository.save(segment));
+    }
+
+    @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
     })
