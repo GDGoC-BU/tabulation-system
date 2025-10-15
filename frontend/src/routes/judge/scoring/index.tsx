@@ -21,6 +21,9 @@ import { Input } from '@/components/ui/input'
 import useDebounce from '@/hooks/use-debounce'
 import useEditScoreMutate from '@/features/scores/hooks/use-edit-score-mutate'
 import splitCandidates from '@/features/candidates/lib/split-candidates'
+import capitalizeWords from '@/lib/capitalize-words'
+import { useJudgeQuery } from '@/features/judges/hooks/use-judge-query'
+import { useOngoingSegmentQuery } from '@/features/segments/hooks/use-ongoing-segment-query'
 
 function ScoreInputForm({
   score,
@@ -68,7 +71,7 @@ function ScoreInputForm({
               defaultValue={score.value}
               type="number"
               min={0}
-              max={5}
+              max={score.criterion.maxScore}
               onChange={(e) => setScoreValue(parseInt(e.target.value))}
             />
           </div>
@@ -89,6 +92,14 @@ function CandidateScoreCard({
   const [scoreValues, setScoreValues] = useState(() =>
     Object.fromEntries(scores.map((score) => [score.id, score.value])),
   )
+
+  useEffect(() => {
+    if (scores) {
+      setScoreValues(
+        Object.fromEntries(scores.map((score) => [score.id, score.value])),
+      )
+    }
+  }, [scores])
 
   /* Prop drill and handle total score count client side to minimize expensive score fetching and keep it simple. */
   const handleScoreChange = (id: string, value: number) => {
@@ -153,39 +164,39 @@ function CandidateScoreCard({
   )
 }
 
-function NoActiveSegmentRenderer() {
-  const { data: currentPhase } = useOngoingPhaseQuery()
+// function NoActiveSegmentRenderer() {
+//   const { data: currentPhase } = useOngoingPhaseQuery()
 
-  if (!currentPhase) return
+//   if (!currentPhase) return
 
-  let title = 'No active segment'
-  let body = 'Kindly wait for admin to start the next segment'
+//   let title = 'No active segment'
+//   let body = 'Kindly wait for admin to start the next segment'
 
-  const PENDING = phaseSegmentStatusValue.enum.PENDING
-  const ONGOING = phaseSegmentStatusValue.enum.ONGOING
-  const CLOSED = phaseSegmentStatusValue.enum.CLOSED
+//   const PENDING = phaseSegmentStatusValue.enum.PENDING
+//   const ONGOING = phaseSegmentStatusValue.enum.ONGOING
+//   const CLOSED = phaseSegmentStatusValue.enum.CLOSED
 
-  if (currentPhase.segments.every((segment) => segment.status === CLOSED)) {
-    title = `${currentPhase.name} has completed!`
-    body = 'Thank you for participating in this pageant.'
-  } else if (
-    currentPhase.segments.every((segment) => segment.status === PENDING)
-  ) {
-    title = `${currentPhase.name} has not started`
-    body = 'Kindly wait for admin to start a segment'
-  }
+//   if (currentPhase.segments.every((segment) => segment.status === CLOSED)) {
+//     title = `${currentPhase.name} has completed!`
+//     body = 'Thank you for participating in this pageant.'
+//   } else if (
+//     currentPhase.segments.every((segment) => segment.status === PENDING)
+//   ) {
+//     title = `${currentPhase.name} has not started`
+//     body = 'Kindly wait for admin to start a segment'
+//   }
 
-  return (
-    <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
-      <div className="flex flex-col text-center gap-2">
-        <Scoring.TabsFacade.Body.Title>{title}</Scoring.TabsFacade.Body.Title>
-        <Scoring.TabsFacade.Body.Description>
-          {body}
-        </Scoring.TabsFacade.Body.Description>
-      </div>
-    </Scoring.TabsFacade.Body>
-  )
-}
+//   return (
+//     <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
+//       <div className="flex flex-col text-center gap-2">
+//         <Scoring.TabsFacade.Body.Title>{title}</Scoring.TabsFacade.Body.Title>
+//         <Scoring.TabsFacade.Body.Description>
+//           {body}
+//         </Scoring.TabsFacade.Body.Description>
+//       </div>
+//     </Scoring.TabsFacade.Body>
+//   )
+// }
 
 export const Route = createFileRoute('/judge/scoring/')({
   component: JudgeScoring,
@@ -195,6 +206,7 @@ function JudgeScoring() {
   const queryClient = useQueryClient()
 
   const { account, getAssignedPageantId } = useAuthenticationStore()
+  const { data: judge } = useJudgeQuery(account?.id)
   const { setSelectedPageantId } = useSelectedPageantIdStore()
   const { data: assignedPageant } = usePageantQuery(getAssignedPageantId())
 
@@ -241,7 +253,6 @@ function JudgeScoring() {
         try {
           const data = JSON.parse(message.body)
           setOngoingSegmentId(data?.id ?? null)
-          queryClient.invalidateQueries({ queryKey: ['phases', 'ongoing'] })
         } catch (err) {
           console.error('Failed to parse STOMP message', err)
         }
@@ -336,7 +347,16 @@ function JudgeScoring() {
   ) : (
     /* Temporary body for inactive segments. Special cases apply
        when all segments are PENDING and CLOSED  */
-    <NoActiveSegmentRenderer />
+    <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
+      <div className="flex flex-col text-center gap-2">
+        <Scoring.TabsFacade.Body.Title>
+          No active segment
+        </Scoring.TabsFacade.Body.Title>
+        <Scoring.TabsFacade.Body.Description>
+          Kindly wait for admin to start the next segment
+        </Scoring.TabsFacade.Body.Description>
+      </div>
+    </Scoring.TabsFacade.Body>
   )
 
   return (
@@ -344,7 +364,11 @@ function JudgeScoring() {
       <Scoring.Header>
         <TextDisplay>{assignedPageant?.title}</TextDisplay>
         <Scoring.Header.Title>{currentPhase?.name}</Scoring.Header.Title>
-        <Scoring.Header.Sub>Welcome, {account?.username}</Scoring.Header.Sub>
+        <Scoring.Header.Sub>
+          Welcome, {capitalizeWords(judge?.honorific ?? '') + '.'}{' '}
+          {capitalizeWords(judge?.firstName ?? '')}{' '}
+          {capitalizeWords(judge?.lastName ?? '')}
+        </Scoring.Header.Sub>
       </Scoring.Header>
       <Scoring.Content>
         <Scoring.TabsFacade>

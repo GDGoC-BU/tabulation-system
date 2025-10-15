@@ -1,25 +1,24 @@
 import { useQuery } from '@tanstack/react-query'
-import { judgesSchema } from '../schemas'
+import { judgeSummarySchema } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function useJudgesQuery() {
+export function useJudgeQuery(id: string | null | undefined) {
   return useQuery({
-    queryKey: ['judges'],
+    queryKey: ['judges', id],
     queryFn: async () => {
       try {
-        const response = await api.get('/judges')
-        console.log(response.data)
-        const parsedResponse = judgesSchema.safeParse(response.data)
+        const response = await api.get(`/judges/${id}`)
+        const parsedResponse = judgeSummarySchema.safeParse(response.data)
         if (!parsedResponse.success) {
-          console.error("/judges response doesn't match schema!")
-          return []
+          throw new Error(`/judges/id response doesn't match schema!`)
         }
         return parsedResponse.data
       } catch (error) {
         throw errorResolver(error)
       }
     },
+    enabled: !!id,
     staleTime: 1000 * 60 * 10,
   })
 }

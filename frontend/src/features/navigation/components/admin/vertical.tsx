@@ -63,8 +63,8 @@ const pageantAction = [
 export default function Vertical() {
   const { data } = useSelectedPageantQuery()
 
-  const showManagePageantLinks =
-    !data || data.status.value !== pageantStatusValue.enum.PREPARATION
+  const showManagePageantLinks = true
+  // !data || data.status.value !== pageantStatusValue.enum.PREPARATION
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
@@ -130,8 +130,8 @@ export default function Vertical() {
                   <SidebarMenuItem
                     className={
                       showManagePageantLinks
-                        ? 'pointer-events-none opacity-50'
-                        : ''
+                        ? ''
+                        : 'pointer-events-none opacity-50'
                     }
                   >
                     <SidebarMenuButton asChild>

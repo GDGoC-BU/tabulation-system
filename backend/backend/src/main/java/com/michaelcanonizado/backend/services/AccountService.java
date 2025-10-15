@@ -5,10 +5,10 @@ import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.account.AccountCreateDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountLoginDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountSummaryDTO;
+import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.*;
 import com.michaelcanonizado.backend.mappers.AccountMapper;
-import com.michaelcanonizado.backend.mappers.AdminMapper;
 import com.michaelcanonizado.backend.mappers.JudgeMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
@@ -50,6 +50,9 @@ public class AccountService {
 
     @Autowired
     private AccountMapper accountMapper;
+
+    @Autowired
+    private JudgeMapper judgeMapper;
 
     @Autowired
     private PageantContext pageantContext;
@@ -107,6 +110,7 @@ public class AccountService {
     }
 
     public AccountSummaryDTO createAdmin(AccountCreateDTO request) {
+        /* Use mapstruct here to encode! */
         String username = request.username();
         String password = request.password();
         String passwordHash = passwordEncoder.encode(password);
@@ -117,21 +121,20 @@ public class AccountService {
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
     })
-    public AccountSummaryDTO createJudge(AccountCreateDTO request) {
-        String username = request.username();
-        String password = request.password();
-        String passwordHash = passwordEncoder.encode(password);
+    public AccountSummaryDTO createJudge(JudgeCreateDTO request) {
+        /* Password encoding is done by mapper */
+        Judge judge = judgeMapper.toEntity(request);
 
         UUID selectedPageantId = pageantContext.getId();
         Pageant pageant = pageantRepository.findById(selectedPageantId).orElseThrow(() -> {
             return new PageantAccessDeniedException(
-                    "Pageant not found! Can't perform operation",
+                    "Pageant not found! Can't create judge",
                     ErrorCode.PAGEANT_ACCESS_DENIED
             );
         });
+        /* Connect pageant */
+        judge.setPageant(pageant);
 
-        /* Create judge through account */
-        Judge judge = new Judge(username, passwordHash, pageant);
         Account savedAccount = accountRepository.save(judge);
 
         /* Refetch judge to get a managed entity to

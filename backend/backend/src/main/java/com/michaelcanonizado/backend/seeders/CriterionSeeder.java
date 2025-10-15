@@ -27,19 +27,20 @@ public class CriterionSeeder implements DatabaseSeeder {
     private final CriterionRepository criterionRepository;
 
     private final List<CriterionItem> criteria = Arrays.asList(
-            new CriterionItem("Interview Criterion 1", 5, "Interview Proper"),
-            new CriterionItem("Interview Criterion 2", 5, "Interview Proper"),
-            new CriterionItem("Interview Criterion 3", 5, "Interview Proper"),
-            new CriterionItem("Beauty of Figure", 5, "Swimwear"),
-            new CriterionItem("Stage Presence", 5, "Swimwear"),
-            new CriterionItem("Poise and Personality", 5, "Swimwear"),
-            new CriterionItem("Attire and Carriage", 5, "Formal Attire"),
-            new CriterionItem("Stage Presence", 5, "Formal Attire"),
-            new CriterionItem("Poise and Bearing", 5, "Formal Attire"),
-            new CriterionItem("Intelligence", 5, "Question and Answer"),
-            new CriterionItem("Poise and Personality", 5, "Question and Answer"),
-            new CriterionItem("Intelligence and Wit", 5, "Final Round"),
-            new CriterionItem("Poise, Confidence, and Personality", 5, "Final Round")
+            new CriterionItem("Presence and Projection", 25, "Swimwear"),
+            new CriterionItem("Poise", 20, "Swimwear"),
+            new CriterionItem("Physical Well-being and Vitality", 5, "Swimwear"),
+
+            new CriterionItem("Attire, Elegance, and Grace", 30, "Formal Attire"),
+            new CriterionItem("Stage Presence", 20, "Formal Attire"),
+
+            new CriterionItem("Intelligence", 50, "Preliminary Question and Answer"),
+            new CriterionItem("Alignment with Advocacy or Purpose", 25, "Preliminary Question and Answer"),
+            new CriterionItem("Poise and Personality", 25, "Preliminary Question and Answer"),
+
+            new CriterionItem("Intelligence", 50, "Final Question and Answer"),
+            new CriterionItem("Relevance", 25, "Final Question and Answer"),
+            new CriterionItem("Poise and Personality", 25, "Final Question and Answer")
     );
 
     @Autowired

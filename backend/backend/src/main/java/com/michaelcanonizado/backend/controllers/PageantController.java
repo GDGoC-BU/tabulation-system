@@ -4,7 +4,6 @@ import com.michaelcanonizado.backend.dtos.pageant.PageantCreateDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantHierarchyDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantUpdateDTO;
-import com.michaelcanonizado.backend.dtos.phase.PhaseHierarchyDTO;
 import com.michaelcanonizado.backend.services.PageantService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +69,14 @@ public class PageantController {
             @RequestBody @Valid PageantUpdateDTO pageantUpdateDTO
     ) {
         PageantSummaryDTO pageant = service.updatePageant(id, pageantUpdateDTO);
+        return new ResponseEntity<>(pageant, HttpStatus.OK);
+    }
+
+    @PutMapping("/pageants/{id}/soft-reset")
+    public ResponseEntity<PageantSummaryDTO> resetPageant(
+            @PathVariable UUID id
+    ) {
+        PageantSummaryDTO pageant = service.softResetPageant(id);
         return new ResponseEntity<>(pageant, HttpStatus.OK);
     }
 

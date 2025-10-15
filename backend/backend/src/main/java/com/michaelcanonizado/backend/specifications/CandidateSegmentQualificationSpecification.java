@@ -1,9 +1,6 @@
 package com.michaelcanonizado.backend.specifications;
 
-import com.michaelcanonizado.backend.models.CandidateSegmentQualification;
-import com.michaelcanonizado.backend.models.Criterion;
-import com.michaelcanonizado.backend.models.Score;
-import com.michaelcanonizado.backend.models.Segment;
+import com.michaelcanonizado.backend.models.*;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,6 +28,22 @@ public class CandidateSegmentQualificationSpecification {
             Join<CandidateSegmentQualification, Segment> segment = root.join("segment", JoinType.INNER);
             /* where seg.id = <segmentId> */
             return criteriaBuilder.equal(segment.get("id"), segmentId);
+        };
+    }
+
+    public static Specification<CandidateSegmentQualification> hasPageant(UUID pageantId) {
+        return (root, query, criteriaBuilder) -> {
+            if (pageantId == null) return null;
+
+            /* select * from candidateSegmentQualification csq */
+            /* join csq.segment seg */
+            Join<CandidateSegmentQualification, Segment> segment = root.join("segment", JoinType.INNER);
+            /* join seg.phase phs */
+            Join<Segment, Phase> phase = segment.join("phase", JoinType.INNER);
+            /* join phs.pageant pag */
+            Join<Phase, Pageant> pageant = phase.join("pageant", JoinType.INNER);
+            /* where pag.id = <pageantId> */
+            return criteriaBuilder.equal(pageant.get("id"), pageantId);
         };
     }
 }

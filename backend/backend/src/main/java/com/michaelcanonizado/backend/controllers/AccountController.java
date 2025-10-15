@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.controllers;
 import com.michaelcanonizado.backend.dtos.account.AccountCreateDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountLoginDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountSummaryDTO;
+import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.models.Account;
 import com.michaelcanonizado.backend.services.AccountService;
 import jakarta.validation.Valid;
@@ -34,8 +35,8 @@ public class AccountController {
     }
 
     @PostMapping("/accounts/judge")
-    public ResponseEntity<AccountSummaryDTO> createJudge(@RequestBody @Valid AccountCreateDTO accountCreateDTO) {
-        AccountSummaryDTO account = service.createJudge(accountCreateDTO);
+    public ResponseEntity<AccountSummaryDTO> createJudge(@RequestBody @Valid JudgeCreateDTO judgeCreateDTO) {
+        AccountSummaryDTO account = service.createJudge(judgeCreateDTO);
         return new ResponseEntity<>(account, HttpStatus.CREATED);
     }
 

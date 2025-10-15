@@ -18,5 +18,6 @@ export function useOngoingPhaseQuery() {
         throw errorResolver(error)
       }
     },
+    // staleTime: 1000 * 60 * 10,
   })
 }

@@ -115,6 +115,7 @@ public class PhaseService {
 
         /* Revisit this. Might want to add a check to verify that only 1 phase should be ongoing */
 
+        /* This is doesnt check if it belongs to the pageant! */
         Phase ongoingPhase = phaseRepository.findByStatus(PhaseSegmentStatus.ONGOING).orElseThrow(() -> {
             return new EntityNotFoundException(
                     "No ongoing phase for pageant!",
