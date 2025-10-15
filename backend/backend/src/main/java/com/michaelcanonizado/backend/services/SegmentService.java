@@ -281,6 +281,28 @@ public class SegmentService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.ONGOING
+    })
+    public SegmentDetailedDTO getOngoingSegment() {
+        UUID selectedPageantId = pageantContext.getId();
+
+        /* Revisit this. Might want to add a check to verify that only 1 phase should be ongoing */
+
+        /* This is doesnt check if it belongs to the pageant! */
+        Segment ongoingSegment = segmentRepository.findByStatus(PhaseSegmentStatus.ONGOING).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "No ongoing segment for pageant!",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        });
+
+        return mapper.toDetailedDTO(ongoingSegment);
+    }
+
+    @RequirePageantStatus({
+            PageantStatus.PREPARATION,
             PageantStatus.ONGOING
     })
     @Transactional

@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.controllers;
 
+import com.michaelcanonizado.backend.dtos.phase.PhaseDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
@@ -42,6 +43,12 @@ public class SegmentController {
     @GetMapping("/segments/{id}")
     public ResponseEntity<SegmentDetailedDTO> getSegment(@PathVariable UUID id) {
         SegmentDetailedDTO segment = service.getSegment(id);
+        return new ResponseEntity<>(segment, HttpStatus.OK);
+    }
+
+    @GetMapping("/segments/ongoing")
+    public ResponseEntity<SegmentDetailedDTO> getOngoingSegment() {
+        SegmentDetailedDTO segment = service.getOngoingSegment();
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 
