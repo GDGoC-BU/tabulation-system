@@ -93,6 +93,20 @@ export const segmentTableColumns: Array<
       const segment = row.original
       return (
         <Link
+          to={'/admin/console/segments/$segmentId/qualified'}
+          params={{ segmentId: segment.id }}
+        >
+          Get Qualified Candidates
+        </Link>
+      )
+    },
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const segment = row.original
+      return (
+        <Link
           to={'/admin/console/segments/$segmentId/edit'}
           params={{ segmentId: segment.id }}
         >
