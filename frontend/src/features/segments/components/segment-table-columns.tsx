@@ -88,7 +88,7 @@ export const segmentTableColumns: Array<
     },
   },
   {
-    id: 'actions',
+    id: 'qualified-candidates',
     cell: ({ row }) => {
       const segment = row.original
       return (

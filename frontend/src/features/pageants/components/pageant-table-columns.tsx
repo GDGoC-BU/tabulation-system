@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import PageantTitle from './pageant-title'
 import PageantEditFormDialog from './pageant-edit-form-dialog'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -73,6 +74,20 @@ export const pageantTableColumns: Array<ColumnDef<PageantSummary>> = [
       }).format(date)
 
       return <TextBody>{formatted}</TextBody>
+    },
+  },
+  {
+    id: 'soft-reset',
+    cell: ({ row }) => {
+      const pageant = row.original
+      return (
+        <Link
+          to={'/admin/console/pageants/$pageantId/soft-reset'}
+          params={{ pageantId: pageant.id }}
+        >
+          Soft Reset
+        </Link>
+      )
     },
   },
   {

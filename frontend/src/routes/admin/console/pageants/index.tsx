@@ -5,7 +5,7 @@ import { pageantTableColumns } from '@/features/pageants/components/pageant-tabl
 import { usePageantsQuery } from '@/features/pageants/hooks/use-pageants-query'
 import PageantAddFormDialog from '@/features/pageants/components/pageant-add-form-dialog'
 
-export const Route = createFileRoute('/admin/console/pageants')({
+export const Route = createFileRoute('/admin/console/pageants/')({
   component: AdminConsolePageants,
 })
 
