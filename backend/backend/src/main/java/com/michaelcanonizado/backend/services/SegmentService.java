@@ -427,6 +427,8 @@ public class SegmentService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
             PageantStatus.ONGOING
     })
     @Transactional
@@ -442,7 +444,7 @@ public class SegmentService {
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
             PageantStatus.FINALIZING,
-            PageantStatus.ONGOING
+            PageantStatus.CLOSED
     })
     public SegmentDetailedDTO getOngoingSegment() {
         UUID selectedPageantId = pageantContext.getId();
@@ -462,6 +464,8 @@ public class SegmentService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
             PageantStatus.ONGOING
     })
     @Transactional

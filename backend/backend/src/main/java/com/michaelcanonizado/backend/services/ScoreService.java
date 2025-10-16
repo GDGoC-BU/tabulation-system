@@ -35,7 +35,9 @@ public class ScoreService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public List<ScoreDetailedDTO> getScores(UUID judgeId, UUID candidateId, UUID criterionId, UUID segmentId) {
         UUID selectedPageantId = pageantContext.getId();

@@ -34,7 +34,9 @@ public class JudgeService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public JudgeSummaryDTO getJudge(UUID id) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
@@ -51,6 +53,8 @@ public class JudgeService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
             PageantStatus.ONGOING
     })
     public List<JudgeSummaryDTO> getJudges() {
