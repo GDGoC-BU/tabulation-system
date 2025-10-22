@@ -21,6 +21,8 @@ public interface SegmentMapper {
     @Mapping(target = "formula", source = "formula", qualifiedByName = "decodeFormula")
     SegmentDetailedDTO toDetailedDTO(Segment segment);
 
+    SegmentBreakdownDTO toBreakdownDTO(Segment segment);
+
     @Mapping(target = "formula", source = "formula", qualifiedByName = "decodeFormula")
     SegmentHierarchyDTO toHierarchyDTO(Segment segment);
 

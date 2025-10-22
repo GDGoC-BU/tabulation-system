@@ -63,6 +63,13 @@
 			<version>0.12.6</version>
 		</dependency>
 
+		<!-- JSON column in database (change this comment) -->
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-60</artifactId>
+			<version>3.9.0</version>
+		</dependency>
+
 		<!-- Websocket -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

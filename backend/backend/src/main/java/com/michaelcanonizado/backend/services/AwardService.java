@@ -6,10 +6,13 @@ import com.michaelcanonizado.backend.dtos.awardLeaderboard.AwardLeaderboardSumma
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
+import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentBreakdownDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
-import com.michaelcanonizado.backend.mappers.AwardLeaderboardMapper;
-import com.michaelcanonizado.backend.mappers.AwardMapper;
+import com.michaelcanonizado.backend.mappers.*;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.contexts.PageantContext;
@@ -37,6 +40,9 @@ public class AwardService {
     private CandidateRepository candidateRepository;
 
     @Autowired
+    private CriterionRepository criterionRepository;
+
+    @Autowired
     private AwardLeaderboardRepository awardLeaderboardRepository;
 
     @Autowired
@@ -47,6 +53,21 @@ public class AwardService {
 
     @Autowired
     private AwardMapper awardMapper;
+
+    @Autowired
+    private PhaseMapper phaseMapper;
+
+    @Autowired
+    private SegmentMapper segmentMapper;
+
+    @Autowired
+    private CriterionMapper criterionMapper;
+
+    @Autowired
+    private JudgeMapper judgeMapper;
+
+    @Autowired
+    private ScoreMapper scoreMapper;
 
     @Autowired
     private AwardLeaderboardMapper awardLeaderboardMapper;
@@ -137,6 +158,9 @@ public class AwardService {
     })
     @Transactional
     public AwardDetailedDTO calculateAwardResult(UUID id) {
+        /* NOTE: Use Maps to search for entities inside the candidate-formula
+           evaluator. */
+
         UUID selectedPageantId = pageantContext.getId();
 
         /* Get award */
@@ -153,13 +177,45 @@ public class AwardService {
         /* Extract criterion ids from formula */
         Set<UUID> criteriaIdsInFormula = formulaEncoder.extractEncodedUUIDs(award.getFormula());
 
+        /* Fetch candidates, but only get ids */
         List<UUID> candidateIds = candidateRepository
                                     .findAllByPageant_Id(selectedPageantId)
                                     .stream()
                                     .map(Candidate::getId)
                                     .toList();
 
-        /* Fetch relevant scores: */
+        /* Fetch the criteria in the formula */
+        List<Criterion> criteriaInFormula = criterionRepository.findAllById(criteriaIdsInFormula);
+        /* Load criteria in a Map for faster lookup */
+        Map<UUID, Criterion> criteriaMap = criteriaInFormula
+                .stream()
+                .collect(
+                        Collectors.toMap(
+                                Criterion::getId,
+                                Function.identity(),
+                                (existing, replacement) -> existing
+                        )
+                );
+
+        /* Pregenerate the phase-segment-criterion details for the breakdowns.
+           All criteria in the formula for all candidates are the same, this prevents
+           redundant queries when we build the whole breakdown inside the candidate-formula
+           evaluator loop. (Rephrase this comment) */
+        Map<UUID, CriteriaBreakdown> criteriaBreakdownTemplates = new HashMap<>();
+        for (UUID criterionId : criteriaIdsInFormula) {
+            Criterion criterion = criteriaMap.get(criterionId);
+
+            PhaseBreakdownDTO phaseBreakdown = phaseMapper.toBreakdownDTO(criterion.getSegment().getPhase());
+            SegmentBreakdownDTO segmentBreakdown = segmentMapper.toBreakdownDTO(criterion.getSegment());
+            CriterionBreakdownDTO criterionBreakdown = criterionMapper.toBreakdownDTO(criterion);
+
+            criteriaBreakdownTemplates.put(
+                    criterionId,
+                    new CriteriaBreakdown(phaseBreakdown, segmentBreakdown, criterionBreakdown, null, null)
+            );
+        }
+
+        /* Fetch relevant scores */
         List<Score> scores = scoreRepository.findAll(
                 Specification.allOf(
                         /* Scores that belong to the selected pageant */
@@ -170,6 +226,19 @@ public class AwardService {
                         ScoreSpecification.hasCriteria(new ArrayList<>(criteriaIdsInFormula))
                 )
         );
+
+        /* Map to search for scores for a candidate over a criterion
+           Map<CandidateID, Map<CriterionId, List<Score>>> */
+        Map<UUID, Map<UUID, List<Score>>> scoreMap = new HashMap<>();
+        for (Score score : scores) {
+            UUID candidateId = score.getCandidate().getId();
+            UUID criterionId = score.getCriterion().getId();
+
+            scoreMap
+                    .computeIfAbsent(candidateId, k -> new HashMap<>())
+                    .computeIfAbsent(criterionId, k -> new ArrayList<>())
+                    .add(score);
+        }
 
         /* Aggregate the scores in a more operable format.
            Candidates will have a list of their Criterion
@@ -220,12 +289,10 @@ public class AwardService {
                         )
                 );
 
-        /* Get award's leaderboard (Pre-generate when creating award and candidate)
-           At this point all rows should have score = 0. So just update them. */
+        /* Get award's leaderboard rows (Pre-generate when creating award and candidate)
+           At this point all rows should have score = 0 and breakdown = [null]. So just update them. */
         List<AwardLeaderboard> leaderboard = awardLeaderboardRepository.findAllByAward_Id(id);
-        /* Map leaderboard by candidate id. This makes it more efficient and
-           easier to perform update. O(1) lookup!
-           ( Nested loops = NOOBS , lists = AMATEUR , hashmaps = PRO | XD ). */
+        /* Map leaderboard row to its candidate */
         Map<UUID, AwardLeaderboard> candidateRowsInLeaderboard =
                 leaderboard
                     .stream()
@@ -240,10 +307,11 @@ public class AwardService {
         ExpressionParser parser = new SpelExpressionParser();
         /* Parse the formula and reuse it. Parsing is expensive! */
         Expression expression = parser.parseExpression(award.getFormula());
-        /* Loop through all candidates and use their criterion averages to fill the formula */
+        /* Loop through all candidates evaluate the formula */
         candidateCriterionAverages.forEach((candidateId, criterionAverages) -> {
             /* Load the criterion averages into context */
             StandardEvaluationContext context = new StandardEvaluationContext(criterionAverages);
+
             /* Substitute the #criterionUUID using criterionAverages.
 
                E.g:
@@ -261,23 +329,46 @@ public class AwardService {
             /* Evaluate the expression: "0.4 * 85.5 + 0.4 * 90.0" --> 88.2
                This is then the candidate's score for the award */
             Double result = expression.getValue(context, Double.class);
-            AwardLeaderboard row = candidateRowsInLeaderboard.get(candidateId);
-            row.setScore(result);
 
-            String substitutedFormula = award.getFormula();
-            for (Map.Entry<String, Double> entry : criterionAverages.entrySet()) {
-                // entry.getKey() is something like "C1234abcd..."
-                // but note: in the formula it's "#C1234abcd..."
-                substitutedFormula = substitutedFormula.replace(
-                        "#" + entry.getKey(),
-                        entry.getValue().toString()
+            /* Get candidate's award leaderboard row */
+            AwardLeaderboard leaderboardRow = candidateRowsInLeaderboard.get(candidateId);
+            leaderboardRow.setScore(result);
+
+            List<CriteriaBreakdown> criteriaBreakdowns = new ArrayList<>();
+            /* Go through the criteria in the formula and build the breakdown */
+            criteriaIdsInFormula.forEach(criterionId -> {
+                /* Get scores for the current candidate and current criterion */
+                List<Score> scoresForCriterion = scoreMap
+                        .getOrDefault(candidateId, Map.of())
+                        .getOrDefault(criterionId, List.of());
+
+                /* Get pregenerated breakdown for the current criterion */
+                CriteriaBreakdown breakdownTemplate = criteriaBreakdownTemplates.get(criterionId);
+
+                /* Calculate the average score for the current criterion */
+                Double averageScore = scoresForCriterion.stream()
+                        .mapToInt(Score::getValue)
+                        .average()
+                        .orElse(0.0);
+
+                List<ScoreBreakdownDTO> scoresBreakdown = scoresForCriterion.stream().map(score -> {
+                    return scoreMapper.toBreakdownDTO(score);
+                }).toList();
+
+                CriteriaBreakdown criteriaBreakdown = new CriteriaBreakdown(
+                        breakdownTemplate.getPhase(),
+                        breakdownTemplate.getSegment(),
+                        breakdownTemplate.getCriterion(),
+                        averageScore,
+                        scoresBreakdown
                 );
-            }
-            System.out.println(candidateId + " : " + substitutedFormula);
+                criteriaBreakdowns.add(criteriaBreakdown);
+            });
+            /* CriterionBreakdown is stored as JSONB. Completely change it so JPA notices the change */
+            leaderboardRow.setCriteriaBreakdown(criteriaBreakdowns);
         });
         /* Save updated leaderboard */
         List<AwardLeaderboard> updatedLeaderboard = awardLeaderboardRepository.saveAll(candidateRowsInLeaderboard.values());
-
         return awardMapper.toDetailedDTO(award);
     }
 

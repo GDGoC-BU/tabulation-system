@@ -12,6 +12,7 @@ public interface PhaseMapper {
     Phase toEntity(PhaseCreateDTO phaseCreateDTO);
     PhaseSummaryDTO toSummaryDTO(Phase phase);
     PhaseDetailedDTO toDetailedDTO(Phase phase);
+    PhaseBreakdownDTO toBreakdownDTO(Phase phase);
     PhaseHierarchyDTO toHierarchyDTO(Phase phase);
 
     void updateEntityFromDTO(@MappingTarget Phase phase, PhaseUpdateDTO phaseUpdateDTO);
