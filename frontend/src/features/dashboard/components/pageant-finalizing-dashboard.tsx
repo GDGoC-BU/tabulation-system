@@ -83,6 +83,7 @@ export default function PageantFinalizingDashboard() {
   const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
   const { data: awards } = useAwardsQuery()
   const awardResults = useAwardCalculations(awards)
+  // const awardResults = useAwardCalculations(awards ? [awards[0]] : awards)
 
   const { data: pageantHierarchy } = usePageantHierarchyQuery(
     selectedPageant?.id,

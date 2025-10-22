@@ -50,15 +50,15 @@ function RouteComponent() {
               <div className="border rounded-lg p-4 flex flex-col gap-4">
                 <div className="mt-4 mb-4 text-center">
                   <TextHeading>
-                    {capitalizeWords(judge.honorific) + '.'}{' '}
+                    {judge.username} | {capitalizeWords(judge.honorific) + '.'}{' '}
                     {capitalizeWords(judge.firstName)}{' '}
                     {capitalizeWords(judge.lastName)}
                   </TextHeading>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col  gap-4">
-                    <div className="text-center">
-                      <TextBody>FEMALE</TextBody>
+                    <div className="text-center bg-pink-400 w-fit mx-auto px-4 py-2 rounded-full">
+                      <TextBody className="text-background">FEMALE</TextBody>
                     </div>
                     {candidateGroupA.map((candidate) => {
                       const candidateScores = scores?.filter(
@@ -70,7 +70,7 @@ function RouteComponent() {
                       return (
                         <div className="border rounded-lg p-4 flex flex-col gap-4">
                           <div className="">
-                            <TextBody>
+                            <TextBody className="text-lg font-bold">
                               Candidate {candidate.number} :{' '}
                               {candidate.lastName}
                             </TextBody>
@@ -83,14 +83,14 @@ function RouteComponent() {
                               )
                               .map((score) => {
                                 return (
-                                  <div className="flex flex-row gap-4">
+                                  <div className="flex flex-row justify-between items-center gap-4">
                                     <div className="">
                                       <TextBody>
                                         {score.criterion.name}
                                       </TextBody>
                                     </div>
                                     <div className="">
-                                      <TextBody>
+                                      <TextBody className="text-lg font-bold">
                                         {score.value} /{' '}
                                         {score.criterion.maxScore}
                                       </TextBody>
@@ -104,8 +104,8 @@ function RouteComponent() {
                     })}
                   </div>
                   <div className="flex flex-col  gap-4">
-                    <div className="text-center">
-                      <TextBody>MALE</TextBody>
+                    <div className="text-center bg-blue-400 w-fit mx-auto px-4 py-2 rounded-full">
+                      <TextBody className="text-background">MALE</TextBody>
                     </div>
                     {candidateGroupB.map((candidate) => {
                       const candidateScores = scores?.filter(
@@ -117,7 +117,7 @@ function RouteComponent() {
                       return (
                         <div className="border rounded-lg p-4 flex flex-col gap-4">
                           <div className="">
-                            <TextBody>
+                            <TextBody className="text-lg font-bold">
                               Candidate {candidate.number} :{' '}
                               {candidate.lastName}
                             </TextBody>
@@ -130,14 +130,14 @@ function RouteComponent() {
                               )
                               .map((score) => {
                                 return (
-                                  <div className="flex flex-row gap-4">
+                                  <div className="flex flex-row justify-between items-center gap-4">
                                     <div className="">
                                       <TextBody>
                                         {score.criterion.name}
                                       </TextBody>
                                     </div>
                                     <div className="">
-                                      <TextBody>
+                                      <TextBody className="text-lg font-bold">
                                         {score.value} /{' '}
                                         {score.criterion.maxScore}
                                       </TextBody>

@@ -38,7 +38,7 @@ function RouteComponent() {
           <div className="flex flex-col gap-2">
             {candidateGroupA.map((candidate) => {
               return (
-                <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-4">
                   <div>
                     <TextBody>Candidate {candidate.number}</TextBody>
                   </div>
