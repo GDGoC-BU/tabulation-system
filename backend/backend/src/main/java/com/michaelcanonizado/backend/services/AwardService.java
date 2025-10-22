@@ -159,7 +159,7 @@ public class AwardService {
     @Transactional
     public AwardDetailedDTO calculateAwardResult(UUID id) {
         /* NOTE: Use Maps to search for entities inside the candidate-formula
-           evaluator. */
+           evaluator for faster [O(1)] lookup! */
 
         UUID selectedPageantId = pageantContext.getId();
 

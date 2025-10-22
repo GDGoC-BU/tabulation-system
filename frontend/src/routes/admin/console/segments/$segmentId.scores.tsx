@@ -50,7 +50,7 @@ function RouteComponent() {
               <div className="border rounded-lg p-4 flex flex-col gap-4">
                 <div className="mt-4 mb-4 text-center">
                   <TextHeading>
-                    {judge.username} | {capitalizeWords(judge.honorific) + '.'}{' '}
+                    {capitalizeWords(judge.honorific) + '.'}{' '}
                     {capitalizeWords(judge.firstName)}{' '}
                     {capitalizeWords(judge.lastName)}
                   </TextHeading>
