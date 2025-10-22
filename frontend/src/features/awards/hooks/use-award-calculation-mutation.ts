@@ -11,6 +11,7 @@ export function useAwardCalculations(awards?: Awards) {
       queryFn: async () => {
         try {
           const response = await api.post(`/awards/${award.id}/calculate`)
+          console.log('Res: ', response.data)
           const parsedResponse = awardDetailedSchema.safeParse(response.data)
           if (!parsedResponse.success) {
             throw new Error(
