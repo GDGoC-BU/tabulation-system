@@ -1,5 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
-import type { AwardDetailed } from '@/features/awards/schemas'
+import type {
+  AwardDetailed,
+  AwardLeaderboards,
+} from '@/features/awards/schemas'
 import { TextBody, TextHeading } from '@/components/text'
 import { Button } from '@/components/ui/button'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
@@ -8,12 +11,19 @@ import { useAwardsQuery } from '@/features/awards/hooks/use-awards-query'
 import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
-import { useAwardCalculations } from '@/features/awards/hooks/use-award-calculation-mutation'
+import { useAwardsCalculation } from '@/features/awards/hooks/use-awards-calculation-mutation'
 import { cn } from '@/lib/utils'
 import { candidateGender } from '@/features/candidates/schemas'
 
-function groupLeaderboardByGender(award: AwardDetailed | undefined) {
-  if (!award) return
+export function groupLeaderboardByGender(award: AwardDetailed | undefined): {
+  groupA: AwardLeaderboards
+  groupB: AwardLeaderboards
+} {
+  if (!award)
+    return {
+      groupA: [],
+      groupB: [],
+    }
 
   const groupA = award.leaderboard.filter(
     (entry) => entry.candidate.gender === candidateGender.enum.FEMALE,
@@ -26,16 +36,17 @@ function groupLeaderboardByGender(award: AwardDetailed | undefined) {
   return { groupA, groupB }
 }
 
-function AwardLeaderboard({
+export function AwardLeaderboard({
   leaderboard,
   limit,
 }: {
-  leaderboard: AwardDetailed['leaderboard']
+  leaderboard: AwardLeaderboards
   limit: number
 }) {
   return leaderboard.map((row, index) => {
     return (
       <div
+        key={row.id}
         className={cn(
           'border grid grid-cols-[50px_150px_1fr_max-content] items-center rounded-md divide-x',
           index < limit ? 'border-emerald-500' : 'border-red-600',
@@ -82,7 +93,7 @@ export default function PageantFinalizingDashboard() {
   const { mutateAsync } = useStatusChangeMutate()
   const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
   const { data: awards } = useAwardsQuery()
-  const awardResults = useAwardCalculations(awards)
+  const awardResults = useAwardsCalculation(awards)
   // const awardResults = useAwardCalculations(awards ? [awards[0]] : awards)
 
   const { data: pageantHierarchy } = usePageantHierarchyQuery(
@@ -127,10 +138,7 @@ export default function PageantFinalizingDashboard() {
             )
           }
 
-          const { groupA, groupB } = groupLeaderboardByGender(award) ?? {
-            groupA: [],
-            groupB: [],
-          }
+          const { groupA, groupB } = groupLeaderboardByGender(award)
 
           return (
             <div className="border rounded-lg p-4">

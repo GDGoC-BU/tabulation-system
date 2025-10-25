@@ -29,6 +29,7 @@ import { Route as AdminConsoleSegmentsSegmentIdScoresRouteImport } from './route
 import { Route as AdminConsoleSegmentsSegmentIdQualifiedRouteImport } from './routes/admin/console/segments/$segmentId.qualified'
 import { Route as AdminConsoleSegmentsSegmentIdEditRouteImport } from './routes/admin/console/segments/$segmentId.edit'
 import { Route as AdminConsolePageantsPageantIdSoftResetRouteImport } from './routes/admin/console/pageants/$pageantId.soft-reset'
+import { Route as AdminConsoleAwardsAwardIdResultsRouteImport } from './routes/admin/console/awards/$awardId.results'
 import { Route as AdminConsoleAwardsAwardIdEditRouteImport } from './routes/admin/console/awards/$awardId.edit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -137,6 +138,12 @@ const AdminConsolePageantsPageantIdSoftResetRoute =
     path: '/pageants/$pageantId/soft-reset',
     getParentRoute: () => AdminConsoleRouteRoute,
   } as any)
+const AdminConsoleAwardsAwardIdResultsRoute =
+  AdminConsoleAwardsAwardIdResultsRouteImport.update({
+    id: '/awards/$awardId/results',
+    path: '/awards/$awardId/results',
+    getParentRoute: () => AdminConsoleRouteRoute,
+  } as any)
 const AdminConsoleAwardsAwardIdEditRoute =
   AdminConsoleAwardsAwardIdEditRouteImport.update({
     id: '/awards/$awardId/edit',
@@ -162,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/admin/console/pageants': typeof AdminConsolePageantsIndexRoute
   '/admin/console/segments': typeof AdminConsoleSegmentsIndexRoute
   '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
+  '/admin/console/awards/$awardId/results': typeof AdminConsoleAwardsAwardIdResultsRoute
   '/admin/console/pageants/$pageantId/soft-reset': typeof AdminConsolePageantsPageantIdSoftResetRoute
   '/admin/console/segments/$segmentId/edit': typeof AdminConsoleSegmentsSegmentIdEditRoute
   '/admin/console/segments/$segmentId/qualified': typeof AdminConsoleSegmentsSegmentIdQualifiedRoute
@@ -183,6 +191,7 @@ export interface FileRoutesByTo {
   '/admin/console/pageants': typeof AdminConsolePageantsIndexRoute
   '/admin/console/segments': typeof AdminConsoleSegmentsIndexRoute
   '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
+  '/admin/console/awards/$awardId/results': typeof AdminConsoleAwardsAwardIdResultsRoute
   '/admin/console/pageants/$pageantId/soft-reset': typeof AdminConsolePageantsPageantIdSoftResetRoute
   '/admin/console/segments/$segmentId/edit': typeof AdminConsoleSegmentsSegmentIdEditRoute
   '/admin/console/segments/$segmentId/qualified': typeof AdminConsoleSegmentsSegmentIdQualifiedRoute
@@ -207,6 +216,7 @@ export interface FileRoutesById {
   '/admin/console/pageants/': typeof AdminConsolePageantsIndexRoute
   '/admin/console/segments/': typeof AdminConsoleSegmentsIndexRoute
   '/admin/console/awards/$awardId/edit': typeof AdminConsoleAwardsAwardIdEditRoute
+  '/admin/console/awards/$awardId/results': typeof AdminConsoleAwardsAwardIdResultsRoute
   '/admin/console/pageants/$pageantId/soft-reset': typeof AdminConsolePageantsPageantIdSoftResetRoute
   '/admin/console/segments/$segmentId/edit': typeof AdminConsoleSegmentsSegmentIdEditRoute
   '/admin/console/segments/$segmentId/qualified': typeof AdminConsoleSegmentsSegmentIdQualifiedRoute
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/admin/console/pageants'
     | '/admin/console/segments'
     | '/admin/console/awards/$awardId/edit'
+    | '/admin/console/awards/$awardId/results'
     | '/admin/console/pageants/$pageantId/soft-reset'
     | '/admin/console/segments/$segmentId/edit'
     | '/admin/console/segments/$segmentId/qualified'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/admin/console/pageants'
     | '/admin/console/segments'
     | '/admin/console/awards/$awardId/edit'
+    | '/admin/console/awards/$awardId/results'
     | '/admin/console/pageants/$pageantId/soft-reset'
     | '/admin/console/segments/$segmentId/edit'
     | '/admin/console/segments/$segmentId/qualified'
@@ -276,6 +288,7 @@ export interface FileRouteTypes {
     | '/admin/console/pageants/'
     | '/admin/console/segments/'
     | '/admin/console/awards/$awardId/edit'
+    | '/admin/console/awards/$awardId/results'
     | '/admin/console/pageants/$pageantId/soft-reset'
     | '/admin/console/segments/$segmentId/edit'
     | '/admin/console/segments/$segmentId/qualified'
@@ -432,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsolePageantsPageantIdSoftResetRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
+    '/admin/console/awards/$awardId/results': {
+      id: '/admin/console/awards/$awardId/results'
+      path: '/awards/$awardId/results'
+      fullPath: '/admin/console/awards/$awardId/results'
+      preLoaderRoute: typeof AdminConsoleAwardsAwardIdResultsRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
     '/admin/console/awards/$awardId/edit': {
       id: '/admin/console/awards/$awardId/edit'
       path: '/awards/$awardId/edit'
@@ -454,6 +474,7 @@ interface AdminConsoleRouteRouteChildren {
   AdminConsolePageantsIndexRoute: typeof AdminConsolePageantsIndexRoute
   AdminConsoleSegmentsIndexRoute: typeof AdminConsoleSegmentsIndexRoute
   AdminConsoleAwardsAwardIdEditRoute: typeof AdminConsoleAwardsAwardIdEditRoute
+  AdminConsoleAwardsAwardIdResultsRoute: typeof AdminConsoleAwardsAwardIdResultsRoute
   AdminConsolePageantsPageantIdSoftResetRoute: typeof AdminConsolePageantsPageantIdSoftResetRoute
   AdminConsoleSegmentsSegmentIdEditRoute: typeof AdminConsoleSegmentsSegmentIdEditRoute
   AdminConsoleSegmentsSegmentIdQualifiedRoute: typeof AdminConsoleSegmentsSegmentIdQualifiedRoute
@@ -472,6 +493,7 @@ const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
   AdminConsolePageantsIndexRoute: AdminConsolePageantsIndexRoute,
   AdminConsoleSegmentsIndexRoute: AdminConsoleSegmentsIndexRoute,
   AdminConsoleAwardsAwardIdEditRoute: AdminConsoleAwardsAwardIdEditRoute,
+  AdminConsoleAwardsAwardIdResultsRoute: AdminConsoleAwardsAwardIdResultsRoute,
   AdminConsolePageantsPageantIdSoftResetRoute:
     AdminConsolePageantsPageantIdSoftResetRoute,
   AdminConsoleSegmentsSegmentIdEditRoute:

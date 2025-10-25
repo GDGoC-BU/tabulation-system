@@ -154,6 +154,7 @@ public class AwardService {
     }
 
     @RequirePageantStatus({
+            PageantStatus.ONGOING,
             PageantStatus.FINALIZING
     })
     @Transactional

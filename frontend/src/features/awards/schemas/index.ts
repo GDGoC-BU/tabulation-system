@@ -29,6 +29,7 @@ export const criteriaBreakdownSchema = z.object({
     }),
   ),
 })
+export type CriteriaBreakdown = z.infer<typeof criteriaBreakdownSchema>
 
 export const awardLeaderboardSummarySchema = z.object({
   id: z.string(),
@@ -36,6 +37,12 @@ export const awardLeaderboardSummarySchema = z.object({
   score: z.number(),
   criteriaBreakdown: z.array(criteriaBreakdownSchema),
 })
+export type AwardLeaderboardSummary = z.infer<
+  typeof awardLeaderboardSummarySchema
+>
+
+export const awardLeaderboardsSchema = z.array(awardLeaderboardSummarySchema)
+export type AwardLeaderboards = z.infer<typeof awardLeaderboardsSchema>
 
 export const awardSummarySchema = z.object({
   id: z.string(),
@@ -50,7 +57,7 @@ export const awardDetailedSchema = z.object({
   name: z.string(),
   candidateLimit: z.int(),
   formula: z.string(),
-  leaderboard: z.array(awardLeaderboardSummarySchema),
+  leaderboard: awardLeaderboardsSchema,
 })
 export type AwardDetailed = z.infer<typeof awardDetailedSchema>
 

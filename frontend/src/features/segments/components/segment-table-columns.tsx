@@ -74,7 +74,7 @@ export const segmentTableColumns: Array<
     },
   },
   {
-    id: 'actions',
+    id: 'view-scores',
     cell: ({ row }) => {
       const segment = row.original
       return (
