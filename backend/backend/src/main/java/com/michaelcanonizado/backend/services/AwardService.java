@@ -178,15 +178,9 @@ public class AwardService {
         /* Extract criterion ids from formula */
         Set<UUID> criteriaIdsInFormula = formulaEncoder.extractEncodedUUIDs(award.getFormula());
 
-        /* Fetch candidates, but only get ids */
-        List<UUID> candidateIds = candidateRepository
-                                    .findAllByPageant_Id(selectedPageantId)
-                                    .stream()
-                                    .map(Candidate::getId)
-                                    .toList();
-
         /* Fetch the criteria in the formula */
         List<Criterion> criteriaInFormula = criterionRepository.findAllById(criteriaIdsInFormula);
+
         /* Load criteria in a Map for faster lookup */
         Map<UUID, Criterion> criteriaMap = criteriaInFormula
                 .stream()
@@ -212,9 +206,22 @@ public class AwardService {
 
             criteriaBreakdownTemplates.put(
                     criterionId,
-                    new CriteriaBreakdown(phaseBreakdown, segmentBreakdown, criterionBreakdown, null, null)
+                    new CriteriaBreakdown(
+                            phaseBreakdown,
+                            segmentBreakdown,
+                            criterionBreakdown,
+                            null,
+                            null
+                    )
             );
         }
+
+        /* Fetch candidates, but only get ids */
+        List<UUID> candidateIds = candidateRepository
+                                    .findAllByPageant_Id(selectedPageantId)
+                                    .stream()
+                                    .map(Candidate::getId)
+                                    .toList();
 
         /* Fetch relevant scores */
         List<Score> scores = scoreRepository.findAll(
@@ -336,7 +343,7 @@ public class AwardService {
             leaderboardRow.setScore(result);
 
             List<CriteriaBreakdown> criteriaBreakdowns = new ArrayList<>();
-            /* Go through the criteria in the formula and build the breakdown */
+            /* Go through the criteria in the formula and build the breakdowns */
             criteriaIdsInFormula.forEach(criterionId -> {
                 /* Get scores for the current candidate and current criterion */
                 List<Score> scoresForCriterion = scoreMap
@@ -346,11 +353,17 @@ public class AwardService {
                 /* Get pregenerated breakdown for the current criterion */
                 CriteriaBreakdown breakdownTemplate = criteriaBreakdownTemplates.get(criterionId);
 
-                /* Calculate the average score for the current criterion */
-                Double averageScore = scoresForCriterion.stream()
-                        .mapToInt(Score::getValue)
-                        .average()
-                        .orElse(0.0);
+//                /* Calculate the average score for the current criterion */
+//                Double averageScore = scoresForCriterion.stream()
+//                        .mapToInt(Score::getValue)
+//                        .average()
+//                        .orElse(0.0);
+                
+                /* Get the candidate-criterion average score from the existing map. Don't recalculate!
+                   This keeps the data consistent and prevents redundant calculation. */
+                Double averageScore = candidateCriterionAverages
+                        .getOrDefault(candidateId, Collections.emptyMap())
+                        .getOrDefault(formulaEncoder.encodeUUID(criterionId), 0.0);
 
                 List<ScoreBreakdownDTO> scoresBreakdown = scoresForCriterion.stream().map(score -> {
                     return scoreMapper.toBreakdownDTO(score);
@@ -365,7 +378,7 @@ public class AwardService {
                 );
                 criteriaBreakdowns.add(criteriaBreakdown);
             });
-            /* CriterionBreakdown is stored as JSONB. Completely change it so JPA notices the change */
+            /* CriterionBreakdown is stored as JSONB. Completely change the reference so JPA notices the change */
             leaderboardRow.setCriteriaBreakdown(criteriaBreakdowns);
         });
         /* Save updated leaderboard */
