@@ -53,6 +53,14 @@ public class CandidateSegmentQualification {
     @JoinColumn(name = "segment_id", nullable = false)
     private Segment segment;
 
+    @Column(nullable = false)
+    private Double score = 0.0;
+
+    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<CriteriaBreakdown> criteriaBreakdown = new ArrayList<>();
+
     public CandidateSegmentQualification(Segment segment, Candidate candidate) {
         this.segment = segment;
         this.candidate = candidate;

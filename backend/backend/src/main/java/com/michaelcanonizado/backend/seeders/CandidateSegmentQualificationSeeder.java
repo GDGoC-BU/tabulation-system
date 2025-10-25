@@ -34,7 +34,7 @@ public class CandidateSegmentQualificationSeeder implements DatabaseSeeder {
         candidates.forEach(candidate -> {
             segments.forEach(segment -> {
                 CandidateSegmentQualification csq = new CandidateSegmentQualification(segment, candidate);
-                segment.addCandidateSegmentQualification(csq);
+                segment.addCandidateQualification(csq);
                 candidate.addCandidateSegmentQualification(csq);
 
                 csqRepository.save(csq);

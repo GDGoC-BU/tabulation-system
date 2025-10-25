@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {PhaseService.class, FormulaEncoder.class})
+@Mapper(componentModel = "spring", uses = {PhaseService.class, FormulaEncoder.class, CandidateSegmentQualificationMapper.class})
 public interface SegmentMapper {
     @Mapping(target = "phase", source = "phaseId")
     @Mapping(target = "formula", source = "formula", qualifiedByName = "encodeFormula")
@@ -17,7 +17,6 @@ public interface SegmentMapper {
     @Mapping(target = "formula", source = "formula", qualifiedByName = "decodeFormula")
     SegmentSummaryDTO toSummaryDTO(Segment segment);
 
-    @Mapping(target = "qualifiedCandidates", source = "qualifiedCandidates")
     @Mapping(target = "formula", source = "formula", qualifiedByName = "decodeFormula")
     SegmentDetailedDTO toDetailedDTO(Segment segment);
 

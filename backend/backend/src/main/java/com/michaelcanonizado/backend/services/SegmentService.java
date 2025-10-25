@@ -1,13 +1,13 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
-import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
-import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
-import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
-import com.michaelcanonizado.backend.dtos.segment.SegmentUpdateDTO;
+import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.segment.*;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
-import com.michaelcanonizado.backend.mappers.SegmentMapper;
+import com.michaelcanonizado.backend.mappers.*;
 import com.michaelcanonizado.backend.messages.OngoingSegmentMessage;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
@@ -57,7 +57,22 @@ public class SegmentService {
     private PageantRepository pageantRepository;
 
     @Autowired
-    private SegmentMapper mapper;
+    private CriterionRepository criterionRepository;
+
+    @Autowired
+    private PhaseMapper phaseMapper;
+
+    @Autowired
+    private SegmentMapper segmentMapper;
+
+    @Autowired
+    private CriterionMapper criterionMapper;
+
+    @Autowired
+    private JudgeMapper judgeMapper;
+
+    @Autowired
+    private ScoreMapper scoreMapper;
 
     @Autowired
     private PageantContext pageantContext;
@@ -74,7 +89,7 @@ public class SegmentService {
     @Transactional
     public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
         /* Load DTO to entity */
-        Segment segment = mapper.toEntity(segmentCreateDTO);
+        Segment segment = segmentMapper.toEntity(segmentCreateDTO);
 
         /* Check if phase being connected actually belongs to the pageant */
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
@@ -88,7 +103,7 @@ public class SegmentService {
         });
 
         /* Save candidate to database */
-        return mapper.toDetailedDTO(savedSegment);
+        return segmentMapper.toDetailedDTO(savedSegment);
     }
 
     @RequirePageantStatus({
@@ -240,7 +255,7 @@ public class SegmentService {
                 new OngoingSegmentMessage(segment.getId())
         );
 
-        return mapper.toDetailedDTO(segmentRepository.save(segment));
+        return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
     }
 
     @RequirePageantStatus({
@@ -263,7 +278,7 @@ public class SegmentService {
                 new OngoingSegmentMessage(null)
         );
 
-        return mapper.toDetailedDTO(segmentRepository.save(segment));
+        return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
     }
 
     @RequirePageantStatus({
@@ -272,6 +287,9 @@ public class SegmentService {
             PageantStatus.CLOSED,
     })
     public SegmentDetailedDTO calculateQualifiedCandidates(UUID id) {
+        /* NOTE: Refer to AwardService for a more detailed documentation of the flow.
+           This method is just a reflection of the logic used there with minor tweaks. */
+
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Cannot start! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
@@ -281,7 +299,7 @@ public class SegmentService {
         /* If the formula or candidate limit is not present,
            Don't determine the qualified candidates for the segment  */
         if (segment.getFormula() == null || segment.getCandidateLimit() == null) {
-            return mapper.toDetailedDTO(segmentRepository.save(segment));
+            return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
         }
 
         UUID selectedPageantId = pageantContext.getId();
@@ -289,7 +307,42 @@ public class SegmentService {
         /* Extract criterion ids from formula */
         Set<UUID> criteriaIdsInFormula = formulaEncoder.extractEncodedUUIDs(segment.getFormula());
 
-        /* Get candidates */
+        /* Fetch the criteria in the formula */
+        List<Criterion> criteriaInFormula = criterionRepository.findAllById(criteriaIdsInFormula);
+
+        /* Load criteria in a Map for faster lookup */
+        Map<UUID, Criterion> criteriaMap = criteriaInFormula
+                .stream()
+                .collect(
+                        Collectors.toMap(
+                                Criterion::getId,
+                                Function.identity(),
+                                (existing, replacement) -> existing
+                        )
+                );
+
+        /* Pregenerate the phase-segment-criterion details for the breakdowns. */
+        Map<UUID, CriteriaBreakdown> criteriaBreakdownTemplates = new HashMap<>();
+        for (UUID criterionId : criteriaIdsInFormula) {
+            Criterion criterion = criteriaMap.get(criterionId);
+
+            PhaseBreakdownDTO phaseBreakdown = phaseMapper.toBreakdownDTO(criterion.getSegment().getPhase());
+            SegmentBreakdownDTO segmentBreakdown = segmentMapper.toBreakdownDTO(criterion.getSegment());
+            CriterionBreakdownDTO criterionBreakdown = criterionMapper.toBreakdownDTO(criterion);
+
+            criteriaBreakdownTemplates.put(
+                    criterionId,
+                    new CriteriaBreakdown(
+                            phaseBreakdown,
+                            segmentBreakdown,
+                            criterionBreakdown,
+                            null,
+                            null
+                    )
+            );
+        }
+
+        /* Get candidates and construct the necessary Maps */
         List<Candidate> candidates = candidateRepository
                 .findAllByPageant_Id(selectedPageantId);
 
@@ -298,13 +351,6 @@ public class SegmentService {
                 .collect(Collectors.toMap(
                         Candidate::getId,
                         Candidate::getGender
-                ));
-
-        Map<UUID, String> candidateLastNames = candidates
-                .stream()
-                .collect(Collectors.toMap(
-                        Candidate::getId,
-                        Candidate::getLastName
                 ));
 
         List<UUID> candidateIds = candidates
@@ -324,7 +370,21 @@ public class SegmentService {
                 )
         );
 
-        /* Aggregate. Group the criterion averages per candidate */
+        /* Map to search for scores for a candidate over a criterion
+           Map<CandidateID, Map<CriterionId, List<Score>>> */
+        Map<UUID, Map<UUID, List<Score>>> scoreMap = new HashMap<>();
+        for (Score score : scores) {
+            UUID candidateId = score.getCandidate().getId();
+            UUID criterionId = score.getCriterion().getId();
+
+            scoreMap
+                    .computeIfAbsent(candidateId, k -> new HashMap<>())
+                    .computeIfAbsent(criterionId, k -> new ArrayList<>())
+                    .add(score);
+        }
+
+        /* Group the criterion averages per candidate
+           Map<CandidateId, Map<EncodedCriterionId, Average Score>> */
         Map<UUID, Map<String, Double>> candidateCriterionAverages = scores
                 .stream()
                 .collect(
@@ -340,16 +400,15 @@ public class SegmentService {
                         )
                 );
 
-        /* Get candidateSegmentQualification rows for the candidates */
+        /* Get candidateSegmentQualification rows of the candidates */
         List<CandidateSegmentQualification> candidateSegmentQualifications = csqRepository.findAll(
                 Specification.allOf(
                         CandidateSegmentQualificationSpecification.hasSegment(segment.getId()),
                         CandidateSegmentQualificationSpecification.hasCandidates(candidateIds)
                 )
         );
-
-        /* Turn the csq rows from a list to map for O(1) lookup */
-        Map<UUID, CandidateSegmentQualification> candidateSegmentQualificationMap =
+        /* Map<CandidateId, CSQ> */
+        Map<UUID, CandidateSegmentQualification> csqMap =
                 candidateSegmentQualifications
                         .stream()
                         .collect(
@@ -359,13 +418,14 @@ public class SegmentService {
                                 )
                         );
 
+        /* Collect the results */
+        List<CandidateSegmentQualification> femaleCandidateResults = new ArrayList<>();
+        List<CandidateSegmentQualification> maleCandidateResults = new ArrayList<>();
+
         /* Create shared parser */
         ExpressionParser parser = new SpelExpressionParser();
         /* Parse the formula and reuse it. Parsing is expensive! */
         Expression expression = parser.parseExpression(segment.getFormula());
-        /* Collect the results */
-        List<CandidateResult> femaleCandidateResults = new ArrayList<>();
-        List<CandidateResult> maleCandidateResults = new ArrayList<>();
         /* Loop through all candidates and use their criterion averages to fill the formula */
         candidateCriterionAverages.forEach((candidateId, criterionAverages) -> {
             /* Load the criterion averages into context */
@@ -374,50 +434,75 @@ public class SegmentService {
             criterionAverages.forEach(context::setVariable);
             /* Evaluate the expression */
             Double result = expression.getValue(context, Double.class);
-            /* Push the result to the candidate result list */
-            if (candidateGenders.get(candidateId).equals(CandidateGender.FEMALE)) {
-                femaleCandidateResults.add(new CandidateResult(candidateId, result));
-            } else if (candidateGenders.get(candidateId).equals(CandidateGender.MALE)) {
-                maleCandidateResults.add(new CandidateResult(candidateId, result));
-            }
 
-            String substitutedFormula = segment.getFormula();
-            for (Map.Entry<String, Double> entry : criterionAverages.entrySet()) {
-                substitutedFormula = substitutedFormula.replace(
-                        "#" + entry.getKey(),
-                        entry.getValue().toString()
+            CandidateSegmentQualification csq = csqMap.get(candidateId);
+            csq.setScore(result);
+
+            List<CriteriaBreakdown> criteriaBreakdowns = new ArrayList<>();
+            criteriaIdsInFormula.forEach(criterionId -> {
+                /* Get scores for the current candidate and current criterion */
+                List<Score> scoresForCriterion = scoreMap
+                        .getOrDefault(candidateId, Map.of())
+                        .getOrDefault(criterionId, List.of());
+
+                /* Get pregenerated breakdown for the current criterion */
+                CriteriaBreakdown breakdownTemplate = criteriaBreakdownTemplates.get(criterionId);
+
+                /* Get the calculate score from the existing map. */
+                Double averageScore = candidateCriterionAverages
+                        .getOrDefault(candidateId, Collections.emptyMap())
+                        .getOrDefault(formulaEncoder.encodeUUID(criterionId), 0.0);
+
+                List<ScoreBreakdownDTO> scoresBreakdown = scoresForCriterion
+                        .stream()
+                        .map(score -> {
+                            return scoreMapper.toBreakdownDTO(score);
+                        }).toList();
+
+                CriteriaBreakdown criteriaBreakdown = new CriteriaBreakdown(
+                        breakdownTemplate.getPhase(),
+                        breakdownTemplate.getSegment(),
+                        breakdownTemplate.getCriterion(),
+                        averageScore,
+                        scoresBreakdown
                 );
+                criteriaBreakdowns.add(criteriaBreakdown);
+            });
+            csq.setCriteriaBreakdown(criteriaBreakdowns);
+
+            /* Group the CSQs by gender */
+            if (candidateGenders.get(candidateId).equals(CandidateGender.FEMALE)) {
+                femaleCandidateResults.add(csq);
+            } else if (candidateGenders.get(candidateId).equals(CandidateGender.MALE)) {
+                maleCandidateResults.add(csq);
             }
-            System.out.println(candidateLastNames.get(candidateId) + " : " + substitutedFormula + " = " + result);
         });
 
-        /* Sort results in descending order */
+        /* Sort scores in descending order */
         femaleCandidateResults.sort((a, b) -> {
-            return Double.compare(b.getResult(), a.getResult());
+            return Double.compare(b.getScore(), a.getScore());
         });
         maleCandidateResults.sort((a, b) -> {
-            return Double.compare(b.getResult(), a.getResult());
+            return Double.compare(b.getScore(), a.getScore());
         });
 
-        /* Get the qualified candidates */
+        /* Get the ids of qualified candidates */
         Set<UUID> qualifiedFemaleCandidateIds = femaleCandidateResults
                 .stream()
                 .limit(segment.getCandidateLimit())
-                .map(CandidateResult::getCandidateId)
+                .map(csq -> csq.getCandidate().getId())
                 .collect(Collectors.toSet());
         Set<UUID> qualifiedMaleCandidateIds = maleCandidateResults
                 .stream()
                 .limit(segment.getCandidateLimit())
-                .map(CandidateResult::getCandidateId)
+                .map(csq -> csq.getCandidate().getId())
                 .collect(Collectors.toSet());
 
-        /* Update the CSQs. Batch save to lessen db queries */
+        /* Update the CSQs' isQualified field. */
         List<CandidateSegmentQualification> updatedCSQs = new ArrayList<>();
-        for (CandidateSegmentQualification csq : candidateSegmentQualificationMap.values()) {
+        for (CandidateSegmentQualification csq : csqMap.values()) {
             UUID candidateId = csq.getCandidate().getId();
-            if (qualifiedFemaleCandidateIds.contains(candidateId)) {
-                csq.setQualified(true);
-            } else if (qualifiedMaleCandidateIds.contains(candidateId)) {
+            if (qualifiedFemaleCandidateIds.contains(candidateId) || qualifiedMaleCandidateIds.contains(candidateId)) {
                 csq.setQualified(true);
             } else {
                 csq.setQualified(false);
@@ -426,8 +511,7 @@ public class SegmentService {
         }
         csqRepository.saveAll(updatedCSQs);
 
-
-        return mapper.toDetailedDTO(segmentRepository.save(segment));
+        return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
     }
 
     @RequirePageantStatus({
@@ -442,7 +526,7 @@ public class SegmentService {
             return new EntityNotFoundException("Segment not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
-        return mapper.toDetailedDTO(segment);
+        return segmentMapper.toDetailedDTO(segment);
     }
 
     @RequirePageantStatus({
@@ -464,7 +548,7 @@ public class SegmentService {
             );
         });
 
-        return mapper.toDetailedDTO(ongoingSegment);
+        return segmentMapper.toDetailedDTO(ongoingSegment);
     }
 
     @RequirePageantStatus({
@@ -484,7 +568,7 @@ public class SegmentService {
                 Comparator.comparing((Segment segment) -> segment.getPhase().getSequence())
                         .thenComparing(Segment::getSequence)
         ).map(segment -> {
-            return mapper.toSummaryDTO(segment);
+            return segmentMapper.toSummaryDTO(segment);
         }).toList();
     }
 
@@ -498,10 +582,10 @@ public class SegmentService {
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
 
-        mapper.updateEntityFromDTO(segment, segmentUpdateDTO);
+        segmentMapper.updateEntityFromDTO(segment, segmentUpdateDTO);
 
         Segment savedSegment = segmentRepository.save(segment);
-        return mapper.toSummaryDTO(savedSegment);
+        return segmentMapper.toSummaryDTO(savedSegment);
     }
 
     @RequirePageantStatus({
