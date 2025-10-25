@@ -33,12 +33,19 @@ export default function BreakdownRenderer({
                 </Badge>
               </TooltipTrigger>
               <TooltipContent className="flex flex-col items-center gap-4 p-4">
-                <div className="flex flex-row gap-1 [&>*]:text-background">
-                  <TextSub>{br?.phase.name}</TextSub>
-                  <TextSub>/</TextSub>
-                  <TextSub>{br?.segment.name}</TextSub>
-                  <TextSub>/</TextSub>
-                  <TextSub>{br?.criterion.name}</TextSub>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex flex-row gap-1 [&>*]:text-background">
+                    <TextSub>{br?.phase.name}</TextSub>
+                    <TextSub>/</TextSub>
+                    <TextSub>{br?.segment.name}</TextSub>
+                    <TextSub>/</TextSub>
+                    <TextSub>{br?.criterion.name}</TextSub>
+                  </div>
+                  <div>
+                    <TextSub className="text-background">
+                      Max Score: {br?.criterion.maxScore}
+                    </TextSub>
+                  </div>
                 </div>
                 <div className="flex flex-col items-center gap-1">
                   <div className="flex flex-row gap-2">

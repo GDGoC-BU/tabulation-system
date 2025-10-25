@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record CriterionBreakdownDTO(
         UUID id,
-        String name
+        String name,
+        int maxScore
 ) {
 }

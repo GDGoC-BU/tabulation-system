@@ -14,6 +14,7 @@ export const criteriaBreakdownSchema = z.object({
   criterion: z.object({
     id: z.string(),
     name: z.string(),
+    maxScore: z.number(),
   }),
   averageScore: z.number(),
   scores: z.array(
