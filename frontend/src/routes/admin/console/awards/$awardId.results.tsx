@@ -1,18 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
 import { useAwardQuery } from '@/features/awards/hooks/use-award-query'
 import { useAwardCalculation } from '@/features/awards/hooks/use-award-calculation-mutation'
 import { TextBody, TextHeading } from '@/components/text'
-import {
-  AwardLeaderboard,
-  groupLeaderboardByGender,
-} from '@/features/dashboard/components/pageant-finalizing-dashboard'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
 import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 import Table from '@/components/table'
 import { awardLeadboardTableColumns } from '@/features/awards/components/award-leaderboard-columns'
+import { groupLeaderboardByGender } from '@/lib/group-leaderboard-by-gender'
 
 export const Route = createFileRoute('/admin/console/awards/$awardId/results')({
   component: RouteComponent,
@@ -20,7 +16,7 @@ export const Route = createFileRoute('/admin/console/awards/$awardId/results')({
 
 function RouteComponent() {
   const { awardId } = Route.useParams()
-  const { data: award } = useAwardQuery(awardId)
+  const { data: award, isLoading: isAwardLoading } = useAwardQuery(awardId)
   const {
     data: awardResult,
     isLoading: isResultLoading,
@@ -51,7 +47,7 @@ function RouteComponent() {
     )
   }
 
-  if (isResultLoading) {
+  if (isResultLoading || isAwardLoading) {
     return (
       <div className="border rounded-lg p-4">
         <TextBody>Calculating {award?.name}...</TextBody>
@@ -59,7 +55,9 @@ function RouteComponent() {
     )
   }
 
-  const { groupA, groupB } = groupLeaderboardByGender(awardResult ?? undefined)
+  const { groupA, groupB } = groupLeaderboardByGender(
+    awardResult?.leaderboard ?? undefined,
+  )
 
   return (
     <div className="p-4">

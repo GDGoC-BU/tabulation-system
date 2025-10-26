@@ -13,28 +13,7 @@ import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-crit
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
 import { useAwardsCalculation } from '@/features/awards/hooks/use-awards-calculation-mutation'
 import { cn } from '@/lib/utils'
-import { candidateGender } from '@/features/candidates/schemas'
-
-export function groupLeaderboardByGender(award: AwardDetailed | undefined): {
-  groupA: AwardLeaderboards
-  groupB: AwardLeaderboards
-} {
-  if (!award)
-    return {
-      groupA: [],
-      groupB: [],
-    }
-
-  const groupA = award.leaderboard.filter(
-    (entry) => entry.candidate.gender === candidateGender.enum.FEMALE,
-  )
-
-  const groupB = award.leaderboard.filter(
-    (entry) => entry.candidate.gender === candidateGender.enum.MALE,
-  )
-
-  return { groupA, groupB }
-}
+import { groupLeaderboardByGender } from '@/lib/group-leaderboard-by-gender'
 
 export function AwardLeaderboard({
   leaderboard,
@@ -138,7 +117,9 @@ export default function PageantFinalizingDashboard() {
             )
           }
 
-          const { groupA, groupB } = groupLeaderboardByGender(award)
+          const { groupA, groupB } = groupLeaderboardByGender(
+            award?.leaderboard,
+          )
 
           return (
             <div className="border rounded-lg p-4">

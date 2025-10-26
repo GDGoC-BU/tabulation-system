@@ -8,27 +8,27 @@ export const awardLeadboardTableColumns: Array<
   ColumnDef<AwardLeaderboardSummary>
 > = [
   {
-    accessorKey: '',
+    id: 'rank',
     header: 'Rank',
-    cell: ({ cell, row }) => {
+    cell: ({ row }) => {
       return <TextBody>{row.index + 1}</TextBody>
     },
   },
   {
-    accessorKey: 'candidate',
+    id: 'candidateNumber',
     header: 'Candidate Number',
     cell: ({ row }) => {
       const candidate: AwardLeaderboardSummary['candidate'] =
-        row.getValue('candidate')
+        row.original.candidate
       return <TextBody>#{candidate.number}</TextBody>
     },
   },
   {
-    accessorKey: 'candidate',
+    id: 'candidateName',
     header: 'Candidate Name',
     cell: ({ row }) => {
       const candidate: AwardLeaderboardSummary['candidate'] =
-        row.getValue('candidate')
+        row.original.candidate
       return (
         <TextBody>
           {capitalizeWords(candidate.firstName)}{' '}
@@ -51,7 +51,7 @@ export const awardLeadboardTableColumns: Array<
     header: 'Breakdown',
     cell: ({ row, table }) => {
       const leaderboard: AwardLeaderboardSummary = row.original
-      const formula: string = table.options.meta.formula ?? ''
+      const formula: string = table.options.meta?.formula ?? ''
 
       if (!formula || formula.length === 0) {
         return <TextBody>No formula passed</TextBody>

@@ -23,6 +23,36 @@ export const honorificSchema = z.enum([
 ])
 export type Honorific = z.infer<typeof honorificSchema>
 
+export const criteriaBreakdownSchema = z.object({
+  phase: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  segment: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  criterion: z.object({
+    id: z.string(),
+    name: z.string(),
+    maxScore: z.number(),
+  }),
+  averageScore: z.number(),
+  scores: z.array(
+    z.object({
+      judge: z.object({
+        id: z.string(),
+        username: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
+        honorific: honorificSchema,
+      }),
+      value: z.number(),
+    }),
+  ),
+})
+export type CriteriaBreakdown = z.infer<typeof criteriaBreakdownSchema>
+
 export const pageantStatusValue = z.enum([
   'PREPARATION',
   'ONGOING',

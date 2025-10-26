@@ -59,11 +59,11 @@ export default function Leaderboard<TData, TValue>({
         </TableHeader>
         <TableBody className="">
           {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row, index) => {
+            table.getRowModel().rows.map((row, rowIndex) => {
               const ringClassName =
-                index < limit ? 'ring-emerald-500' : 'ring-red-500'
+                rowIndex < limit ? 'ring-emerald-500' : 'ring-red-500'
               const borderClassName =
-                index < limit ? 'border-emerald-500' : 'border-red-500'
+                rowIndex < limit ? 'border-emerald-500' : 'border-red-500'
 
               return (
                 <TableRow
@@ -71,10 +71,14 @@ export default function Leaderboard<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                 >
-                  {row.getVisibleCells().map((cell) => {
+                  {row.getVisibleCells().map((cell, cellIndex) => {
                     return (
                       <TableCell
-                        className={cn('border-r', borderClassName)}
+                        className={cn(
+                          cellIndex < row.getVisibleCells().length - 1 &&
+                            'border-r',
+                          borderClassName,
+                        )}
                         key={cell.id}
                       >
                         {flexRender(
