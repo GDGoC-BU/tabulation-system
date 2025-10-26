@@ -1,8 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
-import { useQualifiedCandidates } from '@/features/segments/hooks/use-qualified-candidates-query'
+import { useSegmentCalculateQualifiedCandidates } from '@/features/segments/hooks/use-qualified-candidates-query'
 import { TextBody, TextHeading } from '@/components/text'
-import splitCandidates from '@/features/candidates/lib/split-candidates'
+import { groupCandidateQualificationsByGender } from '@/lib/group-candidate-qualifications-by-gender'
+import capitalizeWords from '@/lib/capitalize-words'
+import FormulaRenderer from '@/features/formula/components/formula-renderer'
+import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
+import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
+import Table from '@/components/table'
+import { segmentCandidateQualifications } from '@/features/segments/components/segment-candidate-qualifications-table-columns'
 
 export const Route = createFileRoute(
   '/admin/console/segments/$segmentId/qualified',
@@ -12,65 +19,101 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { segmentId } = Route.useParams()
-  const { data: segment } = useQualifiedCandidates(segmentId)
+  const {
+    data: segment,
+    isLoading: isSegmentLoading,
+    isError: isSegmentError,
+    error: segmentError,
+  } = useSegmentCalculateQualifiedCandidates(segmentId)
 
-  const { groupA: candidateGroupA, groupB: candidateGroupB } = useMemo(() => {
-    if (!segment) {
-      return {
-        groupA: [],
-        groupB: [],
-      }
-    }
+  const { data: selectedPageant, isLoading: isPageantStateLoading } =
+    useSelectedPageantQuery()
+  const { data: pageantHierarchy, isLoading: isPageantHierarchyLoading } =
+    usePageantHierarchyQuery(selectedPageant?.id)
+  const criterionLookup = useFormulaCriterionLookup(
+    pageantHierarchy?.phases ?? [],
+  )
 
-    return splitCandidates(segment.qualifiedCandidates)
-  }, [segment])
+  if (isSegmentError) {
+    return (
+      <div className="border rounded-lg p-4">
+        <TextBody>{segmentError}</TextBody>
+      </div>
+    )
+  }
+
+  if (isPageantStateLoading || isPageantHierarchyLoading) {
+    return (
+      <div className="border rounded-lg p-4">
+        <TextBody>Loading pageant...</TextBody>
+      </div>
+    )
+  }
+
+  if (isSegmentLoading) {
+    return (
+      <div className="border rounded-lg p-4">
+        <TextBody>Calculating qualified candidates...</TextBody>
+      </div>
+    )
+  }
+
+  const { groupA, groupB } = groupCandidateQualificationsByGender(
+    segment?.candidateQualifications,
+  )
 
   return (
-    <div className="m-4 border rounded-lg p-4">
-      <div className="mb-18">
-        <TextHeading>{segment?.name} Qualified Candidates</TextHeading>
-      </div>
-      <div className="grid grid-cols-2 gap4">
-        <div className="flex flex-col gap-4">
-          <div className="text center">
-            <TextBody className="font-bold">Female</TextBody>
+    <div className="p-4">
+      <div className="w-full flex flex-col gap-24">
+        <div className="border rounded-lg p-4">
+          <div className="mb-2">
+            <TextHeading>Qualified Candidates for {segment?.name}</TextHeading>
           </div>
-          <div className="flex flex-col gap-2">
-            {candidateGroupA.map((candidate) => {
-              return (
-                <div className="flex flex-row gap-4">
-                  <div>
-                    <TextBody>Candidate {candidate.number}</TextBody>
-                  </div>
-                  <div>
-                    <TextBody>
-                      {candidate.firstName} {candidate.lastName}
-                    </TextBody>
-                  </div>
+          <div className="flex flex-col gap-2 border-b pb-8">
+            <div className="">
+              <TextBody>
+                Candidate Limit: {segment?.candidateLimit ?? 'None'}
+              </TextBody>
+            </div>
+            <div className="">
+              {segment?.formula === null ? (
+                <div>
+                  <TextBody>Formula: None</TextBody>
                 </div>
-              )
-            })}
-          </div>
-        </div>
-        <div className="flex flex-col gap-4">
-          <div className="text center">
-            <TextBody className="font-bold">Male</TextBody>
-          </div>
-          <div className="flex flex-col gap-2">
-            {candidateGroupB.map((candidate) => {
-              return (
+              ) : (
                 <div className="flex flex-row gap-2">
-                  <div>
-                    <TextBody>Candidate {candidate.number}</TextBody>
-                  </div>
-                  <div>
-                    <TextBody>
-                      {candidate.firstName} {candidate.lastName}
-                    </TextBody>
-                  </div>
+                  <TextBody>Formula: </TextBody>
+                  <FormulaRenderer
+                    formula={segment?.formula ?? ''}
+                    criterionLookup={criterionLookup}
+                  />
                 </div>
-              )
-            })}
+              )}
+            </div>
+          </div>
+          <div className="w-full flex flex-col">
+            <div className="flex flex-col gap-2 mt-8">
+              <div className="w-full text-center mb-8">
+                <TextHeading className="font-bold">Female</TextHeading>
+              </div>
+              <Table.CandidateQualifications
+                columns={segmentCandidateQualifications}
+                data={groupA}
+                limit={segment?.candidateLimit ?? 0}
+                formula={segment?.formula ?? ''}
+              />
+            </div>
+            <div className="flex flex-col gap-2 mt-8">
+              <div className="w-full text-center mb-8">
+                <TextHeading className="font-bold">Male</TextHeading>
+              </div>
+              <Table.CandidateQualifications
+                columns={segmentCandidateQualifications}
+                data={groupB}
+                limit={segment.candidateLimit}
+                formula={segment.formula}
+              />
+            </div>
           </div>
         </div>
       </div>

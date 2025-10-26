@@ -1,5 +1,5 @@
 import tokenizeFormula from '../lib/tokenize-formula'
-import type { CriteriaBreakdown } from '../../awards/schemas'
+import type { CriteriaBreakdown } from '@/schemas'
 import { Badge } from '@/components/ui/badge'
 import { TextBody, TextSub } from '@/components/text'
 import {
@@ -12,11 +12,14 @@ export default function BreakdownRenderer({
   breakdown,
   formula,
 }: {
-  breakdown: Array<CriteriaBreakdown>
+  breakdown: Array<CriteriaBreakdown> | null
   formula: string
 }) {
-  const tokens = tokenizeFormula(formula)
+  if (!breakdown) {
+    return <TextBody>No formula passed</TextBody>
+  }
 
+  const tokens = tokenizeFormula(formula)
   const criterionMap = new Map(breakdown.map((br) => [br.criterion.id, br]))
 
   return (

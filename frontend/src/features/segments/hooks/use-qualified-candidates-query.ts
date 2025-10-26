@@ -3,7 +3,9 @@ import { segmentDetailedSchema } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function useQualifiedCandidates(id: string | null | undefined) {
+export function useSegmentCalculateQualifiedCandidates(
+  id: string | null | undefined,
+) {
   return useQuery({
     queryKey: ['segments', id],
     queryFn: async () => {
@@ -14,10 +16,18 @@ export function useQualifiedCandidates(id: string | null | undefined) {
         const parsedResponse = segmentDetailedSchema.safeParse(response.data)
         if (!parsedResponse.success) {
           throw new Error(
-            `/segments/${id}/calculate-qualified-candidates response doesn't match schema!`,
+            `"/segments/${id}/calculate-qualified-candidates" response doesn't match schema!`,
           )
         }
-        return parsedResponse.data
+
+        const sortedCandidateQualifications = [
+          ...parsedResponse.data.candidateQualifications,
+        ].sort((a, b) => b.score - a.score)
+
+        return {
+          ...parsedResponse.data,
+          candidateQualifications: sortedCandidateQualifications,
+        }
       } catch (error) {
         throw errorResolver(error)
       }

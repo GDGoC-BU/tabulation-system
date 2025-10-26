@@ -72,7 +72,8 @@ function RouteComponent() {
                 Candidate Limit: {awardResult?.candidateLimit}
               </TextBody>
             </div>
-            <div className="">
+            <div className="flex flex-row gap-2">
+              <TextBody>Formula: </TextBody>
               <FormulaRenderer
                 formula={awardResult?.formula ?? ''}
                 criterionLookup={criterionLookup}

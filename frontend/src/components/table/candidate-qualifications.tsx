@@ -4,6 +4,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import type { ColumnDef } from '@tanstack/react-table'
+import type { CandidateSegmentQualificationSummary } from '@/features/segments/schemas'
 import {
   Table,
   TableBody,
@@ -14,19 +15,19 @@ import {
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 
-type DataTableProps<TData, TValue> = {
-  columns: Array<ColumnDef<TData, TValue>>
-  data: Array<TData>
-  limit: number
-  formula: string
+type DataTableProps = {
+  columns: Array<ColumnDef<CandidateSegmentQualificationSummary>>
+  data: Array<CandidateSegmentQualificationSummary>
+  limit: number | null
+  formula: string | null
 }
 
-export default function Leaderboard<TData, TValue>({
+export default function CandidateQualifications({
   columns,
   data,
   limit,
   formula,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps) {
   const table = useReactTable({
     data,
     columns,
@@ -59,11 +60,16 @@ export default function Leaderboard<TData, TValue>({
         </TableHeader>
         <TableBody className="">
           {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row, rowIndex) => {
-              const ringClassName =
-                rowIndex < limit ? 'ring-emerald-500' : 'ring-red-500'
-              const borderClassName =
-                rowIndex < limit ? 'border-emerald-500' : 'border-red-500'
+            table.getRowModel().rows.map((row, index) => {
+              const isQualified =
+                !limit || (row.original.isQualified && index < limit)
+
+              const ringClassName = isQualified
+                ? 'ring-emerald-500'
+                : 'ring-red-500'
+              const borderClassName = isQualified
+                ? 'border-emerald-500'
+                : 'border-red-500'
 
               return (
                 <TableRow
