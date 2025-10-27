@@ -110,8 +110,8 @@ function RouteComponent() {
               <Table.CandidateQualifications
                 columns={segmentCandidateQualifications}
                 data={groupB}
-                limit={segment.candidateLimit}
-                formula={segment.formula}
+                limit={segment?.candidateLimit ?? null}
+                formula={segment?.formula ?? null}
               />
             </div>
           </div>

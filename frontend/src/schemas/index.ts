@@ -24,6 +24,8 @@ export const honorificSchema = z.enum([
 export type Honorific = z.infer<typeof honorificSchema>
 
 export const criteriaBreakdownSchema = z.object({
+  /* NOTE: Move the individual fields to their respective schema fiels in features.
+     But beware of the cyclic dependencies. */
   phase: z.object({
     id: z.string(),
     name: z.string(),
@@ -46,6 +48,7 @@ export const criteriaBreakdownSchema = z.object({
         firstName: z.string(),
         lastName: z.string(),
         honorific: honorificSchema,
+        number: z.number(),
       }),
       value: z.number(),
     }),

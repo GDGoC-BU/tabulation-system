@@ -28,58 +28,75 @@ export default function BreakdownRenderer({
         if (token.type === 'uuid') {
           const br = criterionMap.get(token.value)
 
+          if (!br) {
+            return
+          }
+
+          const phaseName = br.phase.name
+          const segmentName = br.segment.name
+          const criterionName = br.criterion.name
+          const maxScore = br.criterion.maxScore
+          const averageScore = br.averageScore
+          const scores = br.scores
+          const numberOfJudge = scores.length
+
           return (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Badge key={index} variant="outline" className="">
-                  {br?.averageScore}
+                  {averageScore}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent className="flex flex-col items-center gap-4 p-4">
                 <div className="flex flex-col items-center gap-1">
                   <div className="flex flex-row gap-1 [&>*]:text-background">
-                    <TextSub>{br?.phase.name}</TextSub>
+                    <TextSub>{phaseName}</TextSub>
                     <TextSub>/</TextSub>
-                    <TextSub>{br?.segment.name}</TextSub>
+                    <TextSub>{segmentName}</TextSub>
                     <TextSub>/</TextSub>
-                    <TextSub>{br?.criterion.name}</TextSub>
+                    <TextSub>{criterionName}</TextSub>
                   </div>
                   <div>
                     <TextSub className="text-background">
-                      Max Score: {br?.criterion.maxScore}
+                      Max Score: {maxScore}
                     </TextSub>
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-1">
-                  <div className="flex flex-row gap-2">
-                    {br?.scores.map((score, index) => {
-                      return (
-                        <>
-                          <div className="flex flex-col items-center">
-                            <div className="">
-                              <TextSub className="text-background">
-                                {score.judge.lastName}
-                              </TextSub>
+                  <div className="flex flex-row gap-2 items-end">
+                    {scores
+                      .sort((a, b) => a.judge.number - b.judge.number)
+                      .map((score, index) => {
+                        const judgeNumber = score.judge.number
+                        const judgeScore = score.value
+
+                        return (
+                          <>
+                            <div className="flex flex-col items-center">
+                              <div className="">
+                                <TextSub className="text-background">
+                                  Judge {judgeNumber}
+                                </TextSub>
+                              </div>
+                              <div className="">
+                                <TextSub className="text-background">
+                                  {judgeScore}
+                                </TextSub>
+                              </div>
                             </div>
-                            <div className="">
-                              <TextSub className="text-background">
-                                {score.value}
-                              </TextSub>
-                            </div>
-                          </div>
-                          {index < br.scores.length - 1 && (
-                            <div className="">
-                              <TextSub className="text-background">+</TextSub>
-                            </div>
-                          )}
-                        </>
-                      )
-                    })}
+                            {index < numberOfJudge - 1 && (
+                              <div className="">
+                                <TextSub className="text-background">+</TextSub>
+                              </div>
+                            )}
+                          </>
+                        )
+                      })}
                   </div>
                   <div className="h-[1px] bg-border w-full" />
                   <div className="">
                     <TextSub className="text-background">
-                      {br?.scores.length}
+                      {numberOfJudge}
                     </TextSub>
                   </div>
                 </div>
@@ -87,6 +104,7 @@ export default function BreakdownRenderer({
             </Tooltip>
           )
         }
+
         return <TextBody>{token.value}</TextBody>
       })}
     </div>
