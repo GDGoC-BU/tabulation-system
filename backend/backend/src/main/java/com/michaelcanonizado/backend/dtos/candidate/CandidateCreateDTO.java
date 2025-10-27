@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public record CandidateCreateDTO(
         @NotNull(message = "required")
-        @Min(value = 0, message = ">= 1")
+        @Min(value = 1, message = ">= 1")
         int number,
 
         @NotBlank(message = "required")

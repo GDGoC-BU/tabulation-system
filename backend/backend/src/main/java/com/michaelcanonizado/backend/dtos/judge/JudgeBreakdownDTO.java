@@ -9,6 +9,7 @@ public record JudgeBreakdownDTO(
         String username,
         String firstName,
         String lastName,
-        Honorific honorific
+        Honorific honorific,
+        int number
 ) {
 }

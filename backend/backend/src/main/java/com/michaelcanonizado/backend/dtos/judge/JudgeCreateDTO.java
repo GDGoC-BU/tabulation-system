@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.dtos.judge;
 
 import com.michaelcanonizado.backend.models.Honorific;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,6 +17,10 @@ public record JudgeCreateDTO(
 
         @NotNull(message = "required")
         Honorific honorific,
+
+        @NotNull(message = "required")
+        @Min(value = 1, message = ">= 1")
+        int number,
 
         @NotBlank(message = "required")
         String password
