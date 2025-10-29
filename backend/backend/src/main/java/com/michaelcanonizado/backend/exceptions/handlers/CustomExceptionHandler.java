@@ -78,9 +78,9 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
-    @ExceptionHandler(PhaseStatusException.class)
+    @ExceptionHandler(PhaseSegmentStatusException.class)
     public ResponseEntity<ErrorResponse> handlePhaseStatusException(
-            PhaseStatusException exception,
+            PhaseSegmentStatusException exception,
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.LOCKED;

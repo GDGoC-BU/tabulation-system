@@ -7,6 +7,7 @@ import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.segment.*;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
+import com.michaelcanonizado.backend.exceptions.customs.PhaseSegmentStatusException;
 import com.michaelcanonizado.backend.mappers.*;
 import com.michaelcanonizado.backend.messages.OngoingSegmentMessage;
 import com.michaelcanonizado.backend.models.*;
@@ -538,17 +539,25 @@ public class SegmentService {
     public SegmentDetailedDTO getOngoingSegment() {
         UUID selectedPageantId = pageantContext.getId();
 
-        /* Revisit this. Might want to add a check to verify that only 1 phase should be ongoing */
+        /* Revisit this. Might want to add a more robust check to verify that only 1 segment should be ongoing */
+        List<Segment> ongoingSegments = segmentRepository
+                .findAllByStatusAndPhasePageantId(
+                        PhaseSegmentStatus.ONGOING,
+                        selectedPageantId
+                );
 
-        /* This is doesnt check if it belongs to the pageant! */
-        Segment ongoingSegment = segmentRepository.findByStatus(PhaseSegmentStatus.ONGOING).orElseThrow(() -> {
-            return new EntityNotFoundException(
-                    "No ongoing segment for pageant!",
-                    ErrorCode.ENTITY_NOT_FOUND
+        /* Only 1 segment should be ongoing */
+        if (ongoingSegments.size() > 1) {
+            throw new PhaseSegmentStatusException(
+                    "Multiple ongoing segments found for pageant " + selectedPageantId,
+                    ErrorCode.PHASE_SEGMENT_ILLEGAL_STATE
             );
-        });
+        }
 
-        return segmentMapper.toDetailedDTO(ongoingSegment);
+        return ongoingSegments.stream()
+                .findFirst()
+                .map(segmentMapper::toDetailedDTO)
+                .orElse(null);
     }
 
     @RequirePageantStatus({

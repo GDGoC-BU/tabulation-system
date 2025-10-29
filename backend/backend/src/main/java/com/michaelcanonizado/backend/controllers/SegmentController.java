@@ -54,6 +54,9 @@ public class SegmentController {
     @GetMapping("/segments/ongoing")
     public ResponseEntity<SegmentDetailedDTO> getOngoingSegment() {
         SegmentDetailedDTO segment = service.getOngoingSegment();
+        if (segment == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 

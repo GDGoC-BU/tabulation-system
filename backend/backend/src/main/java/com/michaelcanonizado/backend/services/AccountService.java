@@ -96,7 +96,7 @@ public class AccountService {
 
             /* Check if there is an ongoing phase. Else don't let judge login. */
             phaseRepository.findByStatus(PhaseSegmentStatus.ONGOING).orElseThrow(() -> {
-                return new PhaseStatusException(
+                return new PhaseSegmentStatusException(
                         "No phase has started. Please wait for admin to open a phase.",
                         ErrorCode.ACCESS_DENIED
                 );
