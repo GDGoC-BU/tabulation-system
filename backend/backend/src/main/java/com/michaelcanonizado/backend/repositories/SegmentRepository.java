@@ -15,5 +15,4 @@ import java.util.UUID;
 public interface SegmentRepository extends JpaRepository<Segment, UUID>, JpaSpecificationExecutor<Segment> {
     Optional<Segment> findBySequence(int sequence);
     List<Segment> findAllByStatusAndPhasePageantId(PhaseSegmentStatus status, UUID pageantId);
-    Optional<Segment> findByStatus(PhaseSegmentStatus status);
 }

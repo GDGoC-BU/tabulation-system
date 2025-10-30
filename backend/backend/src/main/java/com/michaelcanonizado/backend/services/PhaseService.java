@@ -8,11 +8,9 @@ import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
+import com.michaelcanonizado.backend.exceptions.customs.PhaseSegmentStatusException;
 import com.michaelcanonizado.backend.mappers.PhaseMapper;
-import com.michaelcanonizado.backend.models.Pageant;
-import com.michaelcanonizado.backend.models.PageantStatus;
-import com.michaelcanonizado.backend.models.Phase;
-import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
+import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.PhaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,23 +103,33 @@ public class PhaseService {
     }
 
     @RequirePageantStatus({
-            PageantStatus.ONGOING
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public PhaseDetailedDTO getOngoingPhase() {
         UUID selectedPageantId = pageantContext.getId();
-        List<Phase> phases =  phaseRepository.findAllByPageant_Id(selectedPageantId);
 
-        /* Revisit this. Might want to add a check to verify that only 1 phase should be ongoing */
+        /* Revisit this. Might want to add a more robust check to verify that only 1 segment should be ongoing */
+        List<Phase> ongoingPhases = phaseRepository
+                .findAllByStatusAndPageantId(
+                        PhaseSegmentStatus.ONGOING,
+                        selectedPageantId
+                );
 
-        /* This is doesnt check if it belongs to the pageant! */
-        Phase ongoingPhase = phaseRepository.findByStatus(PhaseSegmentStatus.ONGOING).orElseThrow(() -> {
-            return new EntityNotFoundException(
-                    "No ongoing phase for pageant!",
-                    ErrorCode.ENTITY_NOT_FOUND
+        /* Only 1 segment should be ongoing */
+        if (ongoingPhases.size() > 1) {
+            throw new PhaseSegmentStatusException(
+                    "Multiple ongoing phases found for pageant " + selectedPageantId,
+                    ErrorCode.PHASE_SEGMENT_ILLEGAL_STATE
             );
-        });
+        }
 
-        return mapper.toDetailedDTO(ongoingPhase);
+        return ongoingPhases.stream()
+                .findFirst()
+                .map(mapper::toDetailedDTO)
+                .orElse(null);
     }
 
     @RequirePageantStatus({

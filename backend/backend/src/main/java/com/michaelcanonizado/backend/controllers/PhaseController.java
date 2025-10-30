@@ -51,6 +51,9 @@ public class PhaseController {
     @GetMapping("/phases/ongoing")
     public ResponseEntity<PhaseDetailedDTO> getOngoingPhase() {
         PhaseDetailedDTO phase = service.getOngoingPhase();
+        if (phase == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         return new ResponseEntity<>(phase, HttpStatus.OK);
     }
 
