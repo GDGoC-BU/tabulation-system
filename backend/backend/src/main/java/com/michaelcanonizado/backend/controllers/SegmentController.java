@@ -40,8 +40,8 @@ public class SegmentController {
     }
 
     @PostMapping("/segments/{id}/calculate-qualified-candidates")
-    public ResponseEntity<SegmentDetailedDTO> calculateQualifiedCandidates(@PathVariable UUID id) {
-        SegmentDetailedDTO segment = service.calculateQualifiedCandidates(id);
+    public ResponseEntity<SegmentDetailedDTO> calculateCandidateQualifications(@PathVariable UUID id) {
+        SegmentDetailedDTO segment = service.calculateCandidateQualifications(id);
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 
