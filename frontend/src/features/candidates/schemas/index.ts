@@ -5,6 +5,16 @@ import { collegeSummarySchema } from '@/features/colleges/schemas'
 export const candidateGender = z.enum(['MALE', 'FEMALE', 'OTHER'])
 export type CandidateGender = z.infer<typeof candidateGender>
 
+export const candidateHierarchySchema = z.object({
+  id: z.string(),
+  number: z.number(),
+  firstName: z.string(),
+  lastName: z.string(),
+  gender: candidateGender,
+  age: z.number(),
+})
+export type CandidateHierarchy = z.infer<typeof candidateHierarchySchema>
+
 export const candidateSummarySchema = z.object({
   id: z.string(),
   number: z.number(),

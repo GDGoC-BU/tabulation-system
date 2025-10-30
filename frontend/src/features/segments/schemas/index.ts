@@ -5,7 +5,20 @@ import {
   criterionHierarchySchema,
   criterionSummarySchema,
 } from '@/features/criteria/schemas'
-import { candidateSummarySchema } from '@/features/candidates/schemas'
+import {
+  candidateHierarchySchema,
+  candidateSummarySchema,
+} from '@/features/candidates/schemas'
+
+export const candidateSegmentQualificationHierarchySchema = z.object({
+  id: z.string(),
+  candidate: candidateHierarchySchema,
+  isQualified: z.boolean(),
+  score: z.union([z.null(), z.number()]),
+})
+export type CandidateSegmentQualificationHierarchy = z.infer<
+  typeof candidateSegmentQualificationHierarchySchema
+>
 
 export const candidateSegmentQualificationSummarySchema = z.object({
   id: z.string(),
@@ -64,6 +77,9 @@ export const segmentHierarchySchema = z.object({
   formula: z.union([z.null(), z.string()]),
   status: phaseSegmentStatusValue,
   criteria: z.array(criterionHierarchySchema),
+  candidateQualifications: z.array(
+    candidateSegmentQualificationHierarchySchema,
+  ),
 })
 export type SegmentHierarchy = z.infer<typeof segmentHierarchySchema>
 
