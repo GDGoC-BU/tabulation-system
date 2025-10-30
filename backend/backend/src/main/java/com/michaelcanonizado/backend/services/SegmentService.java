@@ -35,13 +35,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Getter
-@AllArgsConstructor
-class CandidateResult {
-    private UUID candidateId;
-    private Double result;
-}
-
 @Service
 public class SegmentService {
     @Autowired

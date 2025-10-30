@@ -8,7 +8,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {PhaseService.class, FormulaEncoder.class, CandidateSegmentQualificationMapper.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {
+                PhaseService.class,
+                FormulaEncoder.class,
+                CriterionMapper.class,
+                CandidateSegmentQualificationMapper.class
+        }
+)
 public interface SegmentMapper {
     @Mapping(target = "phase", source = "phaseId")
     @Mapping(target = "formula", source = "formula", qualifiedByName = "encodeFormula")

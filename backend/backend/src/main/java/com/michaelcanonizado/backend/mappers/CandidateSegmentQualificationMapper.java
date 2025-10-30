@@ -6,7 +6,12 @@ import com.michaelcanonizado.backend.models.CandidateSegmentQualification;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = {
+                CandidateMapper.class
+        }
+)
 public interface CandidateSegmentQualificationMapper {
     @Mapping(target = "isQualified", source = "qualified")
     CandidateSegmentQualificationSummaryDTO toSummaryDTO(CandidateSegmentQualification candidateSegmentQualification);

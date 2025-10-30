@@ -14,6 +14,7 @@ import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.PhaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,9 @@ public class PhaseService {
     @Autowired
     private PageantRepository pageantRepository;
 
+    /* Lazy inject the mapper to break the circular dependency:
+       PhaseService → PhaseMapper → SegmentMapper → PhaseService */
+    @Lazy
     @Autowired
     private PhaseMapper mapper;
 

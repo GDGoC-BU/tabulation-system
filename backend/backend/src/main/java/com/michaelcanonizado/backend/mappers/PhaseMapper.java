@@ -7,7 +7,12 @@ import com.michaelcanonizado.backend.models.Segment;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = {
+                SegmentMapper.class
+        }
+)
 public interface PhaseMapper {
     Phase toEntity(PhaseCreateDTO phaseCreateDTO);
 
