@@ -8,6 +8,7 @@ export type StompStore = {
   client: Client | null
   connect: () => void
   disconnect: () => void
+  isConnected: boolean
   subscribe: (
     topic: string,
     callback: (message: IMessage) => void,
@@ -41,10 +42,17 @@ export const useStompStore = create<StompStore>((set, get) => ({
 
     client.onConnect = () => {
       console.log('Connected to STOMP broker...')
+      set({ isConnected: true })
+    }
+
+    client.onDisconnect = () => {
+      console.log('Disconnected to STOMP broker...')
+      set({ client: null, isConnected: false })
     }
 
     client.onStompError = (frame) => {
       console.error('STOMP connection error...', frame)
+      set({ client: null, isConnected: false })
     }
 
     client.activate()
@@ -53,8 +61,10 @@ export const useStompStore = create<StompStore>((set, get) => ({
 
   disconnect: () => {
     get().client?.deactivate()
-    set({ client: null })
+    set({ client: null, isConnected: false })
   },
+
+  isConnected: false,
 
   subscribe: (topic, callback) => {
     const client = get().client

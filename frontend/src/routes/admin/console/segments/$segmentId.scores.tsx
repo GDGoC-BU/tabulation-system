@@ -27,11 +27,11 @@ function RouteComponent() {
     !!segment,
   )
 
-  const { groupA: candidateGroupA, groupB: candidateGroupB } = useMemo(() => {
+  const { femaleCandidates, maleCandidates } = useMemo(() => {
     if (!segment) {
       return {
-        groupA: [],
-        groupB: [],
+        femaleCandidates: [],
+        maleCandidates: [],
       }
     }
 
@@ -60,7 +60,7 @@ function RouteComponent() {
                     <div className="text-center bg-pink-400 w-fit mx-auto px-4 py-2 rounded-full">
                       <TextBody className="text-background">FEMALE</TextBody>
                     </div>
-                    {candidateGroupA.map((candidate) => {
+                    {femaleCandidates.map((candidate) => {
                       const candidateScores = scores?.filter(
                         (score) =>
                           score.candidateId === candidate.id &&
@@ -107,7 +107,7 @@ function RouteComponent() {
                     <div className="text-center bg-blue-400 w-fit mx-auto px-4 py-2 rounded-full">
                       <TextBody className="text-background">MALE</TextBody>
                     </div>
-                    {candidateGroupB.map((candidate) => {
+                    {maleCandidates.map((candidate) => {
                       const candidateScores = scores?.filter(
                         (score) =>
                           score.candidateId === candidate.id &&
