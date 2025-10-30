@@ -2,7 +2,7 @@ import type { ComponentClassNameAndChildrenProp } from '@/types'
 import { cn } from '@/lib/utils'
 
 export const textDisplayClassName =
-  'font-heading text-[89.76px] leading-[85px] font-[600] tracking-[-0.05em]'
+  'font-heading text-[67.34px] leading-[85px] font-[600] tracking-[-0.05em]'
 export const TextDisplay = ({
   className,
   children,
