@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface CriterionMapper {
     Criterion toEntity(CriterionSummaryDTO criterionSummaryDTO);
+
     CriterionSummaryDTO toSummaryDTO(Criterion criterion);
     CriterionBreakdownDTO toBreakdownDTO(Criterion criterion);
     CriterionHierarchyDTO toHierarchyDTO(Criterion criterion);

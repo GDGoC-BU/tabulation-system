@@ -10,6 +10,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface PhaseMapper {
     Phase toEntity(PhaseCreateDTO phaseCreateDTO);
+
     PhaseSummaryDTO toSummaryDTO(Phase phase);
     PhaseDetailedDTO toDetailedDTO(Phase phase);
     PhaseBreakdownDTO toBreakdownDTO(Phase phase);
