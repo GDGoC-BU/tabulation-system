@@ -1,12 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import useEmblaCarousel from 'embla-carousel-react'
+import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import type { EmblaCarouselType } from 'embla-carousel'
 import type { ScoreDetailed } from '@/features/scores/schemas'
 import type { PhaseDetailed, PhaseHierarchy } from '@/features/phases/schemas'
+import type {
+  CandidateDetailed,
+  CandidateGender,
+  CandidateHierarchy,
+  CandidateSummary,
+} from '@/features/candidates/schemas'
+import { candidateGender } from '@/features/candidates/schemas'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 import { useSelectedPageantIdStore } from '@/features/pageants/store/use-selected-pageant-id-store'
 import Scoring from '@/components/scoring'
-import { TextBody, TextDisplay } from '@/components/text'
+import { TextBody, TextHeading, TextSub } from '@/components/text'
 import capitalizeWords from '@/lib/capitalize-words'
 import judgeQueryOptions from '@/features/judges/query-options/judge-query-options'
 import scoresQueryOptions from '@/features/scores/query-options/scores-query-options'
@@ -15,6 +26,9 @@ import { useStompStore } from '@/store/stomp-store'
 import { phaseSegmentStatusValue } from '@/schemas'
 import CandidateScoreCard from '@/features/scores/components/candidate-score-card'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
 
 function ScoringTabsFacadeBodyNoActiveSegmentFallback({
   phase,
@@ -22,28 +36,141 @@ function ScoringTabsFacadeBodyNoActiveSegmentFallback({
   phase: PhaseDetailed | PhaseHierarchy
 }) {
   let title = 'No active segment'
-  let body = 'Kindly wait for admin to start the next segment'
+  let body = '👨🏻‍💻Kindly wait for the admin to start the next segment'
 
   const PENDING = phaseSegmentStatusValue.enum.PENDING
   const CLOSED = phaseSegmentStatusValue.enum.CLOSED
 
   if (phase.segments.every((segment) => segment.status === CLOSED)) {
     title = `${phase.name} has completed!`
-    body = 'Thank you for participating in this pageant.'
+    body = '💖Thank you for participating in this pageant.'
   } else if (phase.segments.every((segment) => segment.status === PENDING)) {
     title = `${phase.name} has not started`
-    body = 'Kindly wait for admin to start a segment'
+    body = `✨Kindly wait for the admin to start the pageant`
   }
 
   return (
-    <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
+    <Scoring.TabsFacade.Body className="w-full h-full grow grid place-items-center">
       <div className="flex flex-col text-center gap-2">
-        <Scoring.TabsFacade.Body.Title>{title}</Scoring.TabsFacade.Body.Title>
-        <Scoring.TabsFacade.Body.Description>
-          {body}
-        </Scoring.TabsFacade.Body.Description>
+        <TextHeading>{title}</TextHeading>
+        <TextBody>{body}</TextBody>
       </div>
     </Scoring.TabsFacade.Body>
+  )
+}
+
+function CandidateScoringCards({
+  candidates,
+  scoresMap,
+  gender,
+}: {
+  candidates: Array<CandidateDetailed | CandidateSummary | CandidateHierarchy>
+  scoresMap: Map<string, Array<ScoreDetailed>>
+  gender: CandidateGender
+}) {
+  const [isLastCardInView, setIsLastCardInView] = useState(false)
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false }, [
+    WheelGesturesPlugin(),
+  ])
+
+  const onSlideScroll = useCallback((api: EmblaCarouselType) => {
+    const progress = api.scrollProgress()
+    if (progress > 0.99) {
+      setIsLastCardInView(true)
+    } else {
+      setIsLastCardInView(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    /* Might want to throttle this. But the compontent only ever rerenders when
+       isLastCardInView changes */
+    if (emblaApi) emblaApi.on('scroll', onSlideScroll)
+  }, [emblaApi, onSlideScroll])
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev()
+  }, [emblaApi])
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext()
+  }, [emblaApi])
+
+  const FEMALE = candidateGender.enum.FEMALE
+  const MALE = candidateGender.enum.MALE
+
+  let genderClassNames = ''
+  if (gender === FEMALE) {
+    genderClassNames = 'bg-pink-400'
+  } else if (gender === MALE) {
+    genderClassNames = 'bg-blue-400'
+  }
+
+  let genderLabel = ''
+  if (gender === FEMALE) {
+    genderLabel = 'Female'
+  } else if (gender === MALE) {
+    genderLabel = 'Male'
+  }
+
+  return (
+    <div className="overflow-hidden bg-muted flex flex-col gap-8 rounded-xl py-8 px-4 relative">
+      <Badge className={genderClassNames}>
+        <TextBody className="text-background">
+          {genderLabel} Candidates
+        </TextBody>
+      </Badge>
+      <div className="embla">
+        <div
+          className="embla__viewport hover:cursor-pointer cursor-grabbing"
+          ref={emblaRef}
+        >
+          <div className="embla__container flex flex-row gap-4">
+            {candidates.map((candidate) => {
+              return (
+                <CandidateScoreCard
+                  className="embla__slide"
+                  key={candidate.id}
+                  candidate={candidate}
+                  scores={scoresMap.get(candidate.id) ?? []}
+                />
+              )
+            })}
+          </div>
+        </div>
+        <div className="mt-4 flex flex-row gap-2 justify-start items-center">
+          <div className="flex flex-row gap-2">
+            <Button
+              onClick={scrollPrev}
+              variant="outline"
+              className="embla__prev rounded-full aspect-square"
+            >
+              <ChevronLeft />
+            </Button>
+            <Button
+              onClick={scrollNext}
+              variant="outline"
+              className="embla__next rounded-full aspect-square"
+            >
+              <ChevronRight />
+            </Button>
+          </div>
+          <div>
+            <TextSub>
+              You can also use 2 fingers on the trackpadd to scroll
+            </TextSub>
+          </div>
+        </div>
+      </div>
+      <div
+        className={cn(
+          'absolute bg-gradient-to-r from-white/0 to-white w-[100px] top-0 right-0 bottom-0 transition-all duration-300',
+          isLastCardInView
+            ? 'opacity-0 translate-x-[50%]'
+            : 'opacity-100 translate-x-[0%]',
+        )}
+      />
+    </div>
   )
 }
 
@@ -195,45 +322,32 @@ function RouteComponent() {
 
   /* If there is no ongoing segment, display a fallback */
   const ScoringTabsFacadeBody = ongoingSegment ? (
-    <Scoring.TabsFacade.Body>
-      <Scoring.TabsFacade.Body.Title>
-        {ongoingSegment.name}
-      </Scoring.TabsFacade.Body.Title>
-      <div className="">
-        <Scoring.TabsFacade.Body.Description>
-          Enter the scores for each candidate in the segment.
-        </Scoring.TabsFacade.Body.Description>
-        <Scoring.TabsFacade.Body.Description>
-          {'->'} ❗Scores are saved automatically
-        </Scoring.TabsFacade.Body.Description>
-        <Scoring.TabsFacade.Body.Description>
-          {'->'} ❗Scoring will automatically close when a segment finishes
-        </Scoring.TabsFacade.Body.Description>
+    <Scoring.TabsFacade.Body className="flex flex-col gap-12">
+      <div className="flex flex-col gap-4 items-center">
+        <div className="[&>*]:text-center">
+          <TextHeading>{ongoingSegment.name}</TextHeading>
+          <TextBody>Score each candidate in the segment</TextBody>
+        </div>
+        <div className="flex flex-col items-center">
+          <TextBody>🔒Scores are saved automatically</TextBody>
+          <TextBody>🚫Scoring will close when a segment finishes</TextBody>
+          <TextBody>
+            👨🏻‍💻Contact organizers when there is a technical problem
+          </TextBody>
+        </div>
       </div>
-      <Scoring.TabsFacade.Body.Content className="grid grid-cols-2">
-        <div className="grid grid-cols-1 gap-4">
-          {femaleCandidates.map((candidate) => {
-            return (
-              <CandidateScoreCard
-                key={candidate.id}
-                candidate={candidate}
-                scores={candidateScoresMap.get(candidate.id)}
-              />
-            )
-          })}
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          {maleCandidates.map((candidate) => {
-            return (
-              <CandidateScoreCard
-                key={candidate.id}
-                candidate={candidate}
-                scores={candidateScoresMap.get(candidate.id)}
-              />
-            )
-          })}
-        </div>
-      </Scoring.TabsFacade.Body.Content>
+      <div className="grid grid-rows-2 gap-4 select-none">
+        <CandidateScoringCards
+          gender={candidateGender.enum.FEMALE}
+          candidates={femaleCandidates}
+          scoresMap={candidateScoresMap}
+        />
+        <CandidateScoringCards
+          gender={candidateGender.enum.MALE}
+          candidates={maleCandidates}
+          scoresMap={candidateScoresMap}
+        />
+      </div>
     </Scoring.TabsFacade.Body>
   ) : (
     <ScoringTabsFacadeBodyNoActiveSegmentFallback phase={ongoingPhase} />
@@ -242,13 +356,13 @@ function RouteComponent() {
   return (
     <Scoring>
       <Scoring.Header>
-        <TextDisplay className="text-center">
+        <Scoring.Header.Display className="text-center">
           {assignedPageant.title}
-        </TextDisplay>
+        </Scoring.Header.Display>
         <Scoring.Header.Title>{ongoingPhase.name}</Scoring.Header.Title>
         <Scoring.Header.Sub>
           Welcome, {capitalizeWords(judge.honorific) + '.'}{' '}
-          {capitalizeWords(judge.firstName)} {capitalizeWords(judge.lastName)}
+          {capitalizeWords(judge.firstName)} {capitalizeWords(judge.lastName)}!
         </Scoring.Header.Sub>
       </Scoring.Header>
       <Scoring.Content>
