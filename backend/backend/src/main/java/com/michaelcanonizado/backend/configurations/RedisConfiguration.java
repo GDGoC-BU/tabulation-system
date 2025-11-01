@@ -23,6 +23,7 @@ public class RedisConfiguration {
         /* List of allowed classes to be stored in cache */
         BasicPolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType("com.michaelcanonizado.backend.dtos")
+                .allowIfSubType("com.michaelcanonizado.backend.models")
                 .allowIfSubType("java.time")
                 .allowIfSubType("java.util")
                 .build();
