@@ -6,6 +6,8 @@ import com.michaelcanonizado.backend.models.Account;
 import com.michaelcanonizado.backend.models.Admin;
 import com.michaelcanonizado.backend.models.Judge;
 import com.michaelcanonizado.backend.repositories.AccountRepository;
+import com.michaelcanonizado.backend.services.CacheService;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,14 +18,23 @@ import java.util.List;
 
 @Service
 public class AccountDetailsService implements UserDetailsService {
+    private static final String CACHE_NAME = CacheNameConstants.ACCOUNT;
+
     @Autowired
     private AccountRepository repository;
 
+    @Autowired
+    private CacheService cacheService;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Account account = repository.findByUsername(username).orElseThrow(() -> {
-            return new UsernameNotFoundException("User not found");
-        });
+        Account account = cacheService.get(CACHE_NAME, username, Account.class);
+        if (account == null) {
+            account = repository.findByUsername(username).orElseThrow(() -> {
+                return new UsernameNotFoundException("User not found");
+            });
+            cacheService.put(CACHE_NAME, account.getUsername(), account);
+        }
 
         List<String> authorities;
         if (account instanceof Admin) {
