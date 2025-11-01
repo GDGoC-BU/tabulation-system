@@ -1,15 +1,17 @@
 package com.michaelcanonizado.backend.aspects;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.PageantContextMissingException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantHeaderLookupFailureException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantStatusException;
+import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.contexts.PageantContext;
-import com.michaelcanonizado.backend.services.PageantCacheService;
+import com.michaelcanonizado.backend.services.CacheService;
 import com.michaelcanonizado.backend.utilities.RequestHeader;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -29,10 +31,13 @@ public class PageantStatusAspect {
     private PageantContext pageantContext;
 
     @Autowired
-    private PageantCacheService pageantCacheService;
+    private RequestHeader requestHeader;
 
     @Autowired
-    private RequestHeader requestHeader;
+    private CacheService cacheService;
+
+    @Autowired
+    private PageantMapper pageantMapper;
 
     @Before("@within(requirePageantStatus) || @annotation(requirePageantStatus)")
     public void checkPageantStatus(RequirePageantStatus requirePageantStatus) {
@@ -43,7 +48,7 @@ public class PageantStatusAspect {
         String headerPageantId = requestHeader.getHeader(headerKey);
 
         /* No Pageant-Id attached in header */
-        if (headerPageantId == null || headerPageantId.isBlank()) {
+        if (headerPageantId == null || headerPageantId.trim().isBlank()) {
             pageantContext.setSelectedPageant(null);
             throw new PageantContextMissingException(
                     "Entity locked under pageant status, but no Pageant-Id header is present!",
@@ -53,9 +58,16 @@ public class PageantStatusAspect {
 
         try {
             UUID pageantId = UUID.fromString(headerPageantId);
+            String cacheName = "PAGEANT";
+            String cacheKey = pageantId.toString();
 
-            /* Check cache */
-            Pageant pageant = pageantCacheService.get(pageantId).orElseGet(() -> {
+            /* Check pageant in cache */
+            PageantSummaryDTO pageant = cacheService.get(
+                    cacheName,
+                    cacheKey,
+                    PageantSummaryDTO.class
+            );
+            if (pageant == null) {
                 /* If not in cache, check database */
                 Pageant pageantInDatabase = pageantRepository.findById(pageantId).orElseThrow(() -> {
                     /* If it doesn't exist anywhere */
@@ -64,14 +76,10 @@ public class PageantStatusAspect {
                             ErrorCode.INVALID_REQUEST_HEADER
                     );
                 });
-
-                /* Update pageant cache */
-                pageantCacheService.put(pageantInDatabase);
-
-                /* Return the found pageant */
-                return pageantInDatabase;
-            });
-
+                pageant = pageantMapper.toSummaryDTO(pageantInDatabase);
+                /* Update cache */
+                cacheService.put(cacheName, cacheKey, pageant);
+            }
             /* Store pageant in context */
             pageantContext.setSelectedPageant(pageant);
         } catch (IllegalArgumentException e) {
@@ -83,13 +91,14 @@ public class PageantStatusAspect {
             );
         }
 
-
         /* Get selected pageant status */
         PageantStatus currentStatus = pageantContext.getStatus();
 
         /* Check if current pageant status aligns with
            the required status to run the method */
-        boolean isAllowed = Arrays.asList(requirePageantStatus.value()).contains(currentStatus);
+        boolean isAllowed = Arrays
+                .asList(requirePageantStatus.value())
+                .contains(currentStatus);
         if (isAllowed) {
             return;
         }

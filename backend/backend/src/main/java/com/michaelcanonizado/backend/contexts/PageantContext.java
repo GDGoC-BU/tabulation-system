@@ -1,5 +1,7 @@
 package com.michaelcanonizado.backend.contexts;
 
+import com.michaelcanonizado.backend.dtos.pageant.PageantStatusDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantContextMissingException;
@@ -9,6 +11,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 @RequestScope
@@ -26,7 +29,7 @@ public class PageantContext {
        relate it the selected Pageant), get the id
        from here and call the database. This ensures
        that the pageant is a fully managed entity. */
-    private Pageant selectedPageant;
+    private PageantSummaryDTO selectedPageant;
 
     public UUID getId() {
         if (selectedPageant == null) {
@@ -35,7 +38,7 @@ public class PageantContext {
                     ErrorCode.PAGEANT_CONTEXT_MISSING
             );
         }
-        return selectedPageant.getId();
+        return selectedPageant.id();
     }
 
     public PageantStatus getStatus() {
@@ -45,7 +48,16 @@ public class PageantContext {
                     ErrorCode.PAGEANT_CONTEXT_MISSING
             );
         }
-        return selectedPageant.getStatus();
+        PageantStatusDTO statusDTO = selectedPageant.status();
+        return Arrays
+                .stream(PageantStatus.values())
+                .filter(status -> status.name().equals(statusDTO.value()))
+                .findFirst()
+                .orElseThrow(() -> {
+                    return new IllegalArgumentException(
+                            "No matching PageantStatus for value: " + statusDTO.value()
+                    );
+                });
     }
 
     public void assertAccess(UUID entityPageantId) {
@@ -55,7 +67,7 @@ public class PageantContext {
                     ErrorCode.PAGEANT_CONTEXT_MISSING
             );
         }
-        if (!selectedPageant.getId().equals(entityPageantId)) {
+        if (!selectedPageant.id().equals(entityPageantId)) {
             throw new PageantAccessDeniedException(
                     "Trying to access entity/ies that don't belong to the current pageant!",
                     ErrorCode.PAGEANT_ACCESS_DENIED
