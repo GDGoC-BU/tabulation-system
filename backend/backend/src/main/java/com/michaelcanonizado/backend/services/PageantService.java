@@ -14,7 +14,10 @@ import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.specifications.CandidateSegmentQualificationSpecification;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,11 +58,22 @@ public class PageantService {
     @Autowired
     private CacheService cacheService;
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
+            evict = @CacheEvict(value = CACHE_NAME, key = "'pageants'")
+    )
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         Pageant pageant = pageantRepository.save(mapper.toEntity(pageantCreateDTO));
         return mapper.toSummaryDTO(pageant);
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
+            evict = {
+                    @CacheEvict(value = CACHE_NAME, key = "#result.id() + '_hierarchy'"),
+                    @CacheEvict(value = CACHE_NAME, key = "'pageants'")
+            }
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
@@ -74,6 +88,13 @@ public class PageantService {
         return mapper.toSummaryDTO(pageantRepository.save(pageant));
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
+            evict = {
+                    @CacheEvict(value = CACHE_NAME, key = "#result.id() + '_hierarchy'"),
+                    @CacheEvict(value = CACHE_NAME, key = "'pageants'")
+            }
+    )
     @RequirePageantStatus({
             PageantStatus.ONGOING
     })
@@ -87,6 +108,13 @@ public class PageantService {
         return mapper.toSummaryDTO(pageantRepository.save(pageant));
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
+            evict = {
+                    @CacheEvict(value = CACHE_NAME, key = "#result.id() + '_hierarchy'"),
+                    @CacheEvict(value = CACHE_NAME, key = "'pageants'")
+            }
+    )
     @RequirePageantStatus({
             PageantStatus.FINALIZING
     })
@@ -101,22 +129,15 @@ public class PageantService {
         return mapper.toSummaryDTO(pageantRepository.save(pageant));
     }
 
+    @Cacheable(value = CACHE_NAME, key = "#id")
     public PageantSummaryDTO getPageant(UUID id) {
-        PageantSummaryDTO pageantDTO = cacheService.get(CACHE_NAME, id.toString(), PageantSummaryDTO.class);
-        if (pageantDTO != null) {
-            return pageantDTO;
-        }
-
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
-
-        pageantDTO = mapper.toSummaryDTO(pageant);
-        cacheService.put(CACHE_NAME, id.toString(), pageantDTO);
-
-        return pageantDTO;
+        return mapper.toSummaryDTO(pageant);
     }
 
+    @Cacheable(value = CACHE_NAME, key = "#id + '_hierarchy'")
     public PageantHierarchyDTO getPageantHierarchy(UUID id) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -125,15 +146,21 @@ public class PageantService {
         return mapper.toHierarchyDTO(pageant);
     }
 
+    @Cacheable(value = CACHE_NAME, key = "'pageants'")
     public List<PageantSummaryDTO> getPageants() {
-        List<Pageant> pageants = pageantRepository.findAll();
-        return pageants
-                .stream()
+        return pageantRepository.findAll().stream()
                 .map(pageant -> {
                     return mapper.toSummaryDTO(pageant);
                 }).toList();
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
+            evict = {
+                    @CacheEvict(value = CACHE_NAME, key = "#result.id() + '_hierarchy'"),
+                    @CacheEvict(value = CACHE_NAME, key = "'pageants'")
+            }
+    )
     public PageantSummaryDTO updatePageant(UUID id, PageantUpdateDTO pageantUpdateDTO) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! Pageant not found.", ErrorCode.ENTITY_NOT_FOUND);
@@ -154,6 +181,13 @@ public class PageantService {
         return mapper.toSummaryDTO(pageantRepository.save(pageant));
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
+            evict = {
+                    @CacheEvict(value = CACHE_NAME, key = "#result.id() + '_hierarchy'"),
+                    @CacheEvict(value = CACHE_NAME, key = "'pageants'")
+            }
+    )
     @Transactional
     public PageantSummaryDTO softResetPageant(UUID id) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
@@ -202,6 +236,13 @@ public class PageantService {
         return mapper.toSummaryDTO(savedPageant);
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = CACHE_NAME, key = "#id"),
+                    @CacheEvict(value = CACHE_NAME, key = "#id + '_hierarchy'"),
+                    @CacheEvict(value = CACHE_NAME, key = "'pageants'")
+            }
+    )
     public void deletePageant(UUID id) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't delete! Pageant not found.", ErrorCode.ENTITY_NOT_FOUND);
