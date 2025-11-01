@@ -14,6 +14,7 @@ import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.specifications.CandidateSegmentQualificationSpecification;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PageantService {
+    private static final String CACHE_NAME = "PAGEANT";
+
     @Autowired
     private PageantRepository pageantRepository;
 
@@ -48,6 +51,9 @@ public class PageantService {
 
     @Autowired
     private PageantMapper mapper;
+
+    @Autowired
+    private CacheService cacheService;
 
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         Pageant pageant = pageantRepository.save(mapper.toEntity(pageantCreateDTO));
@@ -96,12 +102,21 @@ public class PageantService {
     }
 
     public PageantSummaryDTO getPageant(UUID id) {
+        PageantSummaryDTO pageantDTO = cacheService.get(CACHE_NAME, id.toString(), PageantSummaryDTO.class);
+        if (pageantDTO != null) {
+            return pageantDTO;
+        }
+
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
         });
 
-        return mapper.toSummaryDTO(pageant);
+        pageantDTO = mapper.toSummaryDTO(pageant);
+        cacheService.put(CACHE_NAME, id.toString(), pageantDTO);
+
+        return pageantDTO;
     }
+
     public PageantHierarchyDTO getPageantHierarchy(UUID id) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
