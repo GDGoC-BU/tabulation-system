@@ -12,6 +12,7 @@ import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.services.CacheService;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import com.michaelcanonizado.backend.utilities.RequestHeader;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -58,13 +59,13 @@ public class PageantStatusAspect {
 
         try {
             UUID pageantId = UUID.fromString(headerPageantId);
-            String cacheName = "PAGEANT";
-            String cacheKey = pageantId.toString();
+            String CACHE_NAME = CacheNameConstants.PAGEANT;
+            String CACHE_KEY = pageantId.toString();
 
             /* Check pageant in cache */
             PageantSummaryDTO pageant = cacheService.get(
-                    cacheName,
-                    cacheKey,
+                    CACHE_NAME,
+                    CACHE_KEY,
                     PageantSummaryDTO.class
             );
             if (pageant == null) {
@@ -78,7 +79,7 @@ public class PageantStatusAspect {
                 });
                 pageant = pageantMapper.toSummaryDTO(pageantInDatabase);
                 /* Update cache */
-                cacheService.put(cacheName, cacheKey, pageant);
+                cacheService.put(CACHE_NAME, CACHE_KEY, pageant);
             }
             /* Store pageant in context */
             pageantContext.setSelectedPageant(pageant);
