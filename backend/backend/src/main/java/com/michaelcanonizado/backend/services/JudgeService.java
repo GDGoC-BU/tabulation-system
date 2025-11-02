@@ -4,22 +4,27 @@ import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
-import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.mappers.JudgeMapper;
 import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class JudgeService {
+    private static final String CACHE_NAME = CacheNameConstants.JUDGE;
+
     @Autowired
     private JudgeRepository judgeRepository;
 
@@ -32,6 +37,9 @@ public class JudgeService {
     @Autowired
     private PageantContext pageantContext;
 
+    @Caching(
+            cacheable = @Cacheable(value = CACHE_NAME, key = "#id")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
@@ -51,6 +59,9 @@ public class JudgeService {
         return judgeMapper.toSummaryDTO(judge);
     }
 
+    @Caching(
+            cacheable = @Cacheable(value = CACHE_NAME, key = "'judges'")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
@@ -68,6 +79,10 @@ public class JudgeService {
                 .toList();
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
+            evict = @CacheEvict(value = CACHE_NAME, key = "'judges'")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
@@ -85,6 +100,12 @@ public class JudgeService {
         return judgeMapper.toSummaryDTO(judgeRepository.save(judge));
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = CACHE_NAME, key = "#id"),
+                    @CacheEvict(value = CACHE_NAME, key = "'judges'")
+            }
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
