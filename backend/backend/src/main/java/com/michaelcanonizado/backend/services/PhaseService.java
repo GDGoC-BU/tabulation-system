@@ -13,7 +13,12 @@ import com.michaelcanonizado.backend.mappers.PhaseMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.PhaseRepository;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +28,8 @@ import java.util.UUID;
 
 @Service
 public class PhaseService {
+    private static final String CACHE_NAME = CacheNameConstants.PHASE;
+
     @Autowired
     private PhaseRepository phaseRepository;
 
@@ -38,6 +45,9 @@ public class PhaseService {
     @Autowired
     private PageantContext pageantContext;
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
     })
@@ -90,6 +100,9 @@ public class PhaseService {
         return mapper.toDetailedDTO(phaseRepository.save(phase));
     }
 
+    @Caching(
+            cacheable = @Cacheable(value = CACHE_NAME, key = "#id")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
@@ -106,6 +119,9 @@ public class PhaseService {
         return mapper.toDetailedDTO(phase);
     }
 
+    @Caching(
+            cacheable = @Cacheable(value = CACHE_NAME, key = "'ongoing'")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
@@ -136,6 +152,9 @@ public class PhaseService {
                 .orElse(null);
     }
 
+    @Caching(
+            cacheable = @Cacheable(value = CACHE_NAME, key = "'phases'")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING
@@ -151,6 +170,10 @@ public class PhaseService {
                 .toList();
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
+            evict = @CacheEvict(value = CACHE_NAME, key = "'phases'")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
     })
@@ -163,6 +186,13 @@ public class PhaseService {
         return mapper.toDetailedDTO(phaseRepository.save(phase));
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = CACHE_NAME, key = "#id"),
+                    @CacheEvict(value = CACHE_NAME, key = "'ongoing'"),
+                    @CacheEvict(value = CACHE_NAME, key = "'phases'")
+            }
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
     })
