@@ -129,6 +129,23 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationFailedException(
+            AuthenticationFailedException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
     @ExceptionHandler(UnsupportedAccountTypeException.class)
     public ResponseEntity<ErrorResponse> handleUnsupportedAccountTypeException(
             UnsupportedAccountTypeException exception,

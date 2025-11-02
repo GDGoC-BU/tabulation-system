@@ -3,6 +3,7 @@ package com.michaelcanonizado.backend.services;
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.account.AccountCreateDTO;
+import com.michaelcanonizado.backend.dtos.account.AccountCredentialDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountLoginDTO;
 import com.michaelcanonizado.backend.dtos.account.AccountSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
@@ -14,7 +15,12 @@ import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.security.AccountPrincipal;
 import com.michaelcanonizado.backend.security.JwtService;
+import com.michaelcanonizado.backend.utilities.AccountTypeConstants;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +33,8 @@ import java.util.*;
 
 @Service
 public class AccountService {
+    private static final String CACHE_NAME = CacheNameConstants.ACCOUNT;
+
     @Autowired
     private AccountRepository accountRepository;
 
@@ -66,30 +74,40 @@ public class AccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private  CacheService cacheService;
+
     @Transactional
     public String loginAccount(AccountLoginDTO accountLoginDTO) {
         String username = accountLoginDTO.username();
         String password = accountLoginDTO.password();
 
+        /* Verify credentials. If it's wrong, it will throw an exception which is already handled by
+           GlobalExceptionHandler. */
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
 
+        /* If success, generate the token with their respective claims */
         AccountPrincipal principal = (AccountPrincipal) authentication.getPrincipal();
-        Account account = principal.getAccount();
+        AccountCredentialDTO account = principal.getAccount();
 
         Map<String, Object> extraClaims = new HashMap<>();
 
-        if (account instanceof Judge judge) {
+        /* Perform special checks on Judge */
+        if (account.accountType().equals(AccountTypeConstants.JUDGE)) {
+            Judge judge = judgeRepository.findById(account.id()).orElseThrow(() -> {
+                return new AuthenticationFailedException(
+                        "Couldn't find connected Judge entity to Account.",
+                        ErrorCode.AUTHENTICATION_FAILED
+                );
+            });
             Pageant pageant = judge.getPageant();
-
-            /* Might also check if pageant is null, but this
-               might need a custom exception. */
 
             /* Judge can only log in if their assign pageant is ongoing. */
             if (!pageant.getStatus().equals(PageantStatus.ONGOING)) {
                 throw new PageantStatusException(
-                        "Assigned pageant must be ONGOING to login",
+                        "Assigned pageant must be ONGOING to login.",
                         ErrorCode.PAGEANT_ACCESS_DENIED
                 );
             }
@@ -109,6 +127,9 @@ public class AccountService {
         return jwtService.generateToken(account, extraClaims);
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.username()")
+    )
     public AccountSummaryDTO createAdmin(AccountCreateDTO request) {
         /* Use mapstruct here to encode! */
         String username = request.username();
@@ -118,6 +139,9 @@ public class AccountService {
         return accountMapper.toSummaryDTO(accountRepository.save(admin));
     }
 
+    @Caching(
+            put = @CachePut(value = CACHE_NAME, key = "#result.username()")
+    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
     })
@@ -159,9 +183,31 @@ public class AccountService {
     }
 
     public AccountSummaryDTO getCurrentAccount() {
+        /* NOTE: The username is in the security context, so handle caching programmatically. */
+        /* Get account principal from SecurityContextHolder
+           (The caller will be calling this endpoint with a jtw token attached. When they
+           reach this method, the account principal has already been set) */
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AccountPrincipal accountPrincipal = (AccountPrincipal) authentication.getPrincipal();
-        Account currentLoggedInAccount = accountPrincipal.getAccount();
-        return accountMapper.toSummaryDTO(currentLoggedInAccount);
+        AccountCredentialDTO currentLoggedInAccount = accountPrincipal.getAccount();
+
+        /* Since AccountSummaryDTO can't be mapped from AccountCredentialsDTO, refetch the
+           account and map it to required DTO. */
+        String CACHE_NAME = CacheNameConstants.ACCOUNT;
+        String CACHE_KEY = currentLoggedInAccount.username();
+
+        AccountSummaryDTO account = cacheService.get(CACHE_NAME, CACHE_KEY, AccountSummaryDTO.class);
+        if (account == null) {
+            Account accountFromDatabase = accountRepository.findById(currentLoggedInAccount.id()).orElseThrow(() -> {
+                return new EntityNotFoundException(
+                        "Account not found!",
+                        ErrorCode.ENTITY_NOT_FOUND
+                );
+            });
+            account = accountMapper.toSummaryDTO(accountFromDatabase);
+            cacheService.put(CACHE_NAME, CACHE_KEY, account);
+        }
+
+        return account;
     }
 }

@@ -43,6 +43,6 @@ public class AccountController {
     @GetMapping("/accounts/me")
     public ResponseEntity<AccountSummaryDTO> getCurrentAccount() {
         AccountSummaryDTO account = service.getCurrentAccount();
-        return new ResponseEntity<>(account, HttpStatus.CREATED);
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 }

@@ -31,6 +31,9 @@ public abstract class Account extends Auditable {
     @Column(nullable = true)
     private LocalDateTime lastSeenAt;
 
+    @Column(name = "account_type", insertable = false, updatable = false)
+    private String accountType;
+
     public Account(String username, String passwordHash) {
         this.username = username;
         this.passwordHash = passwordHash;

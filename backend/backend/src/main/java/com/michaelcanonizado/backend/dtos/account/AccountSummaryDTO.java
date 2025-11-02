@@ -7,6 +7,7 @@ public record AccountSummaryDTO(
         UUID id,
         String username,
         boolean isOnline,
+        String accountType,
         LocalDateTime lastSeenAt
 ) {
 }

@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.security;
 
-import com.michaelcanonizado.backend.models.Account;
+import com.michaelcanonizado.backend.dtos.account.AccountCredentialDTO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,11 +9,11 @@ import java.util.Collection;
 import java.util.List;
 
 public class AccountPrincipal implements UserDetails {
-    private final Account account;
+    private final AccountCredentialDTO account;
     private final List<? extends GrantedAuthority> authorities;
     private final boolean enabled = true;
 
-    public AccountPrincipal(Account account, List<String> authorities) {
+    public AccountPrincipal(AccountCredentialDTO account, List<String> authorities) {
         this.account = account;
         this.authorities = authorities.stream().map(SimpleGrantedAuthority::new).toList();
     }
@@ -23,18 +23,18 @@ public class AccountPrincipal implements UserDetails {
         return authorities;
     }
 
-    public Account getAccount() {
+    public AccountCredentialDTO getAccount() {
         return account;
     }
 
     @Override
     public String getUsername() {
-        return account.getUsername();
+        return account.username();
     }
 
     @Override
     public String getPassword() {
-        return account.getPasswordHash();
+        return account.passwordHash();
     }
 
     @Override
