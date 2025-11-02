@@ -129,7 +129,9 @@ public class PageantService {
         return mapper.toSummaryDTO(pageantRepository.save(pageant));
     }
 
-    @Cacheable(value = CACHE_NAME, key = "#id")
+    @Caching(
+            cacheable = @Cacheable(value = CACHE_NAME, key = "#id")
+    )
     public PageantSummaryDTO getPageant(UUID id) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -137,7 +139,9 @@ public class PageantService {
         return mapper.toSummaryDTO(pageant);
     }
 
-    @Cacheable(value = CACHE_NAME, key = "#id + '_hierarchy'")
+    @Caching(
+            cacheable = @Cacheable(value = CACHE_NAME, key = "#id + '_hierarchy'")
+    )
     public PageantHierarchyDTO getPageantHierarchy(UUID id) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
@@ -146,7 +150,9 @@ public class PageantService {
         return mapper.toHierarchyDTO(pageant);
     }
 
-    @Cacheable(value = CACHE_NAME, key = "'pageants'")
+    @Caching(
+            cacheable = @Cacheable(value = CACHE_NAME, key = "'pageants'")
+    )
     public List<PageantSummaryDTO> getPageants() {
         return pageantRepository.findAll().stream()
                 .map(pageant -> {
