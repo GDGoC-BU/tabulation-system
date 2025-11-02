@@ -2,6 +2,7 @@ package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantHierarchyDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.segment.*;
@@ -16,6 +17,7 @@ import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.specifications.CandidateSegmentQualificationSpecification;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import com.michaelcanonizado.backend.specifications.SegmentSpecification;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import com.michaelcanonizado.backend.utilities.FormulaEncoder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,6 +58,9 @@ public class SegmentService {
     private CriterionRepository criterionRepository;
 
     @Autowired
+    private PageantMapper pageantMapper;
+
+    @Autowired
     private PhaseMapper phaseMapper;
 
     @Autowired
@@ -78,6 +83,9 @@ public class SegmentService {
 
     @Autowired
     private FormulaEncoder formulaEncoder;
+
+    @Autowired
+    private CacheService cacheService;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION
@@ -125,6 +133,11 @@ public class SegmentService {
         segment.setStatus(PhaseSegmentStatus.ONGOING);
         Segment savedSegment = segmentRepository.save(segment);
 
+        /* Update cache immediately to prevent cache stampede. Judges will refetch
+           /pageants/{id}/hierarchy at the same time when they get notified. Can be
+           improved using thread locks but that's pretty overkill. */
+        updateCachedPageantHierarchy(selectedPageantId);
+
         /* Notify the client about the new ongoing segment after database commit */
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
@@ -137,7 +150,6 @@ public class SegmentService {
                     }
                 }
         );
-
         return segmentMapper.toDetailedDTO(savedSegment);
     }
 
@@ -156,6 +168,8 @@ public class SegmentService {
         segment.setStatus(PhaseSegmentStatus.CLOSED);
         Segment savedSegment = segmentRepository.save(segment);
 
+        updateCachedPageantHierarchy(selectedPageantId);
+
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
                     @Override
@@ -167,8 +181,26 @@ public class SegmentService {
                     }
                 }
         );
-
         return segmentMapper.toDetailedDTO(savedSegment);
+    }
+
+    private void updateCachedPageantHierarchy(UUID pageantId) {
+        Pageant pageant = pageantRepository.findById(pageantId).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "This error should not occur! Pageant access is already being accessed earlier. Contact admin",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        });
+
+        String CACHE_NAME = CacheNameConstants.PAGEANT;
+        String CACHE_KEY = pageant.getId().toString() + "_hierarchy";
+
+        PageantHierarchyDTO pageantHierarchyDTO = pageantMapper.toHierarchyDTO(pageant);
+        cacheService.put(
+                CACHE_NAME,
+                CACHE_KEY,
+                pageantHierarchyDTO
+        );
     }
 
     @RequirePageantStatus({
