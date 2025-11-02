@@ -1,10 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
-import type {
-  AwardDetailed,
-  AwardLeaderboards,
-} from '@/features/awards/schemas'
+import type { AwardLeaderboards } from '@/features/awards/schemas'
 import { TextBody, TextHeading } from '@/components/text'
-import { Button } from '@/components/ui/button'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
 import { useAwardsQuery } from '@/features/awards/hooks/use-awards-query'
@@ -14,6 +10,7 @@ import FormulaRenderer from '@/features/formula/components/formula-renderer'
 import { useAwardsCalculation } from '@/features/awards/hooks/use-awards-calculation-mutation'
 import { cn } from '@/lib/utils'
 import { groupLeaderboardByGender } from '@/lib/group-leaderboard-by-gender'
+import ConfirmDialog from '@/components/confirm-dialog'
 
 export function AwardLeaderboard({
   leaderboard,
@@ -97,7 +94,12 @@ export default function PageantFinalizingDashboard() {
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="">
-        <Button onClick={onClick}>Close Pageant</Button>
+        <ConfirmDialog
+          triggerLabel="Close Pageant"
+          title="Close Pageant"
+          description="This action cannot be undone. Are you sure you want to move to the next stage?"
+          onConfirm={onClick}
+        />
       </div>
       <div className="w-full flex flex-col gap-24">
         {awardResults.map(({ data: award, isLoading, isError }) => {
