@@ -17,6 +17,7 @@ import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.specifications.CandidateSegmentQualificationSpecification;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import com.michaelcanonizado.backend.specifications.SegmentSpecification;
+import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import com.michaelcanonizado.backend.utilities.FormulaEncoder;
 import lombok.AllArgsConstructor;
@@ -87,6 +88,9 @@ public class SegmentService {
     @Autowired
     private CacheService cacheService;
 
+    @Autowired
+    private CacheKeyBuilder cacheKeyBuilder;
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
@@ -133,10 +137,13 @@ public class SegmentService {
         segment.setStatus(PhaseSegmentStatus.ONGOING);
         Segment savedSegment = segmentRepository.save(segment);
 
-        /* Update cache immediately to prevent cache stampede. Judges will refetch
-           /pageants/{id}/hierarchy at the same time when they get notified. Can be
-           improved using thread locks but that's pretty overkill. */
-        updateCachedPageantHierarchy(selectedPageantId);
+        /* Update cache immediately to prevent cache stampede. For instance, Judges
+           will refetch /pageants/{id}/hierarchy at the same time when they get notified.
+           Can be improved using thread locks but that's pretty overkill. But for now,
+           just update all cache instances that hold the segment */
+        Phase phase = segment.getPhase();
+        Pageant pageant = phase.getPageant();
+        updateCacheThatHaveSegment(pageant, phase);
 
         /* Notify the client about the new ongoing segment after database commit */
         TransactionSynchronizationManager.registerSynchronization(
@@ -163,13 +170,14 @@ public class SegmentService {
         });
 
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
-        UUID selectedPageantId = pageantContext.getId();
-
         segment.setStatus(PhaseSegmentStatus.CLOSED);
         Segment savedSegment = segmentRepository.save(segment);
 
-        updateCachedPageantHierarchy(selectedPageantId);
+        Phase phase = segment.getPhase();
+        Pageant pageant = phase.getPageant();
+        updateCacheThatHaveSegment(pageant, phase);
 
+        UUID selectedPageantId = pageantContext.getId();
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
                     @Override
@@ -184,23 +192,29 @@ public class SegmentService {
         return segmentMapper.toDetailedDTO(savedSegment);
     }
 
-    private void updateCachedPageantHierarchy(UUID pageantId) {
-        Pageant pageant = pageantRepository.findById(pageantId).orElseThrow(() -> {
-            return new EntityNotFoundException(
-                    "This error should not occur! Pageant access is already being accessed earlier. Contact admin",
-                    ErrorCode.ENTITY_NOT_FOUND
-            );
-        });
-
-        String CACHE_NAME = CacheNameConstants.PAGEANT;
-        String CACHE_KEY = pageant.getId().toString() + "_hierarchy";
-
-        PageantHierarchyDTO pageantHierarchyDTO = pageantMapper.toHierarchyDTO(pageant);
+    private void updateCacheThatHaveSegment(Pageant pageant, Phase phase) {
+        /* Pageant Hierarchy */
         cacheService.put(
-                CACHE_NAME,
-                CACHE_KEY,
-                pageantHierarchyDTO
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", pageant.getId(), "hierarchy"),
+                pageantMapper.toHierarchyDTO(pageant)
         );
+
+        /* Phase */
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", pageant.getId(), "phases", phase.getId()),
+                phaseMapper.toDetailedDTO(phase)
+        );
+
+        /* Ongoing Phase */
+        if (phase.getStatus() == PhaseSegmentStatus.ONGOING) {
+            cacheService.put(
+                    CacheNameConstants.TABULATION,
+                    cacheKeyBuilder.build("pageants", pageant.getId(), "phases", "ongoing"),
+                    phaseMapper.toDetailedDTO(phase)
+            );
+        }
     }
 
     @RequirePageantStatus({

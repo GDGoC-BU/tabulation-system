@@ -4,10 +4,10 @@ import com.michaelcanonizado.backend.dtos.account.AccountCredentialDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.UnsupportedAccountTypeException;
 import com.michaelcanonizado.backend.mappers.AccountMapper;
-import com.michaelcanonizado.backend.models.Account;
 import com.michaelcanonizado.backend.repositories.AccountRepository;
 import com.michaelcanonizado.backend.services.CacheService;
 import com.michaelcanonizado.backend.utilities.AccountTypeConstants;
+import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,28 +23,40 @@ public class AccountDetailsService implements UserDetailsService {
     private AccountRepository repository;
 
     @Autowired
+    private AccountMapper accountMapper;
+
+    @Autowired
     private CacheService cacheService;
 
     @Autowired
-    private AccountMapper accountMapper;
+    private CacheKeyBuilder cacheKeyBuilder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        /* Account caching when they log in. NOTE: This method is called on every request,
-           therefore adding caching here is important. */
-        String CACHE_NAME = CacheNameConstants.ACCOUNT;
-        String CACHE_KEY = username + "_credentials";
+        /* This method is called on every request, therefore caching here is important. */
+        String CACHE_NAME = CacheNameConstants.AUTH;
+        String CACHE_KEY = cacheKeyBuilder.build("accounts", username, "credential");
 
         /* Account is an abstract class which can't be deserialized, so a DTO will be used.
            This DTO will then be the AccountPrincipal object which means it should hold the
            necessary fields AccountPrincipal needs. */
-        AccountCredentialDTO account = cacheService.get(CACHE_NAME, CACHE_KEY, AccountCredentialDTO.class);
+        AccountCredentialDTO account = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                AccountCredentialDTO.class
+        );
+
         if (account == null) {
-            Account accountFromDatabase = repository.findByUsername(username).orElseThrow(() -> {
-                return new UsernameNotFoundException("User not found");
-            });
-            account = accountMapper.toCredentialDTO(accountFromDatabase);
-            cacheService.put(CACHE_NAME, CACHE_KEY, account);
+            account = accountMapper.toCredentialDTO(
+                    repository.findByUsername(username).orElseThrow(() -> {
+                        return new UsernameNotFoundException("User not found");
+                    })
+            );
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    account
+            );
         }
 
         List<String> authorities;

@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.aspects;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.dtos.pageant.PageantContextDTO;
 import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.PageantContextMissingException;
@@ -12,6 +13,7 @@ import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.services.CacheService;
+import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import com.michaelcanonizado.backend.utilities.RequestHeader;
 import org.aspectj.lang.annotation.Aspect;
@@ -35,10 +37,13 @@ public class PageantStatusAspect {
     private RequestHeader requestHeader;
 
     @Autowired
+    private PageantMapper pageantMapper;
+
+    @Autowired
     private CacheService cacheService;
 
     @Autowired
-    private PageantMapper pageantMapper;
+    private CacheKeyBuilder cacheKeyBuilder;
 
     @Before("@within(requirePageantStatus) || @annotation(requirePageantStatus)")
     public void checkPageantStatus(RequirePageantStatus requirePageantStatus) {
@@ -50,7 +55,7 @@ public class PageantStatusAspect {
 
         /* No Pageant-Id attached in header */
         if (headerPageantId == null || headerPageantId.trim().isBlank()) {
-            pageantContext.setSelectedPageant(null);
+            pageantContext.setPageant(null);
             throw new PageantContextMissingException(
                     "Entity locked under pageant status, but no Pageant-Id header is present!",
                     ErrorCode.PAGEANT_CONTEXT_MISSING
@@ -59,16 +64,16 @@ public class PageantStatusAspect {
 
         try {
             UUID pageantId = UUID.fromString(headerPageantId);
-            String CACHE_NAME = CacheNameConstants.PAGEANT;
-            String CACHE_KEY = pageantId.toString();
+            String CACHE_NAME = CacheNameConstants.TABULATION;
+            String CACHE_KEY = cacheKeyBuilder.build("pageants", pageantId, "context");
 
             /* Check pageant in cache */
-            PageantSummaryDTO pageant = cacheService.get(
+            PageantContextDTO pageantDTO = cacheService.get(
                     CACHE_NAME,
                     CACHE_KEY,
-                    PageantSummaryDTO.class
+                    PageantContextDTO.class
             );
-            if (pageant == null) {
+            if (pageantDTO == null) {
                 /* If not in cache, check database */
                 Pageant pageantInDatabase = pageantRepository.findById(pageantId).orElseThrow(() -> {
                     /* If it doesn't exist anywhere */
@@ -77,15 +82,19 @@ public class PageantStatusAspect {
                             ErrorCode.INVALID_REQUEST_HEADER
                     );
                 });
-                pageant = pageantMapper.toSummaryDTO(pageantInDatabase);
+                pageantDTO = pageantMapper.toContextDTO(pageantInDatabase);
                 /* Update cache */
-                cacheService.put(CACHE_NAME, CACHE_KEY, pageant);
+                cacheService.put(
+                        CACHE_NAME,
+                        CACHE_KEY,
+                        pageantDTO
+                );
             }
             /* Store pageant in context */
-            pageantContext.setSelectedPageant(pageant);
+            pageantContext.setPageant(pageantDTO);
         } catch (IllegalArgumentException e) {
             /* Pageant-Id is attached in header but invalid UUID format */
-            pageantContext.setSelectedPageant(null);
+            pageantContext.setPageant(null);
             throw new PageantHeaderLookupFailureException(
                     "Cannot resolve the attached '" + headerKey + "' header! Invalid UUID format.",
                     ErrorCode.INVALID_REQUEST_HEADER

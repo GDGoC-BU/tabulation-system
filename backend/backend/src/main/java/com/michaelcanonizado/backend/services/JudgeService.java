@@ -10,12 +10,9 @@ import com.michaelcanonizado.backend.mappers.JudgeMapper;
 import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
+import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,8 +20,6 @@ import java.util.UUID;
 
 @Service
 public class JudgeService {
-    private static final String CACHE_NAME = CacheNameConstants.JUDGE;
-
     @Autowired
     private JudgeRepository judgeRepository;
 
@@ -37,9 +32,12 @@ public class JudgeService {
     @Autowired
     private PageantContext pageantContext;
 
-    @Caching(
-            cacheable = @Cacheable(value = CACHE_NAME, key = "#id")
-    )
+    @Autowired
+    private CacheService cacheService;
+
+    @Autowired
+    private CacheKeyBuilder cacheKeyBuilder;
+
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
@@ -47,21 +45,36 @@ public class JudgeService {
             PageantStatus.CLOSED
     })
     public JudgeSummaryDTO getJudge(UUID id) {
-        Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
-        });
+        UUID selectedPageantId = pageantContext.getId();
+        String CACHE_NAME = CacheNameConstants.TABULATION;
+        String CACHE_KEY = cacheKeyBuilder.build("pageants", selectedPageantId, "judges", id);
 
-        pageantContext.assertAccess(
-                judge.getPageant()
-                        .getId()
+        JudgeSummaryDTO responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                JudgeSummaryDTO.class
         );
 
-        return judgeMapper.toSummaryDTO(judge);
+        if (responseDTO == null) {
+            Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
+                return new EntityNotFoundException(
+                        "Judge not found!",
+                        ErrorCode.ENTITY_NOT_FOUND
+                );
+            });
+            pageantContext.assertAccess(judge.getPageant().getId());
+            responseDTO = judgeMapper.toSummaryDTO(judge);
+
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    responseDTO
+            );
+        }
+
+        return responseDTO;
     }
 
-    @Caching(
-            cacheable = @Cacheable(value = CACHE_NAME, key = "'judges'")
-    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
@@ -70,53 +83,86 @@ public class JudgeService {
     })
     public List<JudgeSummaryDTO> getJudges() {
         UUID selectedPageantId = pageantContext.getId();
-        return judgeRepository
-                .findAllByPageant_Id(selectedPageantId)
-                .stream()
-                .map(judge -> {
-                    return judgeMapper.toSummaryDTO(judge);
-                })
-                .toList();
+        String CACHE_NAME = CacheNameConstants.TABULATION;
+        String CACHE_KEY = cacheKeyBuilder.build("pageants", selectedPageantId, "judges", "list", "all");
+
+        List<JudgeSummaryDTO> responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                List.class
+        );
+
+        if (responseDTO == null) {
+            responseDTO = judgeRepository
+                    .findAllByPageant_Id(selectedPageantId)
+                    .stream()
+                    .map(judge -> {
+                        return judgeMapper.toSummaryDTO(judge);
+                    })
+                    .toList();
+
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    responseDTO
+            );
+        }
+
+        return responseDTO;
     }
 
-    @Caching(
-            put = @CachePut(value = CACHE_NAME, key = "#result.id()"),
-            evict = @CacheEvict(value = CACHE_NAME, key = "'judges'")
-    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
     public JudgeSummaryDTO updateJudge(UUID id, JudgeUpdateDTO judgeUpdateDTO) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Can't update. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
+            return new EntityNotFoundException(
+                    "Can't update. Judge not found!",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
         });
 
-        pageantContext.assertAccess(
-                judge.getPageant()
-                        .getId()
+        pageantContext.assertAccess(judge.getPageant().getId());
+        judgeMapper.updateEntityFromDTO(judge, judgeUpdateDTO);
+        Judge savedJudge = judgeRepository.save(judge);
+        JudgeSummaryDTO responseDTO = judgeMapper.toSummaryDTO(savedJudge);
+
+        UUID selectedPageantId = pageantContext.getId();
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "judges", id),
+                responseDTO
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "judges", "list", "all")
         );
 
-        judgeMapper.updateEntityFromDTO(judge, judgeUpdateDTO);
-        return judgeMapper.toSummaryDTO(judgeRepository.save(judge));
+        return responseDTO;
     }
 
-    @Caching(
-            evict = {
-                    @CacheEvict(value = CACHE_NAME, key = "#id"),
-                    @CacheEvict(value = CACHE_NAME, key = "'judges'")
-            }
-    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION
     })
     public void deleteJudge(UUID id) {
         Judge judge = judgeRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Can't delete. Judge not found!", ErrorCode.ENTITY_NOT_FOUND);
+            return new EntityNotFoundException(
+                    "Can't delete. Judge not found!",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
         });
-        pageantContext.assertAccess(
-                judge.getPageant()
-                        .getId()
+        pageantContext.assertAccess(judge.getPageant().getId());
+
+        UUID selectedPageantId = pageantContext.getId();
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "judges", id)
         );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "judges", "list", "all")
+        );
+
         judgeRepository.delete(judge);
     }
 }

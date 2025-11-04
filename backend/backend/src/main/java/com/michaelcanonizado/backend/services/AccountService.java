@@ -16,11 +16,9 @@ import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.security.AccountPrincipal;
 import com.michaelcanonizado.backend.security.JwtService;
 import com.michaelcanonizado.backend.utilities.AccountTypeConstants;
+import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,8 +31,6 @@ import java.util.*;
 
 @Service
 public class AccountService {
-    private static final String CACHE_NAME = CacheNameConstants.ACCOUNT;
-
     @Autowired
     private AccountRepository accountRepository;
 
@@ -76,6 +72,9 @@ public class AccountService {
 
     @Autowired
     private  CacheService cacheService;
+
+    @Autowired
+    private CacheKeyBuilder cacheKeyBuilder;
 
     @Transactional
     public String loginAccount(AccountLoginDTO accountLoginDTO) {
@@ -127,9 +126,6 @@ public class AccountService {
         return jwtService.generateToken(account, extraClaims);
     }
 
-    @Caching(
-            put = @CachePut(value = CACHE_NAME, key = "#result.username()")
-    )
     public AccountSummaryDTO createAdmin(AccountCreateDTO request) {
         /* Use mapstruct here to encode! */
         String username = request.username();
@@ -139,9 +135,6 @@ public class AccountService {
         return accountMapper.toSummaryDTO(accountRepository.save(admin));
     }
 
-    @Caching(
-            put = @CachePut(value = CACHE_NAME, key = "#result.username()")
-    )
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
     })
@@ -183,31 +176,41 @@ public class AccountService {
     }
 
     public AccountSummaryDTO getCurrentAccount() {
-        /* NOTE: The username is in the security context, so handle caching programmatically. */
-        /* Get account principal from SecurityContextHolder
-           (The caller will be calling this endpoint with a jtw token attached. When they
-           reach this method, the account principal has already been set) */
+        /* NOTE: The username(cache key) is in the security context, so handle caching programmatically. */
+        /* Get account principal from SecurityContextHolder (The caller will be calling this endpoint
+        with a jtw token attached. When they reach this method, the account principal has already been set) */
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AccountPrincipal accountPrincipal = (AccountPrincipal) authentication.getPrincipal();
         AccountCredentialDTO currentLoggedInAccount = accountPrincipal.getAccount();
 
         /* Since AccountSummaryDTO can't be mapped from AccountCredentialsDTO, refetch the
            account and map it to required DTO. */
-        String CACHE_NAME = CacheNameConstants.ACCOUNT;
-        String CACHE_KEY = currentLoggedInAccount.username();
+        String CACHE_NAME = CacheNameConstants.AUTH;
+        String CACHE_KEY = cacheKeyBuilder.build("accounts", currentLoggedInAccount.username());
 
-        AccountSummaryDTO account = cacheService.get(CACHE_NAME, CACHE_KEY, AccountSummaryDTO.class);
-        if (account == null) {
-            Account accountFromDatabase = accountRepository.findById(currentLoggedInAccount.id()).orElseThrow(() -> {
-                return new EntityNotFoundException(
-                        "Account not found!",
-                        ErrorCode.ENTITY_NOT_FOUND
-                );
-            });
-            account = accountMapper.toSummaryDTO(accountFromDatabase);
-            cacheService.put(CACHE_NAME, CACHE_KEY, account);
+        AccountSummaryDTO responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                AccountSummaryDTO.class
+        );
+
+        if (responseDTO == null) {
+            responseDTO = accountMapper.toSummaryDTO(
+                    accountRepository.findById(currentLoggedInAccount.id()).orElseThrow(() -> {
+                        return new EntityNotFoundException(
+                                "Account not found!",
+                                ErrorCode.ENTITY_NOT_FOUND
+                        );
+                    })
+            );
+
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    responseDTO
+            );
         }
 
-        return account;
+        return responseDTO;
     }
 }
