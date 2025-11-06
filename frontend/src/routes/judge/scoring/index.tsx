@@ -3,8 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import useEmblaCarousel from 'embla-carousel-react'
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import type { EmblaCarouselType } from 'embla-carousel'
 import type { ScoreDetailed } from '@/features/scores/schemas'
 import type { PhaseDetailed, PhaseHierarchy } from '@/features/phases/schemas'
 import type {
@@ -26,7 +24,6 @@ import { useStompStore } from '@/store/stomp-store'
 import { phaseSegmentStatusValue } from '@/schemas'
 import CandidateScoreCard from '@/features/scores/components/candidate-score-card'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 
@@ -68,25 +65,9 @@ function CandidateScoringCards({
   scoresMap: Map<string, Array<ScoreDetailed>>
   gender: CandidateGender
 }) {
-  const [isLastCardInView, setIsLastCardInView] = useState(false)
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false }, [
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     WheelGesturesPlugin(),
   ])
-
-  const onSlideScroll = useCallback((api: EmblaCarouselType) => {
-    const progress = api.scrollProgress()
-    if (progress > 0.99) {
-      setIsLastCardInView(true)
-    } else {
-      setIsLastCardInView(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    /* Might want to throttle this. But the compontent only ever rerenders when
-       isLastCardInView changes */
-    if (emblaApi) emblaApi.on('scroll', onSlideScroll)
-  }, [emblaApi, onSlideScroll])
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev()
@@ -113,6 +94,13 @@ function CandidateScoringCards({
     genderShadowClassNames = 'shadow-lg shadow-gender-male-secondary'
   }
 
+  let genderRingClassNames = ''
+  if (gender === FEMALE) {
+    genderRingClassNames = 'ring-gender-female-primary'
+  } else if (gender === MALE) {
+    genderRingClassNames = 'ring-gender-male-primary'
+  }
+
   let genderLabel = ''
   if (gender === FEMALE) {
     genderLabel = 'Female'
@@ -120,23 +108,48 @@ function CandidateScoringCards({
     genderLabel = 'Male'
   }
 
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
+    containScroll: 'keepSnaps',
+    dragFree: true,
+    active: false,
+  })
+
+  const onThumbClick = useCallback(
+    (index: number) => {
+      if (!emblaApi || !emblaThumbsApi) return
+      emblaApi.scrollTo(index)
+    },
+    [emblaApi, emblaThumbsApi],
+  )
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi || !emblaThumbsApi) return
+    setSelectedIndex(emblaApi.selectedScrollSnap())
+    emblaThumbsApi.scrollTo(emblaApi.selectedScrollSnap())
+  }, [emblaApi, emblaThumbsApi, setSelectedIndex])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    onSelect()
+
+    emblaApi.on('select', onSelect).on('reInit', onSelect)
+  }, [emblaApi, onSelect])
+
   return (
     <div className="overflow-hidden bg-muted flex flex-col gap-8 rounded-xl py-8 px-4 relative">
-      <Badge className={genderBadgeClassNames}>
+      <Badge className={cn('mx-auto', genderBadgeClassNames)}>
         <TextBody className="text-background">
           {genderLabel} Candidates
         </TextBody>
       </Badge>
       <div className="embla">
-        <div
-          className="embla__viewport hover:cursor-pointer cursor-grabbing"
-          ref={emblaRef}
-        >
-          <div className="embla__container flex flex-row gap-4">
+        <div className="embla__viewport relative" ref={emblaRef}>
+          <div className="embla__container flex flex-row">
             {candidates.map((candidate) => {
               return (
                 <CandidateScoreCard
-                  className={cn('embla__slide', genderShadowClassNames)}
+                  className={cn('embla__slide mx-2', genderShadowClassNames)}
                   key={candidate.id}
                   candidate={candidate}
                   scores={scoresMap.get(candidate.id) ?? []}
@@ -144,38 +157,49 @@ function CandidateScoringCards({
               )
             })}
           </div>
+          <div
+            onClick={scrollPrev}
+            className="absolute w-[calc(26%)] top-0 bottom-0 left-[-1%] bg-tranparent hover:cursor-pointer"
+          />
+          <div
+            onClick={scrollNext}
+            className="absolute w-[calc(26%)] top-0 bottom-0 right-[-1%] bg-tranparent hover:cursor-pointer"
+          />
         </div>
-        <div className="mt-4 flex flex-col gap-2 justify-start items-center w-fit mx-auto">
-          <div className="[&>*]:text-center">
-            <TextSub>⬅️You can also drag the slider left and right!➡️</TextSub>
-            <TextSub>(Use 2 fingers on the trackpad to drag)</TextSub>
+        <div className="embla-thumbs mt-4 w-full">
+          <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
+            <div className="embla-thumbs__container flex flex-row gap-3">
+              {candidates.map((_, index) => (
+                <div
+                  className={cn(
+                    'embla-thumbs__slide grow overflow-visible',
+                    index === selectedIndex
+                      ? 'embla-thumbs__slide--selected'
+                      : '',
+                  )}
+                >
+                  <button
+                    onClick={() => onThumbClick(index)}
+                    className={cn(
+                      'embla-thumbs__slide__number px-4 py-2 rounded-lg w-full hover:cursor-pointer bg-background transition-shadow',
+                      index === selectedIndex
+                        ? genderRingClassNames
+                        : 'ring-border',
+                      index === selectedIndex ? 'ring-[2px]' : 'ring-[1px]',
+                    )}
+                  >
+                    <TextBody>{index + 1}</TextBody>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-row gap-2">
-            <Button
-              onClick={scrollPrev}
-              variant="outline"
-              className="embla__prev rounded-full aspect-square"
-            >
-              <ChevronLeft />
-            </Button>
-            <Button
-              onClick={scrollNext}
-              variant="outline"
-              className="embla__next rounded-full aspect-square"
-            >
-              <ChevronRight />
-            </Button>
-          </div>
+        </div>
+        <div className="[&>*]:text-center mt-4 flex flex-col gap-[0px] w-fit mx-auto">
+          <TextSub>⬅️Use 2 fingers on the trackpad to drag➡️</TextSub>
+          <TextSub>Or click on the candidate cards</TextSub>
         </div>
       </div>
-      <div
-        className={cn(
-          'absolute bg-gradient-to-r from-white/0 to-white w-[100px] top-0 right-0 bottom-0 transition-all duration-300',
-          isLastCardInView
-            ? 'opacity-0 translate-x-[50%]'
-            : 'opacity-100 translate-x-[0%]',
-        )}
-      />
     </div>
   )
 }
