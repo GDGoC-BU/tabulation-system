@@ -99,11 +99,18 @@ function CandidateScoringCards({
   const FEMALE = candidateGender.enum.FEMALE
   const MALE = candidateGender.enum.MALE
 
-  let genderClassNames = ''
+  let genderBadgeClassNames = ''
   if (gender === FEMALE) {
-    genderClassNames = 'bg-pink-400'
+    genderBadgeClassNames = 'bg-gender-female-primary'
   } else if (gender === MALE) {
-    genderClassNames = 'bg-blue-400'
+    genderBadgeClassNames = 'bg-gender-male-primary'
+  }
+
+  let genderShadowClassNames = ''
+  if (gender === FEMALE) {
+    genderShadowClassNames = 'shadow-lg shadow-gender-female-secondary'
+  } else if (gender === MALE) {
+    genderShadowClassNames = 'shadow-lg shadow-gender-male-secondary'
   }
 
   let genderLabel = ''
@@ -115,7 +122,7 @@ function CandidateScoringCards({
 
   return (
     <div className="overflow-hidden bg-muted flex flex-col gap-8 rounded-xl py-8 px-4 relative">
-      <Badge className={genderClassNames}>
+      <Badge className={genderBadgeClassNames}>
         <TextBody className="text-background">
           {genderLabel} Candidates
         </TextBody>
@@ -129,7 +136,7 @@ function CandidateScoringCards({
             {candidates.map((candidate) => {
               return (
                 <CandidateScoreCard
-                  className="embla__slide"
+                  className={cn('embla__slide', genderShadowClassNames)}
                   key={candidate.id}
                   candidate={candidate}
                   scores={scoresMap.get(candidate.id) ?? []}
