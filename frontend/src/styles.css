@@ -4,7 +4,6 @@
 }
 
 @import 'tailwindcss';
-
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
@@ -22,6 +21,10 @@ body {
 @theme {
   --font-body: 'Inter';
   --font-heading: 'Inter';
+  --color-gender-female-primary: #d168b9;
+  --color-gender-female-secondary: #fbeff7;
+  --color-gender-male-primary: #228fd6;
+  --color-gender-male-secondary: #e9f4fc;
 }
 
 /* code {
