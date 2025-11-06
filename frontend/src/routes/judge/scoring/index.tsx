@@ -145,7 +145,11 @@ function CandidateScoringCards({
             })}
           </div>
         </div>
-        <div className="mt-4 flex flex-row gap-2 justify-start items-center">
+        <div className="mt-4 flex flex-col gap-2 justify-start items-center w-fit mx-auto">
+          <div className="[&>*]:text-center">
+            <TextSub>⬅️You can also drag the slider left and right!➡️</TextSub>
+            <TextSub>(Use 2 fingers on the trackpad to drag)</TextSub>
+          </div>
           <div className="flex flex-row gap-2">
             <Button
               onClick={scrollPrev}
@@ -161,11 +165,6 @@ function CandidateScoringCards({
             >
               <ChevronRight />
             </Button>
-          </div>
-          <div>
-            <TextSub>
-              You can also use 2 fingers on the trackpadd to scroll
-            </TextSub>
           </div>
         </div>
       </div>
@@ -331,7 +330,7 @@ function RouteComponent() {
   const ScoringTabsFacadeBody = ongoingSegment ? (
     <Scoring.TabsFacade.Body className="flex flex-col gap-12">
       <div className="flex flex-col gap-4 items-center">
-        <div className="[&>*]:text-center">
+        <div className="[&>*]:text-center flex flex-col gap-1">
           <TextHeading>{ongoingSegment.name}</TextHeading>
           <TextBody>Score each candidate in the segment</TextBody>
         </div>
