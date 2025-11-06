@@ -8,7 +8,7 @@ import { TextBody } from '@/components/text'
 import { cn } from '@/lib/utils'
 
 export default function Horizontal() {
-  const [isLoggingOut, setIsLoggingOut] = useState(true)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const { logout } = useAuthenticationStore((state) => state)
   const { setSelectedPageantId: setPageantId } = useSelectedPageantIdStore(
     (state) => state,
@@ -35,8 +35,8 @@ export default function Horizontal() {
       </div>
       <div
         className={cn(
-          'inset-0 z-[9999] bg-background grid place-items-center',
-          isLoggingOut ? 'absolute' : 'hidden',
+          'z-[9999] w-screen h-screen bg-background top-0 grid place-items-center',
+          isLoggingOut ? 'fixed' : 'hidden',
         )}
       >
         <TextBody>Logging out...</TextBody>
