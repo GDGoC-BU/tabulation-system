@@ -48,7 +48,7 @@ function AdminConsoleLayout() {
       <Navigation.Admin.Vertical />
       <div className="w-full flex flex-col overflow-hidden">
         <Navigation.Admin.Horizontal />
-        <main className="grow">
+        <main className="grow flex">
           <Outlet />
         </main>
       </div>

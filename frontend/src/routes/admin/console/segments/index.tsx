@@ -46,7 +46,6 @@ function AdminConsoleSegments() {
     if (!segments) return []
     return segments.map((award) => {
       const rawFormula = award.formula
-      console.log('Segment Formula: ', rawFormula)
       return {
         ...award,
         /* Really patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */

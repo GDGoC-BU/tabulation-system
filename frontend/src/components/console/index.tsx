@@ -19,7 +19,7 @@ function Title({ className, children }: ComponentClassNameAndChildrenProp) {
 }
 
 function Content({ className, children }: ComponentClassNameAndChildrenProp) {
-  return <div className={cn('', className)}>{children}</div>
+  return <div className={cn('grow', className)}>{children}</div>
 }
 
 Header.Title = Title
