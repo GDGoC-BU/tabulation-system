@@ -2,13 +2,14 @@ import { Link } from '@tanstack/react-router'
 import { Ellipsis } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { SegmentSummary } from '../schemas'
+import type { JSX } from 'react'
 import { TextBody } from '@/components/text'
 
 export type SegmentSummaryWithRenderedFormula = Omit<
   SegmentSummary,
   'formula'
 > & {
-  formula: React.ReactNode
+  formula: JSX.Element
 }
 
 export const segmentTableColumns: Array<
@@ -65,10 +66,6 @@ export const segmentTableColumns: Array<
     cell: ({ row }) => {
       const formula: SegmentSummaryWithRenderedFormula['formula'] =
         row.getValue('formula')
-
-      if (!formula) {
-        return <TextBody>None</TextBody>
-      }
 
       return <div className="max-w-[1000px] whitespace-normal">{formula}</div>
     },

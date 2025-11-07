@@ -30,7 +30,7 @@ export default function FormulaRenderer({
             </Badge>
           )
         }
-        return <TextBody>{token.value}</TextBody>
+        return <TextBody key={index}>{token.value}</TextBody>
       })}
     </div>
   )

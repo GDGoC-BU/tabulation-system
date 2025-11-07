@@ -44,17 +44,19 @@ function AdminConsoleSegments() {
   /* Converts the formula to a more readable format just like in admin/console/awards/add */
   const processedSegments = useMemo(() => {
     if (!segments) return []
-    return segments.map((award) => {
-      const rawFormula = award.formula
+    return segments.map((segment) => {
+      const rawFormula = segment.formula
       return {
-        ...award,
-        /* Really patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
+        ...segment,
+        /* Patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
         formula: rawFormula ? (
           <FormulaRenderer
             formula={rawFormula}
             criterionLookup={criterionLookup}
           />
-        ) : null,
+        ) : (
+          <TextBody>None</TextBody>
+        ),
       }
     })
   }, [segments, criterionMap, criterionLookup])
