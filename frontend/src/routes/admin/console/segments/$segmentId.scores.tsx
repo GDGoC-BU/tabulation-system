@@ -146,9 +146,9 @@ function RouteComponent() {
   }
 
   if (
-    isJudgeLoading &&
-    isCandidatesLoading &&
-    isSegmentLoading &&
+    isJudgeLoading ||
+    isCandidatesLoading ||
+    isSegmentLoading ||
     isScoresLoading
   ) {
     return (
