@@ -26,6 +26,7 @@ import CandidateScoreCard from '@/features/scores/components/candidate-score-car
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import Loading from '@/components/loading'
 
 function ScoringTabsFacadeBodyNoActiveSegmentFallback({
   phase,
@@ -344,7 +345,7 @@ function RouteComponent() {
     return (
       <Scoring className="w-full h-screen">
         <Scoring.Content className="grid place-items-center">
-          <TextBody>Loading...</TextBody>
+          <Loading />
         </Scoring.Content>
       </Scoring>
     )

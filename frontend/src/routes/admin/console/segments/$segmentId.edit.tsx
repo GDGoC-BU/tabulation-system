@@ -17,10 +17,11 @@ import { Button } from '@/components/ui/button'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 import Console from '@/components/console'
 import FormulaInput from '@/features/formula/components/formula-input'
-import { TextBody, TextSub } from '@/components/text'
+import { TextSub } from '@/components/text'
 import { useSegmentQuery } from '@/features/segments/hooks/use-segment-query'
 import { segmentEditFormSchema } from '@/features/segments/schemas'
 import useEditSegmentMutate from '@/features/segments/hooks/use-edit-segment-mutate'
+import Loading from '@/components/loading'
 
 export const Route = createFileRoute('/admin/console/segments/$segmentId/edit')(
   {
@@ -67,7 +68,7 @@ function RouteComponent() {
   if (isLoading) {
     return (
       <div className="p-4">
-        <TextBody>Loading...</TextBody>
+        <Loading />
       </div>
     )
   }

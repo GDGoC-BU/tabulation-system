@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import scoresQueryOptions from '@/features/scores/query-options/scores-query-options'
+import Loading from '@/components/loading'
 
 function CandidateScoreCard({
   candidate,
@@ -159,7 +160,7 @@ function RouteComponent() {
   ) {
     return (
       <div className="w-full grow grid place-items-center">
-        <TextBody>Loading...</TextBody>
+        <Loading />
       </div>
     )
   }

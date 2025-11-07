@@ -21,6 +21,7 @@ import Console from '@/components/console'
 import FormulaInput from '@/features/formula/components/formula-input'
 import { TextBody, TextSub } from '@/components/text'
 import useEditAwardMutate from '@/features/awards/hooks/use-edit-award-mutate'
+import Loading from '@/components/loading'
 
 export const Route = createFileRoute('/admin/console/awards/$awardId/edit')({
   component: RouteComponent,
@@ -64,7 +65,7 @@ function RouteComponent() {
   if (isLoading) {
     return (
       <div className="p-4">
-        <TextBody>Loading...</TextBody>
+        <Loading />
       </div>
     )
   }

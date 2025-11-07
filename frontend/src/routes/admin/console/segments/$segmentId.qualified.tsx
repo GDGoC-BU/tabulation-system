@@ -1,15 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useMemo } from 'react'
 import { useSegmentCalculateQualifiedCandidates } from '@/features/segments/hooks/use-qualified-candidates-query'
 import { TextBody, TextHeading } from '@/components/text'
 import { groupCandidateQualificationsByGender } from '@/lib/group-candidate-qualifications-by-gender'
-import capitalizeWords from '@/lib/capitalize-words'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 import Table from '@/components/table'
 import { segmentCandidateQualifications } from '@/features/segments/components/segment-candidate-qualifications-table-columns'
+import Loading from '@/components/loading'
 
 export const Route = createFileRoute(
   '/admin/console/segments/$segmentId/qualified',
@@ -36,7 +35,7 @@ function RouteComponent() {
 
   if (isSegmentError) {
     return (
-      <div className="border rounded-lg p-4">
+      <div className="border rounded-lg p-4 w-full">
         <TextBody>{segmentError}</TextBody>
       </div>
     )
@@ -44,15 +43,15 @@ function RouteComponent() {
 
   if (isPageantStateLoading || isPageantHierarchyLoading) {
     return (
-      <div className="border rounded-lg p-4">
-        <TextBody>Loading pageant...</TextBody>
+      <div className="border rounded-lg p-4 w-full">
+        <Loading />
       </div>
     )
   }
 
   if (isSegmentLoading) {
     return (
-      <div className="border rounded-lg p-4">
+      <div className="border rounded-lg p-4 w-full">
         <TextBody>Calculating qualified candidates...</TextBody>
       </div>
     )
@@ -63,7 +62,7 @@ function RouteComponent() {
   )
 
   return (
-    <div className="p-4">
+    <div className="p-4 w-full">
       <div className="w-full flex flex-col gap-24">
         <div className="border rounded-lg p-4">
           <div className="mb-2">

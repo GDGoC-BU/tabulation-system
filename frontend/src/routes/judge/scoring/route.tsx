@@ -4,7 +4,7 @@ import { useAuthenticationStore } from '@/features/authentication/store/use-auth
 import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
 import { useStompStore } from '@/store/stomp-store'
 import Navigation from '@/features/navigation/components'
-import { TextBody } from '@/components/text'
+import Loading from '@/components/loading'
 
 export const Route = createFileRoute('/judge/scoring')({
   beforeLoad: async ({ context, location }) => {
@@ -50,7 +50,7 @@ function JudgeScoringLayout() {
     return (
       <div className="w-full h-screen grid place-items-center">
         <main>
-          <TextBody>Loading...</TextBody>
+          <Loading />
         </main>
       </div>
     )
