@@ -63,19 +63,22 @@ function CandidateScoreCard({
         </div>
       </div>
       <div className="px-8 py-6 grid place-items-center w-full">
-        <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
+        <div className="flex flex-col gap-2">
           {scores
             .sort((a, b) => {
-              // First sort by maxScore
+              /* First sort by maxScore */
               if (a.criterion.maxScore !== b.criterion.maxScore) {
                 return a.criterion.maxScore - b.criterion.maxScore
               }
-              // Then sort by name (alphabetically)
+              /* Then sort by name */
               return a.criterion.name.localeCompare(b.criterion.name)
             })
             .map((score) => {
               return (
-                <>
+                <div
+                  key={score.id}
+                  className="w-full grid grid-cols-[1fr_auto_auto] gap-2 items-center"
+                >
                   <TextBody className="text-end whitespace-nowrap">
                     {score.criterion.name}
                   </TextBody>
@@ -83,7 +86,7 @@ function CandidateScoreCard({
                   <TextBody className="text-[20px] leading-[28px] font-[600] tracking-[0]">
                     {score.value} / {score.criterion.maxScore}
                   </TextBody>
-                </>
+                </div>
               )
             })}
         </div>
@@ -186,13 +189,15 @@ function RouteComponent() {
         <TabsList className="w-full">
           {judges?.map((judge) => {
             return (
-              <TabsTrigger value={judge.id}>Judge {judge.number}</TabsTrigger>
+              <TabsTrigger key={judge.id} value={judge.id}>
+                Judge {judge.number}
+              </TabsTrigger>
             )
           })}
         </TabsList>
         {judges?.map((judge) => {
           return (
-            <TabsContent value={judge.id}>
+            <TabsContent key={judge.id} value={judge.id}>
               <div className="border rounded-lg flex flex-col">
                 <div className="px-4 py-8 flex flex-col items-center gap-2 border-b">
                   <TextHeading>Judge {judge.number}</TextHeading>
@@ -221,6 +226,7 @@ function RouteComponent() {
 
                         return (
                           <CandidateScoreCard
+                            key={candidate.id}
                             className="shadow-lg shadow-gender-female-secondary"
                             candidate={candidate}
                             scores={candidateScores ?? []}
@@ -247,6 +253,7 @@ function RouteComponent() {
 
                         return (
                           <CandidateScoreCard
+                            key={candidate.id}
                             className="shadow-lg shadow-gender-male-secondary"
                             candidate={candidate}
                             scores={candidateScores ?? []}
@@ -264,10 +271,4 @@ function RouteComponent() {
       </Tabs>
     </div>
   )
-}
-
-{
-  /* <div className="grid grid-cols-1 gap-12">
-          
-        </div> */
 }
