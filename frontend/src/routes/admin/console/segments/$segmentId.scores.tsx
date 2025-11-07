@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import type {
   CandidateDetailed,
   CandidateHierarchy,
@@ -10,7 +11,6 @@ import type { ComponentClassNameProp } from '@/types'
 import { useSegmentQuery } from '@/features/segments/hooks/use-segment-query'
 import { useJudgesQuery } from '@/features/judges/hooks/use-judges-query'
 import { useCandidatesQuery } from '@/features/candidates/hooks/use-candidates-query'
-import { useScoresQuery } from '@/features/scores/hooks/use-scores-query'
 import { TextBody, TextHeading, TextSub } from '@/components/text'
 import splitCandidates from '@/features/candidates/lib/split-candidates'
 import capitalizeWords from '@/lib/capitalize-words'
@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import scoresQueryOptions from '@/features/scores/query-options/scores-query-options'
 
 function CandidateScoreCard({
   candidate,
@@ -118,16 +119,21 @@ function RouteComponent() {
     isLoading: isSegmentLoading,
     isError: isSegmentError,
   } = useSegmentQuery(segmentId)
+
   const {
     data: scores,
     isLoading: isScoresLoading,
     isError: isScoresError,
     refetch: refetchScores,
-  } = useScoresQuery(
-    {
-      segmentId: segment?.id ?? '',
-    },
-    !!segment,
+  } = useQuery(
+    scoresQueryOptions(
+      {
+        segmentId: segment?.id ?? '',
+      },
+      {
+        enabled: !!segment,
+      },
+    ),
   )
 
   const { femaleCandidates, maleCandidates } = useMemo(() => {
