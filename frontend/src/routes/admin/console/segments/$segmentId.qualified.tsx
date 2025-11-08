@@ -1,14 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 import { useSegmentCalculateQualifiedCandidates } from '@/features/segments/hooks/use-qualified-candidates-query'
 import { TextBody, TextHeading } from '@/components/text'
 import { groupCandidateQualificationsByGender } from '@/features/segments/lib/group-candidate-qualifications-by-gender'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
-import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 import Table from '@/components/table'
 import { segmentCandidateQualifications } from '@/features/segments/components/segment-candidate-qualifications-table-columns'
 import Loading from '@/components/loading'
+import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
 
 export const Route = createFileRoute(
   '/admin/console/segments/$segmentId/qualified',
@@ -26,9 +27,13 @@ function RouteComponent() {
   } = useSegmentCalculateQualifiedCandidates(segmentId)
 
   const { data: selectedPageant, isLoading: isPageantStateLoading } =
-    useSelectedPageantQuery()
+    useSelectedPageant()
   const { data: pageantHierarchy, isLoading: isPageantHierarchyLoading } =
-    usePageantHierarchyQuery(selectedPageant?.id)
+    useQuery(
+      pageantHierarchyQueryOptions(selectedPageant?.id, {
+        enabled: !!selectedPageant,
+      }),
+    )
   const criterionLookup = useFormulaCriterionLookup(
     pageantHierarchy?.phases ?? [],
   )

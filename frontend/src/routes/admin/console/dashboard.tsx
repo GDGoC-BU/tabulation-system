@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import type { PageantStatusValue } from '@/schemas'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import Console from '@/components/console'
 import { TextBody } from '@/components/text'
 import PageantPreparationDashboard from '@/features/dashboard/components/pageant-preparation-dashboard'
@@ -20,7 +20,7 @@ export const Route = createFileRoute('/admin/console/dashboard')({
 })
 
 function AdminConsoleDashboard() {
-  const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
+  const { data: selectedPageant, isLoading } = useSelectedPageant()
   if (isLoading || !selectedPageant) {
     return <TextBody>Loading dashboard...</TextBody>
   }

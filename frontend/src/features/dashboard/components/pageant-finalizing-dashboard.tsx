@@ -1,16 +1,16 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { AwardLeaderboards } from '@/features/awards/schemas'
 import { TextBody, TextHeading } from '@/components/text'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
 import { useAwardsQuery } from '@/features/awards/hooks/use-awards-query'
-import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
 import { useAwardsCalculation } from '@/features/awards/hooks/use-awards-calculation-mutation'
 import { cn } from '@/lib/utils'
 import { groupLeaderboardByGender } from '@/lib/group-leaderboard-by-gender'
 import ConfirmDialog from '@/components/confirm-dialog'
+import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
 
 export function AwardLeaderboard({
   leaderboard,
@@ -67,13 +67,15 @@ export default function PageantFinalizingDashboard() {
   const queryClient = useQueryClient()
 
   const { mutateAsync } = useStatusChangeMutate()
-  const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
+  const { data: selectedPageant, isLoading } = useSelectedPageant()
   const { data: awards } = useAwardsQuery()
   const awardResults = useAwardsCalculation(awards)
   // const awardResults = useAwardCalculations(awards ? [awards[0]] : awards)
 
-  const { data: pageantHierarchy } = usePageantHierarchyQuery(
-    selectedPageant?.id,
+  const { data: pageantHierarchy } = useQuery(
+    pageantHierarchyQueryOptions(selectedPageant?.id, {
+      enabled: !!selectedPageant,
+    }),
   )
   const criterionLookup = useFormulaCriterionLookup(
     pageantHierarchy?.phases ?? [],

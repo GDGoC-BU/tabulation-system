@@ -6,7 +6,7 @@ import { TextBody } from '@/components/text'
 import { usePhasesQuery } from '@/features/phases/hooks/use-phases-query'
 import { useSegmentsQuery } from '@/features/segments/hooks/use-segments-query'
 import determineNextPhaseSegmentStatusAction from '@/features/state-machine/lib/determine-next-phase-segment-status-action'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
 import ConfirmDialog from '@/components/confirm-dialog'
 
@@ -55,7 +55,7 @@ function PhaseSegmentTable({
 }
 
 export default function PageantOngoingDashboard() {
-  const { data: selectedPageant } = useSelectedPageantQuery()
+  const { data: selectedPageant } = useSelectedPageant()
   const { data: phases } = usePhasesQuery()
   const { data: segments } = useSegmentsQuery()
   const { mutateAsync: changeState } = useStatusChangeMutate()

@@ -5,7 +5,7 @@ import FormulaButton from './formula-button'
 import FormulaRenderer from './formula-renderer'
 import type { Control } from 'react-hook-form'
 import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import FormulaBadgeRenderer from '@/features/formula/components/formula-label-renderer'
 
 type ButtonItem = {
@@ -45,7 +45,7 @@ export default function FormulaInput({
   const { field } = useController({ name, control })
   const formula = useWatch({ name, control }) || ''
 
-  const { data: selectedPageant } = useSelectedPageantQuery()
+  const { data: selectedPageant } = useSelectedPageant()
   const { data: pageantHierarchy } = usePageantHierarchyQuery(
     selectedPageant?.id,
   )

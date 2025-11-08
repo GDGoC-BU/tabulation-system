@@ -1,5 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useSoftResetQuery } from '@/features/pageants/hooks/use-soft-reset-query'
+import { useEffect, useState } from 'react'
+import type { PageantSummary } from '@/features/pageants/schemas'
+import { useSoftResetMutate } from '@/features/pageants/hooks/use-soft-reset-query'
 import { TextHeading } from '@/components/text'
 import { Button } from '@/components/ui/button'
 
@@ -11,7 +13,16 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const { pageantId } = Route.useParams()
-  const { data: pageant } = useSoftResetQuery(pageantId)
+  const [pageant, setPageant] = useState<PageantSummary | null>(null)
+  const { mutateAsync: softResetPageant } = useSoftResetMutate(pageantId)
+
+  useEffect(() => {
+    const softReset = async () => {
+      const data = await softResetPageant(pageantId)
+      setPageant(data)
+    }
+    softReset()
+  }, [])
 
   return (
     <div className="m-4 p-4 flex flex-col gap-4">

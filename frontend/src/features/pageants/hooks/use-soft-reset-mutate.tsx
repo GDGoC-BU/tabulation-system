@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { pageantSummarySchema } from '../schemas'
+import type { PageantSummary } from '../schemas'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function useSoftResetQuery(id: string | null | undefined) {
-  return useQuery({
-    queryKey: ['pageants', id],
-    queryFn: async () => {
+export function useSoftResetMutate(id: string | null | undefined) {
+  return useMutation<PageantSummary, string, string | null | undefined>({
+    mutationFn: async () => {
       try {
         const response = await api.put(`/pageants/${id}/soft-reset`)
         console.log('res: ', response)
@@ -21,6 +21,5 @@ export function useSoftResetQuery(id: string | null | undefined) {
         throw errorResolver(error)
       }
     },
-    enabled: !!id,
   })
 }

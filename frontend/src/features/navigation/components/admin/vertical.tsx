@@ -24,7 +24,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar'
 import { TextBody } from '@/components/text'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import { pageantStatusValue } from '@/schemas'
 
 const pageantAction = [
@@ -61,7 +61,7 @@ const pageantAction = [
 ]
 
 export default function Vertical() {
-  const { data } = useSelectedPageantQuery()
+  const { data } = useSelectedPageant()
 
   const showManagePageantLinks = true
   // !data || data.status.value !== pageantStatusValue.enum.PREPARATION

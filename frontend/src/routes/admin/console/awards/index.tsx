@@ -1,14 +1,15 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import Console from '@/components/console'
 import Table from '@/components/table'
 import { useAwardsQuery } from '@/features/awards/hooks/use-awards-query'
 import { Button } from '@/components/ui/button'
 import { awardTableColumns } from '@/features/awards/components/award-table-columns'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
-import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
+import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
 
 export const Route = createFileRoute('/admin/console/awards/')({
   component: AdminConsoleAwards,
@@ -16,9 +17,11 @@ export const Route = createFileRoute('/admin/console/awards/')({
 
 function AdminConsoleAwards() {
   const { data: awards } = useAwardsQuery()
-  const { data: selectedPageant } = useSelectedPageantQuery()
-  const { data: pageantHierarchy } = usePageantHierarchyQuery(
-    selectedPageant?.id,
+  const { data: selectedPageant } = useSelectedPageant()
+  const { data: pageantHierarchy } = useQuery(
+    pageantHierarchyQueryOptions(selectedPageant?.id, {
+      enabled: !!selectedPageant,
+    }),
   )
   const criterionLookup = useFormulaCriterionLookup(
     pageantHierarchy?.phases ?? [],

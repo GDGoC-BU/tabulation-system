@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import { awardEditFormSchema } from '@/features/awards/schemas'
 import Console from '@/components/console'
 import FormulaInput from '@/features/formula/components/formula-input'
@@ -34,7 +34,7 @@ function RouteComponent() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
+  const { data: selectedPageant, isLoading } = useSelectedPageant()
 
   const form = useForm({
     resolver: zodResolver(awardEditFormSchema),

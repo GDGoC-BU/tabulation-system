@@ -1,10 +1,22 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { pageantsSchema } from '../schemas'
+import type { PageantSummary } from '../schemas'
+import type { UseQueryOptions } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function usePageantsQuery() {
-  return useQuery({
+export default function pageantsQueryOptions<
+  TData = Array<PageantSummary>,
+  TError = string,
+>(
+  options?: Omit<
+    UseQueryOptions<Array<PageantSummary>, TError, TData>,
+    'queryKey' | 'queryFn'
+  >,
+) {
+  return queryOptions({
+    staleTime: 1000 * 60 * 10,
+    ...options,
     queryKey: ['pageants'],
     queryFn: async () => {
       try {
@@ -19,6 +31,5 @@ export function usePageantsQuery() {
         throw errorResolver(error)
       }
     },
-    staleTime: 1000 * 60 * 10,
   })
 }

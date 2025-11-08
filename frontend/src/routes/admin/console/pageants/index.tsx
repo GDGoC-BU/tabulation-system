@@ -1,16 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 import Console from '@/components/console'
 import Table from '@/components/table'
 import { pageantTableColumns } from '@/features/pageants/components/pageant-table-columns'
-import { usePageantsQuery } from '@/features/pageants/hooks/use-pageants-query'
 import PageantAddFormDialog from '@/features/pageants/components/pageant-add-form-dialog'
+import pageantsQueryOptions from '@/features/pageants/query-options/pageants-query-options'
 
 export const Route = createFileRoute('/admin/console/pageants/')({
   component: AdminConsolePageants,
 })
 
 function AdminConsolePageants() {
-  const { data } = usePageantsQuery()
+  const { data } = useQuery(pageantsQueryOptions())
 
   return (
     <Console>
