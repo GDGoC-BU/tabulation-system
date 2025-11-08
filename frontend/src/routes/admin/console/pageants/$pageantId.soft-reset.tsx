@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import type { PageantSummary } from '@/features/pageants/schemas'
-import { useSoftResetMutate } from '@/features/pageants/hooks/use-soft-reset-query'
+import { useSoftResetMutate } from '@/features/pageants/hooks/use-soft-reset-mutate'
 import { TextHeading } from '@/components/text'
 import { Button } from '@/components/ui/button'
 

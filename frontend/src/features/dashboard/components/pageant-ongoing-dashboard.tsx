@@ -1,14 +1,14 @@
 import { useMemo } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Phases } from '@/features/phases/schemas'
 import type { Segments } from '@/features/segments/schemas'
 import { TextBody } from '@/components/text'
-import { usePhasesQuery } from '@/features/phases/hooks/use-phases-query'
 import { useSegmentsQuery } from '@/features/segments/hooks/use-segments-query'
 import determineNextPhaseSegmentStatusAction from '@/features/state-machine/lib/determine-next-phase-segment-status-action'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
 import ConfirmDialog from '@/components/confirm-dialog'
+import phasesQueryOptions from '@/features/phases/query-options/phases-query-options'
 
 function PhaseSegmentTable({
   phases,
@@ -56,7 +56,7 @@ function PhaseSegmentTable({
 
 export default function PageantOngoingDashboard() {
   const { data: selectedPageant } = useSelectedPageant()
-  const { data: phases } = usePhasesQuery()
+  const { data: phases } = useQuery(phasesQueryOptions())
   const { data: segments } = useSegmentsQuery()
   const { mutateAsync: changeState } = useStatusChangeMutate()
   const queryClient = useQueryClient()
