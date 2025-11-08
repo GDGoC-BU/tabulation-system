@@ -1,8 +1,4 @@
-import type { AwardLeaderboards } from '@/features/awards/schemas'
-import type {
-  CandidateQualifications,
-  CandidateSegmentQualificationSummary,
-} from '@/features/segments/schemas'
+import type { CandidateQualifications } from '@/features/segments/schemas'
 import { candidateGender } from '@/features/candidates/schemas'
 
 export function groupCandidateQualificationsByGender(

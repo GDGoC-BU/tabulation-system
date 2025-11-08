@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useSegmentCalculateQualifiedCandidates } from '@/features/segments/hooks/use-qualified-candidates-query'
 import { TextBody, TextHeading } from '@/components/text'
-import { groupCandidateQualificationsByGender } from '@/lib/group-candidate-qualifications-by-gender'
+import { groupCandidateQualificationsByGender } from '@/features/segments/lib/group-candidate-qualifications-by-gender'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
 import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
 import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
