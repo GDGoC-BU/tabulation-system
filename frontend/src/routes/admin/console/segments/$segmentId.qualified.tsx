@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { useSegmentCalculateQualifiedCandidates } from '@/features/segments/hooks/use-qualified-candidates-query'
 import { TextBody, TextHeading } from '@/components/text'
 import { groupCandidateQualificationsByGender } from '@/features/segments/lib/group-candidate-qualifications-by-gender'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
@@ -10,6 +9,7 @@ import Table from '@/components/table'
 import { segmentCandidateQualifications } from '@/features/segments/components/segment-candidate-qualifications-table-columns'
 import Loading from '@/components/loading'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
+import segmentCalculateCandidateQualificationsQueryOptions from '@/features/segments/query-options/segment-calculate-candidate-qualifications-query-options'
 
 export const Route = createFileRoute(
   '/admin/console/segments/$segmentId/qualified',
@@ -24,7 +24,7 @@ function RouteComponent() {
     isLoading: isSegmentLoading,
     isError: isSegmentError,
     error: segmentError,
-  } = useSegmentCalculateQualifiedCandidates(segmentId)
+  } = useQuery(segmentCalculateCandidateQualificationsQueryOptions(segmentId))
 
   const { data: selectedPageant, isLoading: isPageantStateLoading } =
     useSelectedPageant()

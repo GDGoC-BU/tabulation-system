@@ -1,12 +1,24 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { segmentDetailedSchema } from '../schemas'
+import type { SegmentDetailed } from '../schemas'
+import type { UseQueryOptions } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function useSegmentCalculateQualifiedCandidates(
-  id: string | null | undefined,
+export default function segmentCalculateCandidateQualificationsQueryOptions<
+  TData = SegmentDetailed | null,
+  TError = string,
+>(
+  id: string | undefined | null,
+  options?: Omit<
+    UseQueryOptions<SegmentDetailed | null, TError, TData>,
+    'queryKey' | 'queryFn'
+  >,
 ) {
-  return useQuery({
+  return queryOptions({
+    enabled: !!id,
+    staleTime: 1000 * 60 * 10,
+    ...options,
     queryKey: ['segments', id],
     queryFn: async () => {
       try {
@@ -22,7 +34,13 @@ export function useSegmentCalculateQualifiedCandidates(
 
         const sortedCandidateQualifications = [
           ...parsedResponse.data.candidateQualifications,
-        ].sort((a, b) => b.score - a.score)
+        ].sort((a, b) => {
+          if (a.rank && b.rank) {
+            return a.rank - b.rank
+          }
+
+          return a.candidate.number - b.candidate.number
+        })
 
         return {
           ...parsedResponse.data,
@@ -32,6 +50,5 @@ export function useSegmentCalculateQualifiedCandidates(
         throw errorResolver(error)
       }
     },
-    enabled: !!id,
   })
 }

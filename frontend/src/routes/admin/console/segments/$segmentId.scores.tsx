@@ -8,7 +8,6 @@ import type {
 } from '@/features/candidates/schemas'
 import type { ScoreDetailed } from '@/features/scores/schemas'
 import type { ComponentClassNameProp } from '@/types'
-import { useSegmentQuery } from '@/features/segments/hooks/use-segment-query'
 import { useJudgesQuery } from '@/features/judges/hooks/use-judges-query'
 import { useCandidatesQuery } from '@/features/candidates/hooks/use-candidates-query'
 import { TextBody, TextHeading, TextSub } from '@/components/text'
@@ -20,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import scoresQueryOptions from '@/features/scores/query-options/scores-query-options'
 import Loading from '@/components/loading'
+import segmentQueryOptions from '@/features/segments/query-options/segment-query-options'
 
 function CandidateScoreCard({
   candidate,
@@ -119,7 +119,7 @@ function RouteComponent() {
     data: segment,
     isLoading: isSegmentLoading,
     isError: isSegmentError,
-  } = useSegmentQuery(segmentId)
+  } = useQuery(segmentQueryOptions(segmentId))
 
   const {
     data: scores,
@@ -129,7 +129,7 @@ function RouteComponent() {
   } = useQuery(
     scoresQueryOptions(
       {
-        segmentId: segment?.id ?? '',
+        segmentId: segment?.id,
       },
       {
         enabled: !!segment,

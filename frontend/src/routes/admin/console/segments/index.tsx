@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useSegmentsQuery } from '@/features/segments/hooks/use-segments-query'
 import Console from '@/components/console'
 import { segmentTableColumns } from '@/features/segments/components/segment-table-columns'
 import Table from '@/components/table'
@@ -10,13 +9,14 @@ import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-crit
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
+import segmentsQueryOptions from '@/features/segments/query-options/segments-query-options'
 
 export const Route = createFileRoute('/admin/console/segments/')({
   component: AdminConsoleSegments,
 })
 
 function AdminConsoleSegments() {
-  const { data: segments, isLoading } = useSegmentsQuery()
+  const { data: segments, isLoading } = useQuery(segmentsQueryOptions())
   const { data: selectedPageant } = useSelectedPageant()
   const { data: pageantHierarchy } = useQuery(
     pageantHierarchyQueryOptions(selectedPageant?.id, {

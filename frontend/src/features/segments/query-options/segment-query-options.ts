@@ -1,10 +1,24 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { segmentDetailedSchema } from '../schemas'
+import type { SegmentDetailed } from '../schemas'
+import type { UseQueryOptions } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import errorResolver from '@/lib/error-resolver'
 
-export function useSegmentQuery(id: string | null | undefined) {
-  return useQuery({
+export default function segmentQueryOptions<
+  TData = SegmentDetailed | null,
+  TError = string,
+>(
+  id: string | undefined | null,
+  options?: Omit<
+    UseQueryOptions<SegmentDetailed | null, TError, TData>,
+    'queryKey' | 'queryFn'
+  >,
+) {
+  return queryOptions({
+    enabled: !!id,
+    staleTime: 1000 * 60 * 10,
+    ...options,
     queryKey: ['segments', id],
     queryFn: async () => {
       try {
@@ -18,7 +32,5 @@ export function useSegmentQuery(id: string | null | undefined) {
         throw errorResolver(error)
       }
     },
-    enabled: !!id,
-    // staleTime: 1000 * 60 * 10,
   })
 }

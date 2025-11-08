@@ -17,10 +17,19 @@ export const segmentCandidateQualifications: Array<
         row.original.rank
       const isTied: CandidateSegmentQualificationSummary['isTied'] =
         row.original.isTied
+
+      if (!rank) {
+        return (
+          <div className="w-full grid place-items-center">
+            <TextBody>No rank available</TextBody>
+          </div>
+        )
+      }
+
       return (
         <div
           className={cn(
-            ' w-full flex flex-row items-center justify-center',
+            'w-full flex flex-row items-center justify-center',
             isTied
               ? 'border border-destructive px-2 py-1 rounded-full [&>*]:text-destructive'
               : 'border-none px-0 py-0 rounded-none',
