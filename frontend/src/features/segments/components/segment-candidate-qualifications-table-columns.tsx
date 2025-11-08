@@ -3,15 +3,36 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { CandidateSegmentQualificationSummary } from '../schemas'
 import { TextBody } from '@/components/text'
 import capitalizeWords from '@/lib/capitalize-words'
+import { cn } from '@/lib/utils'
 
 export const segmentCandidateQualifications: Array<
   ColumnDef<CandidateSegmentQualificationSummary>
 > = [
   {
     id: 'rank',
+    accessorKey: 'rank',
     header: 'Rank',
     cell: ({ row }) => {
-      return <TextBody>{row.index + 1}</TextBody>
+      const rank: CandidateSegmentQualificationSummary['rank'] =
+        row.original.rank
+      const isTied: CandidateSegmentQualificationSummary['isTied'] =
+        row.original.isTied
+      return (
+        <div
+          className={cn(
+            ' w-full flex flex-row items-center justify-center',
+            isTied
+              ? 'border border-destructive px-2 py-1 rounded-full [&>*]:text-destructive'
+              : 'border-none px-0 py-0 rounded-none',
+          )}
+        >
+          <TextBody>{rank}</TextBody>
+          {isTied && (
+            <div className="self-stretch w-[1px] mx-1 bg-destructive" />
+          )}
+          {isTied && <TextBody>Tie</TextBody>}
+        </div>
+      )
     },
   },
   {

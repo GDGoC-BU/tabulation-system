@@ -23,8 +23,10 @@ export type CandidateSegmentQualificationHierarchy = z.infer<
 export const candidateSegmentQualificationSummarySchema = z.object({
   id: z.string(),
   candidate: candidateSummarySchema,
+  rank: z.union([z.null(), z.number()]),
   isQualified: z.boolean(),
   score: z.union([z.null(), z.number()]),
+  isTied: z.boolean(),
   criteriaBreakdown: z.union([z.null(), z.array(criteriaBreakdownSchema)]),
 })
 export type CandidateSegmentQualificationSummary = z.infer<
