@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
@@ -34,8 +35,15 @@ public class CandidateSegmentQualification {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
+    @Column(nullable = true)
+    @Check(constraints = "rank IS NULL OR rank >= 1")
+    private Integer rank;
+
     @Column(nullable = false)
     private boolean isQualified = true;
+
+    @Column(nullable = false)
+    private boolean isTied = false;
 
     @JsonBackReference
     @ManyToOne(

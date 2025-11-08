@@ -14,8 +14,10 @@ import org.mapstruct.Mapping;
 )
 public interface CandidateSegmentQualificationMapper {
     @Mapping(target = "isQualified", source = "qualified")
+    @Mapping(target = "isTied", source = "tied")
     CandidateSegmentQualificationSummaryDTO toSummaryDTO(CandidateSegmentQualification candidateSegmentQualification);
 
     @Mapping(target = "isQualified", source = "qualified")
+    @Mapping(target = "isTied", source = "tied")
     CandidateSegmentQualificationHierarchyDTO toHierarchyDTO(CandidateSegmentQualification candidateSegmentQualification);
 }

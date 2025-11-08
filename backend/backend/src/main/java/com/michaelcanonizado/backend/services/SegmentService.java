@@ -433,30 +433,73 @@ public class SegmentService {
             return Double.compare(b.getScore(), a.getScore());
         });
 
-        /* Get the ids of qualified candidates */
-        Set<UUID> qualifiedFemaleCandidateIds = femaleCandidateResults
-                .stream()
-                .limit(segment.getCandidateLimit())
-                .map(csq -> csq.getCandidate().getId())
-                .collect(Collectors.toSet());
-        Set<UUID> qualifiedMaleCandidateIds = maleCandidateResults
-                .stream()
-                .limit(segment.getCandidateLimit())
-                .map(csq -> csq.getCandidate().getId())
-                .collect(Collectors.toSet());
+        /* Determine CSQ rank, isQualified, and isTied */
+        for (int i = 0; i < femaleCandidateResults.size(); i++) {
+            int currentRank = i + 1;
+            CandidateSegmentQualification currentCSQ = femaleCandidateResults.get(i);
+            Double currentScore = currentCSQ.getScore();
 
-        /* Update the CSQs' isQualified field. */
-        List<CandidateSegmentQualification> updatedCSQs = new ArrayList<>();
-        for (CandidateSegmentQualification csq : csqMap.values()) {
-            UUID candidateId = csq.getCandidate().getId();
-            if (qualifiedFemaleCandidateIds.contains(candidateId) || qualifiedMaleCandidateIds.contains(candidateId)) {
-                csq.setQualified(true);
-            } else {
-                csq.setQualified(false);
+            /* Set the rank */
+            currentCSQ.setRank(currentRank);
+            /* Mark as qualified if within the candidate limit */
+            currentCSQ.setQualified(currentRank <= segment.getCandidateLimit());
+
+            /* Count the number of tied candidates so we can just offset if there is a tie */
+            int tieCount = 0;
+            /* Check following candidates for ties */
+            for (int j = i + 1; j < femaleCandidateResults.size(); j++) {
+                CandidateSegmentQualification nextCSQ = femaleCandidateResults.get(j);
+
+                /* If the next candidate has a different score, i.e: no tie, break out */
+                if (Math.abs(nextCSQ.getScore() - currentScore) > 1e-9) break;
+
+                /* Tied candidates will have the same: rank, isQualified, and tie values */
+                nextCSQ.setRank(currentRank);
+                nextCSQ.setQualified(currentRank <= segment.getCandidateLimit());
+                nextCSQ.setTied(true);
+                currentCSQ.setTied(true);
+
+                tieCount++;
             }
-            updatedCSQs.add(csq);
+
+            /* Skip over tied candidates since we have already set their fields */
+            i += tieCount;
         }
-        csqRepository.saveAll(updatedCSQs);
+
+        for (int i = 0; i < maleCandidateResults.size(); i++) {
+            int currentRank = i + 1;
+            CandidateSegmentQualification currentCSQ = maleCandidateResults.get(i);
+            Double currentScore = currentCSQ.getScore();
+
+            /* Set the rank */
+            currentCSQ.setRank(currentRank);
+            /* Mark as qualified if within the candidate limit */
+            currentCSQ.setQualified(currentRank <= segment.getCandidateLimit());
+
+            /* Count the number of tied candidates so we can just offset if there is a tie */
+            int tieCount = 0;
+            /* Check following candidates for ties */
+            for (int j = i + 1; j < maleCandidateResults.size(); j++) {
+                CandidateSegmentQualification nextCSQ = maleCandidateResults.get(j);
+
+                /* If the next candidate has a different score, i.e: no tie, break out */
+                if (Math.abs(nextCSQ.getScore() - currentScore) > 1e-9) break;
+
+                /* Tied candidates will have the same: rank, isQualified, and tie values */
+                nextCSQ.setRank(currentRank);
+                nextCSQ.setQualified(currentRank <= segment.getCandidateLimit());
+                nextCSQ.setTied(true);
+                currentCSQ.setTied(true);
+
+                tieCount++;
+            }
+
+            /* Skip over tied candidates since we have already set their fields */
+            i += tieCount;
+        }
+
+        csqRepository.saveAll(femaleCandidateResults);
+        csqRepository.saveAll(maleCandidateResults);
     }
 
     @RequirePageantStatus({
