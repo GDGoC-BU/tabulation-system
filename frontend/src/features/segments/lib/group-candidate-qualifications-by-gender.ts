@@ -4,22 +4,35 @@ import { candidateGender } from '@/features/candidates/schemas'
 export function groupCandidateQualificationsByGender(
   candidateQualifications: CandidateQualifications | undefined,
 ): {
-  groupA: CandidateQualifications
-  groupB: CandidateQualifications
+  femaleCandidateQualifications: CandidateQualifications
+  maleCandidateQualifications: CandidateQualifications
 } {
   if (!candidateQualifications)
     return {
-      groupA: [],
-      groupB: [],
+      femaleCandidateQualifications: [],
+      maleCandidateQualifications: [],
     }
 
-  const groupA = candidateQualifications.filter(
-    (entry) => entry.candidate.gender === candidateGender.enum.FEMALE,
-  )
+  const femaleGroup = candidateQualifications
+    .filter((entry) => entry.candidate.gender === candidateGender.enum.FEMALE)
+    .sort((a, b) => {
+      if (a.rank && b.rank) {
+        return a.rank - b.rank
+      }
+      return a.candidate.number - b.candidate.number
+    })
 
-  const groupB = candidateQualifications.filter(
-    (entry) => entry.candidate.gender === candidateGender.enum.MALE,
-  )
+  const maleGroup = candidateQualifications
+    .filter((entry) => entry.candidate.gender === candidateGender.enum.MALE)
+    .sort((a, b) => {
+      if (a.rank && b.rank) {
+        return a.rank - b.rank
+      }
+      return a.candidate.number - b.candidate.number
+    })
 
-  return { groupA, groupB }
+  return {
+    femaleCandidateQualifications: femaleGroup,
+    maleCandidateQualifications: maleGroup,
+  }
 }

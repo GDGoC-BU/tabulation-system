@@ -62,9 +62,8 @@ function RouteComponent() {
     )
   }
 
-  const { groupA, groupB } = groupCandidateQualificationsByGender(
-    segment?.candidateQualifications,
-  )
+  const { femaleCandidateQualifications, maleCandidateQualifications } =
+    groupCandidateQualificationsByGender(segment?.candidateQualifications)
 
   return (
     <div className="p-4 w-full">
@@ -102,7 +101,7 @@ function RouteComponent() {
               </div>
               <Table.CandidateQualifications
                 columns={segmentCandidateQualifications}
-                data={groupA}
+                data={femaleCandidateQualifications}
                 limit={segment?.candidateLimit ?? 0}
                 formula={segment?.formula ?? ''}
               />
@@ -113,7 +112,7 @@ function RouteComponent() {
               </div>
               <Table.CandidateQualifications
                 columns={segmentCandidateQualifications}
-                data={groupB}
+                data={maleCandidateQualifications}
                 limit={segment?.candidateLimit ?? null}
                 formula={segment?.formula ?? null}
               />
