@@ -91,7 +91,7 @@ export default function ScoreEditForm({
               scoreValue === null || isNaN(scoreValue) ? '' : scoreValue
             }
             type="number"
-            className="text-[24px]"
+            className="!text-[16px]"
             min={0}
             max={score.criterion.maxScore}
             onChange={(e) => {
