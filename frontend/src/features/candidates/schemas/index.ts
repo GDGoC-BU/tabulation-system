@@ -1,6 +1,9 @@
 import z from 'zod'
 import { zStringToDate } from '@/schemas'
-import { collegeSummarySchema } from '@/features/colleges/schemas'
+import {
+  collegeHierarchySchema,
+  collegeSummarySchema,
+} from '@/features/colleges/schemas'
 
 export const candidateGender = z.enum(['MALE', 'FEMALE', 'OTHER'])
 export type CandidateGender = z.infer<typeof candidateGender>
@@ -11,6 +14,7 @@ export const candidateHierarchySchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   gender: candidateGender,
+  college: collegeHierarchySchema,
   age: z.number(),
 })
 export type CandidateHierarchy = z.infer<typeof candidateHierarchySchema>

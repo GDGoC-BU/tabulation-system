@@ -223,6 +223,7 @@ public class PageantService {
         return responseDTO;
     }
 
+    @Transactional
     public PageantHierarchyDTO getPageantHierarchy(UUID id) {
         String CACHE_NAME = CacheNameConstants.TABULATION;
         String CACHE_KEY = cacheKeyBuilder.build("pageants", id, "hierarchy");

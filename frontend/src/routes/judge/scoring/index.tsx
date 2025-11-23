@@ -6,10 +6,8 @@ import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 import type { ScoreDetailed } from '@/features/scores/schemas'
 import type { PhaseDetailed, PhaseHierarchy } from '@/features/phases/schemas'
 import type {
-  CandidateDetailed,
   CandidateGender,
   CandidateHierarchy,
-  CandidateSummary,
 } from '@/features/candidates/schemas'
 import { candidateGender } from '@/features/candidates/schemas'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
@@ -62,7 +60,7 @@ function CandidateScoringCards({
   scoresMap,
   gender,
 }: {
-  candidates: Array<CandidateDetailed | CandidateSummary | CandidateHierarchy>
+  candidates: Array<CandidateHierarchy>
   scoresMap: Map<string, Array<ScoreDetailed>>
   gender: CandidateGender
 }) {
@@ -172,6 +170,7 @@ function CandidateScoringCards({
             <div className="embla-thumbs__container flex flex-row gap-3">
               {candidates.map((_, index) => (
                 <div
+                  key={index}
                   className={cn(
                     'embla-thumbs__slide grow overflow-visible',
                     index === selectedIndex

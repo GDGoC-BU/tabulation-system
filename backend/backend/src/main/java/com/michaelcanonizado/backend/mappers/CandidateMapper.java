@@ -7,7 +7,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {CollegeService.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {
+                CollegeService.class,
+                CollegeMapper.class
+        }
+)
 public interface CandidateMapper {
     @Mapping(target = "college", source = "collegeId")
     Candidate toEntity(CandidateCreateDTO candidateCreateDTO);

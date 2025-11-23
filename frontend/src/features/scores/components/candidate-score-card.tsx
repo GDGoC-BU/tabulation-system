@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import ScoreEditForm from './score-edit-form'
 import type { ScoreDetailed } from '@/features/scores/schemas'
-import type { CandidateHierarchy } from '@/features/candidates/schemas'
+import type {
+  CandidateDetailed,
+  CandidateHierarchy,
+  CandidateSummary,
+} from '@/features/candidates/schemas'
 import type { ComponentClassNameProp } from '@/types'
 import { cn } from '@/lib/utils'
 import { TextBody, TextHeading, TextSub } from '@/components/text'
@@ -70,7 +74,7 @@ export default function CandidateScoreCard({
             {capitalizeWords(candidate.firstName)}{' '}
             {capitalizeWords(candidate.lastName)}
           </TextBody>
-          <TextSub className="mt-0">BU College of Science</TextSub>
+          <TextSub className="mt-0">{candidate.college.name}</TextSub>
         </div>
         <div className="size-fit relative">
           <div className="border size-fit px-2 py-1 rounded-full flex flex-row gap-1 items-center">
