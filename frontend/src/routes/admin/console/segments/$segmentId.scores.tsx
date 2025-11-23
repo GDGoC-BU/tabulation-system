@@ -2,7 +2,6 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import type {
-  CandidateDetailed,
   CandidateHierarchy,
   CandidateSummary,
 } from '@/features/candidates/schemas'
@@ -26,7 +25,7 @@ function CandidateScoreCard({
   scores,
   className,
 }: {
-  candidate: CandidateSummary | CandidateDetailed | CandidateHierarchy
+  candidate: CandidateSummary | CandidateHierarchy
   scores: Array<ScoreDetailed>
 } & ComponentClassNameProp) {
   const totalScore = useMemo(() => {
@@ -53,7 +52,7 @@ function CandidateScoreCard({
               {capitalizeWords(candidate.firstName)}{' '}
               {capitalizeWords(candidate.lastName)}
             </TextBody>
-            <TextSub className="mt-0">BU College of Science</TextSub>
+            <TextSub className="mt-0">{candidate.college.code}</TextSub>
           </div>
         </div>
         <div className="size-fit relative">

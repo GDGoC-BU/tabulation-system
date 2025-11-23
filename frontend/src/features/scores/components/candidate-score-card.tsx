@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import ScoreEditForm from './score-edit-form'
 import type { ScoreDetailed } from '@/features/scores/schemas'
 import type {
-  CandidateDetailed,
   CandidateHierarchy,
   CandidateSummary,
 } from '@/features/candidates/schemas'
@@ -16,7 +15,7 @@ export default function CandidateScoreCard({
   scores = [],
   className,
 }: {
-  candidate: CandidateHierarchy
+  candidate: CandidateHierarchy | CandidateSummary
   scores: Array<ScoreDetailed>
 } & ComponentClassNameProp) {
   const [scoreValues, setScoreValues] = useState(() =>
