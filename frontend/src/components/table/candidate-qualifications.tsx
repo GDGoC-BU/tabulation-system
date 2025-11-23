@@ -82,6 +82,7 @@ export default function CandidateQualifications({
                         className={cn(
                           cellIndex < row.getVisibleCells().length - 1 &&
                             'border-r',
+                          cell.column.columnDef.meta?.className,
                           borderClassName,
                         )}
                         key={cell.id}

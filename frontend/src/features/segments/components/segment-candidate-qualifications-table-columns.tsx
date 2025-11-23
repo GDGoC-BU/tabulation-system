@@ -92,7 +92,7 @@ export const segmentCandidateQualifications: Array<
     header: 'Breakdown',
     cell: ({ row, table }) => {
       const leaderboard: CandidateSegmentQualificationSummary = row.original
-      const formula: string = table.options.meta?.formula ?? null
+      const formula = table.options.meta?.formula
 
       if (!formula || formula.length === 0) {
         return <TextBody>No breakdown available</TextBody>
