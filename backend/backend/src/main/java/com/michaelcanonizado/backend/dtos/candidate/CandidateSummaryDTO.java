@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.dtos.candidate;
 
+import com.michaelcanonizado.backend.dtos.college.CollegeSummaryDTO;
 import com.michaelcanonizado.backend.models.CandidateGender;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ public record CandidateSummaryDTO(
         int number,
         String firstName,
         String lastName,
+        CollegeSummaryDTO college,
         CandidateGender gender,
         int age,
         LocalDateTime createdAt,

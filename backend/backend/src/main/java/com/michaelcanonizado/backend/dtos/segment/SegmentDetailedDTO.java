@@ -1,6 +1,5 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
-import com.michaelcanonizado.backend.dtos.candidate.CandidateDetailedDTO;
 import com.michaelcanonizado.backend.dtos.candidateSegmentQualification.CandidateSegmentQualificationSummaryDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;

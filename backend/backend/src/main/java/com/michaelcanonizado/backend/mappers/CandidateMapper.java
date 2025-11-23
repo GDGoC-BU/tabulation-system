@@ -19,7 +19,6 @@ public interface CandidateMapper {
     Candidate toEntity(CandidateCreateDTO candidateCreateDTO);
 
     CandidateSummaryDTO toSummaryDTO(Candidate candidate);
-    CandidateDetailedDTO toDetailedDTO(Candidate candidate);
     CandidateHierarchyDTO toHierarchyDTO(Candidate candidate);
 
     void updateEntityFromDTO(@MappingTarget Candidate candidate, CandidateUpdateDTO candidateUpdateDTO);
