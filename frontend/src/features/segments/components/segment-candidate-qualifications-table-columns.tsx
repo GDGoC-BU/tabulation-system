@@ -68,6 +68,15 @@ export const segmentCandidateQualifications: Array<
     },
   },
   {
+    id: 'candidateCollege',
+    header: 'College',
+    cell: ({ row }) => {
+      const candidate: CandidateSegmentQualificationSummary['candidate'] =
+        row.original.candidate
+      return <TextBody>{candidate.college.code.toUpperCase()}</TextBody>
+    },
+  },
+  {
     accessorKey: 'score',
     header: 'Score',
     cell: ({ row }) => {

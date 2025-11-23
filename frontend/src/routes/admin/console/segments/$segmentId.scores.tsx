@@ -52,7 +52,9 @@ function CandidateScoreCard({
               {capitalizeWords(candidate.firstName)}{' '}
               {capitalizeWords(candidate.lastName)}
             </TextBody>
-            <TextSub className="mt-0">{candidate.college.code}</TextSub>
+            <TextSub className="mt-0">
+              {candidate.college.code.toUpperCase()}
+            </TextSub>
           </div>
         </div>
         <div className="size-fit relative">

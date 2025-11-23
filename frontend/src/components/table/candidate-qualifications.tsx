@@ -60,7 +60,7 @@ export default function CandidateQualifications({
         </TableHeader>
         <TableBody className="">
           {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row, index) => {
+            table.getRowModel().rows.map((row) => {
               const isQualified = !limit || row.original.isQualified
 
               const ringClassName = isQualified
