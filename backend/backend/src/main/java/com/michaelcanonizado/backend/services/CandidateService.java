@@ -117,9 +117,12 @@ public class CandidateService {
         return mapper.toSummaryDTO(savedCandidate);
     }
 
+    @Transactional
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public CandidateSummaryDTO getCandidate(UUID id) {
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> {
@@ -131,9 +134,12 @@ public class CandidateService {
         return mapper.toSummaryDTO(candidate);
     }
 
+    @Transactional
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public List<CandidateSummaryDTO> getCandidates() {
         UUID selectedPageantId = pageantContext.getId();

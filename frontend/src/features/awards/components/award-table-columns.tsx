@@ -38,6 +38,20 @@ export const awardTableColumns: Array<
     },
   },
   {
+    id: 'results',
+    cell: ({ row }) => {
+      const award = row.original
+      return (
+        <Link
+          to={'/admin/console/awards/$awardId/results'}
+          params={{ awardId: award.id }}
+        >
+          <TextBody>View Results</TextBody>
+        </Link>
+      )
+    },
+  },
+  {
     id: 'actions',
     cell: ({ row }) => {
       const award = row.original

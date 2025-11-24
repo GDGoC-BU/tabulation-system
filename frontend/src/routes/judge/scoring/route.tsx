@@ -4,6 +4,7 @@ import { useAuthenticationStore } from '@/features/authentication/store/use-auth
 import { waitForStoreHydration } from '@/lib/wait-for-store-hydration'
 import { useStompStore } from '@/store/stomp-store'
 import Navigation from '@/features/navigation/components'
+import Loading from '@/components/loading'
 
 export const Route = createFileRoute('/judge/scoring')({
   beforeLoad: async ({ context, location }) => {
@@ -42,8 +43,18 @@ export const Route = createFileRoute('/judge/scoring')({
 })
 
 function JudgeScoringLayout() {
-  const { connect } = useStompStore((state) => state)
+  const { connect, isConnected } = useStompStore((state) => state)
   connect()
+
+  if (!isConnected) {
+    return (
+      <div className="w-full h-screen grid place-items-center">
+        <main>
+          <Loading />
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="relative">

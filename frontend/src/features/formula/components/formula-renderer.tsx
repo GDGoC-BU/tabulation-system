@@ -24,13 +24,13 @@ export default function FormulaRenderer({
           return (
             <Badge key={index} variant="outline" className="bg-muted">
               <FormulaBadgeRenderer
-                simplified={true}
+                simplified={false}
                 criterionRelationship={criterionLookup[token.value]}
               />
             </Badge>
           )
         }
-        return <TextBody>{token.value}</TextBody>
+        return <TextBody key={index}>{token.value}</TextBody>
       })}
     </div>
   )

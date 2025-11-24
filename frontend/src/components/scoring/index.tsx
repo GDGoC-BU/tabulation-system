@@ -1,11 +1,15 @@
-import { TextBody, TextHeading, textBodyClassName } from '../text'
-import { Badge } from '../ui/badge'
+import { TextBody, TextDisplay, TextHeading, textBodyClassName } from '../text'
 import type { ComponentClassNameAndChildrenProp } from '@/types'
 import { cn } from '@/lib/utils'
 
 function Scoring({ children, className }: ComponentClassNameAndChildrenProp) {
   return (
-    <div className={cn('p-8 flex flex-col gap-4 min-h-screen', className)}>
+    <div
+      className={cn(
+        'pt-8 pb-12 flex flex-col items-center gap-12 min-h-screen',
+        className,
+      )}
+    >
       {children}
     </div>
   )
@@ -13,22 +17,31 @@ function Scoring({ children, className }: ComponentClassNameAndChildrenProp) {
 
 function Header({ className, children }: ComponentClassNameAndChildrenProp) {
   return (
-    <div className={cn('flex flex-col items-center gap-2', className)}>
+    <div className={cn('flex flex-col items-center', className)}>
       {children}
     </div>
   )
 }
-
-function Title({ className, children }: ComponentClassNameAndChildrenProp) {
-  return <TextHeading className={cn('', className)}>{children}</TextHeading>
+function Display({ className, children }: ComponentClassNameAndChildrenProp) {
+  return (
+    <TextDisplay className={cn('text-center mt-0', className)}>
+      {children}
+    </TextDisplay>
+  )
 }
-
+function Title({ className, children }: ComponentClassNameAndChildrenProp) {
+  return <TextHeading className={cn('mt-0', className)}>{children}</TextHeading>
+}
 function Sub({ className, children }: ComponentClassNameAndChildrenProp) {
-  return <TextBody className={cn('', className)}>{children}</TextBody>
+  return <TextBody className={cn('mt-2', className)}>{children}</TextBody>
 }
 
 function Content({ className, children }: ComponentClassNameAndChildrenProp) {
-  return <div className={cn('grow', className)}>{children}</div>
+  return (
+    <div className={cn('grow flex w-full max-w-[1200px]', className)}>
+      {children}
+    </div>
+  )
 }
 
 function TabsFacade({
@@ -36,14 +49,7 @@ function TabsFacade({
   children,
 }: ComponentClassNameAndChildrenProp) {
   return (
-    <div
-      className={cn(
-        'flex flex-col gap-2 max-w-[1080px] w-full mx-auto',
-        className,
-      )}
-    >
-      {children}
-    </div>
+    <div className={cn('flex flex-col gap-2 grow', className)}>{children}</div>
   )
 }
 function TabsFacadeList({
@@ -88,115 +94,25 @@ function TabsFacadeBody({
   children,
 }: ComponentClassNameAndChildrenProp) {
   return (
-    <div className="bg-muted rounded-lg p-[3px] grow w-full">
-      <div
-        className={cn(
-          'bg-background flex flex-col gap-2 px-4 pt-8 pb-4 rounded-md',
-          className,
-        )}
-      >
-        {children}
-      </div>
-    </div>
-  )
-}
-
-function TabsFacadeBodyTitle({
-  className,
-  children,
-}: ComponentClassNameAndChildrenProp) {
-  return <TextHeading className={cn('', className)}>{children}</TextHeading>
-}
-
-function TabsFacadeBodyDescription({
-  className,
-  children,
-}: ComponentClassNameAndChildrenProp) {
-  return <TextBody className={cn('', className)}>{children}</TextBody>
-}
-
-function TabsFacadeBodyContent({
-  className,
-  children,
-}: ComponentClassNameAndChildrenProp) {
-  return (
     <div
       className={cn(
-        'grid grid-cols-2 gap-4 mt-4 bg-muted p-4 rounded-lg',
+        'bg-background border-muted border-[3px] px-8 py-8 rounded-2xl grow w-full',
         className,
       )}
     >
       {children}
     </div>
   )
-}
-
-function Card({ className, children }: ComponentClassNameAndChildrenProp) {
-  return (
-    <div
-      className={cn('bg-background border rounded-lg flex flex-col', className)}
-    >
-      {children}
-    </div>
-  )
-}
-function CardHeader({
-  className,
-  children,
-}: ComponentClassNameAndChildrenProp) {
-  return (
-    <div
-      className={cn(
-        'flex flex-row justify-between items-center border-b p-4',
-        className,
-      )}
-    >
-      {children}
-    </div>
-  )
-}
-function CardHeaderTitle({
-  className,
-  children,
-}: ComponentClassNameAndChildrenProp) {
-  return <TextBody className={cn('font-bold', className)}>{children}</TextBody>
-}
-function CardHeaderBadgeGroup({
-  className,
-  children,
-}: ComponentClassNameAndChildrenProp) {
-  return <div className={cn('flex flex-row gap-4', className)}>{children}</div>
-}
-function CardHeaderBadge({
-  className,
-  children,
-}: ComponentClassNameAndChildrenProp) {
-  return <Badge className={cn('', className)}>{children}</Badge>
-}
-function CardContent({
-  className,
-  children,
-}: ComponentClassNameAndChildrenProp) {
-  return <div className={cn('px-4 py-8', className)}>{children}</div>
 }
 
 Header.Title = Title
 Header.Sub = Sub
+Header.Display = Display
 Scoring.Header = Header
 
 TabsFacadeList.Trigger = TabsFacadeListTrigger
 TabsFacade.List = TabsFacadeList
-TabsFacadeBody.Title = TabsFacadeBodyTitle
-TabsFacadeBody.Description = TabsFacadeBodyDescription
-TabsFacadeBody.Content = TabsFacadeBodyContent
 TabsFacade.Body = TabsFacadeBody
-
-CardHeader.Badge = CardHeaderBadge
-CardHeader.BadgeGroup = CardHeaderBadgeGroup
-CardHeader.Title = CardHeaderTitle
-Card.Header = CardHeader
-Card.Content = CardContent
-Scoring.Card = Card
 
 Scoring.TabsFacade = TabsFacade
 Scoring.Content = Content

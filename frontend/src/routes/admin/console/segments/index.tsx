@@ -1,24 +1,27 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
-import { useSegmentsQuery } from '@/features/segments/hooks/use-segments-query'
+import { useQuery } from '@tanstack/react-query'
 import Console from '@/components/console'
 import { segmentTableColumns } from '@/features/segments/components/segment-table-columns'
 import Table from '@/components/table'
 import { TextBody } from '@/components/text'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
-import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import FormulaRenderer from '@/features/formula/components/formula-renderer'
+import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
+import segmentsQueryOptions from '@/features/segments/query-options/segments-query-options'
 
 export const Route = createFileRoute('/admin/console/segments/')({
   component: AdminConsoleSegments,
 })
 
 function AdminConsoleSegments() {
-  const { data: segments, isLoading } = useSegmentsQuery()
-  const { data: selectedPageant } = useSelectedPageantQuery()
-  const { data: pageantHierarchy } = usePageantHierarchyQuery(
-    selectedPageant?.id,
+  const { data: segments, isLoading } = useQuery(segmentsQueryOptions())
+  const { data: selectedPageant } = useSelectedPageant()
+  const { data: pageantHierarchy } = useQuery(
+    pageantHierarchyQueryOptions(selectedPageant?.id, {
+      enabled: !!selectedPageant,
+    }),
   )
   const criterionLookup = useFormulaCriterionLookup(
     pageantHierarchy?.phases ?? [],
@@ -44,18 +47,19 @@ function AdminConsoleSegments() {
   /* Converts the formula to a more readable format just like in admin/console/awards/add */
   const processedSegments = useMemo(() => {
     if (!segments) return []
-    return segments.map((award) => {
-      const rawFormula = award.formula
-      console.log('Segment Formula: ', rawFormula)
+    return segments.map((segment) => {
+      const rawFormula = segment.formula
       return {
-        ...award,
-        /* Really patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
+        ...segment,
+        /* Patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
         formula: rawFormula ? (
           <FormulaRenderer
             formula={rawFormula}
             criterionLookup={criterionLookup}
           />
-        ) : null,
+        ) : (
+          <TextBody>None</TextBody>
+        ),
       }
     })
   }, [segments, criterionMap, criterionLookup])

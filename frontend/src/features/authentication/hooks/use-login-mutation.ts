@@ -7,7 +7,9 @@ export function useLoginMutation() {
   return useMutation<string, string, LoginParameters>({
     mutationFn: async (values) => {
       try {
-        const res = await api.post('/accounts/login', values)
+        const res = await api.post('/accounts/login', values, {
+          skipUnauthorizedHandler: true,
+        })
         return res.data
       } catch (error) {
         throw errorResolver(error)

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import { awardAddFormSchema } from '@/features/awards/schemas'
 import Console from '@/components/console'
 import useAddAwardMutate from '@/features/awards/hooks/use-add-award-mutate'
@@ -28,7 +28,7 @@ function AdminConsoleAwardsAdd() {
   const navigate = useNavigate()
 
   const { mutateAsync: addAward } = useAddAwardMutate()
-  const { data: selectedPageant } = useSelectedPageantQuery()
+  const { data: selectedPageant } = useSelectedPageant()
 
   const form = useForm({
     resolver: zodResolver(awardAddFormSchema),

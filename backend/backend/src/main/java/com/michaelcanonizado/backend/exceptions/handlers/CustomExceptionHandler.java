@@ -78,9 +78,9 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
-    @ExceptionHandler(PhaseStatusException.class)
+    @ExceptionHandler(PhaseSegmentStatusException.class)
     public ResponseEntity<ErrorResponse> handlePhaseStatusException(
-            PhaseStatusException exception,
+            PhaseSegmentStatusException exception,
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.LOCKED;
@@ -118,6 +118,23 @@ public class CustomExceptionHandler {
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.FORBIDDEN;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationFailedException(
+            AuthenticationFailedException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
 
         ErrorResponse response = new ErrorResponse(
                 status.value(),

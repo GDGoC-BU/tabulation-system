@@ -2,6 +2,12 @@ import axios from 'axios'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
 import { useSelectedPageantIdStore } from '@/features/pageants/store/use-selected-pageant-id-store'
 
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipUnauthorizedHandler?: boolean
+  }
+}
+
 const api = axios.create({
   baseURL: `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/api/v1`,
   headers: {
@@ -32,13 +38,14 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status
+    const skip = error.config?.skipUnauthorizedHandler
+    if (status === 401 && !skip) {
       const { logout } = useAuthenticationStore.getState()
       logout()
-      /* Hard reload after logout to trigger the layout
-         protection, and clear the stale stores */
       window.location.reload()
     }
+    /* Pass the error to the next */
     return Promise.reject(error)
   },
 )

@@ -11,6 +11,7 @@ public record JudgeSummaryDTO(
         String firstName,
         String lastName,
         Honorific honorific,
+        int number,
         boolean isOnline,
         LocalDateTime lastSeenAt,
         LocalDateTime createdAt,

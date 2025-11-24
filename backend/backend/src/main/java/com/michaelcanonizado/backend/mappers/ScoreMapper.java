@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.mappers;
 
+import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreDetailedDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreUpdateDTO;
 import com.michaelcanonizado.backend.models.Score;
@@ -14,6 +15,8 @@ public interface ScoreMapper {
     @Mapping(target = "criterion", source = "criterion")
     @Mapping(target = "segmentId", source = "criterion.segment.id")
     ScoreDetailedDTO toDetailedDTO(Score score);
+
+    ScoreBreakdownDTO toBreakdownDTO(Score score);
 
     void updateEntityFromDTO(@MappingTarget Score score, ScoreUpdateDTO scoreUpdateDTO);
 }

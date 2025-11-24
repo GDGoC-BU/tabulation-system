@@ -1,6 +1,5 @@
 package com.michaelcanonizado.backend.controllers;
 
-import com.michaelcanonizado.backend.dtos.phase.PhaseDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
@@ -41,8 +40,8 @@ public class SegmentController {
     }
 
     @PostMapping("/segments/{id}/calculate-qualified-candidates")
-    public ResponseEntity<SegmentDetailedDTO> calculateQualifiedCandidates(@PathVariable UUID id) {
-        SegmentDetailedDTO segment = service.caclculateQualifiedCandidates(id);
+    public ResponseEntity<SegmentDetailedDTO> calculateCandidateQualifications(@PathVariable UUID id) {
+        SegmentDetailedDTO segment = service.calculateCandidateQualifications(id);
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 
@@ -55,6 +54,9 @@ public class SegmentController {
     @GetMapping("/segments/ongoing")
     public ResponseEntity<SegmentDetailedDTO> getOngoingSegment() {
         SegmentDetailedDTO segment = service.getOngoingSegment();
+        if (segment == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 

@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 function Console({ className, children }: ComponentClassNameAndChildrenProp) {
   return (
-    <div className={cn('p-4 flex flex-col min-h-full', className)}>
+    <div className={cn('p-4 flex flex-col min-h-full w-full', className)}>
       {children}
     </div>
   )
@@ -19,7 +19,7 @@ function Title({ className, children }: ComponentClassNameAndChildrenProp) {
 }
 
 function Content({ className, children }: ComponentClassNameAndChildrenProp) {
-  return <div className={cn('', className)}>{children}</div>
+  return <div className={cn('grow', className)}>{children}</div>
 }
 
 Header.Title = Title

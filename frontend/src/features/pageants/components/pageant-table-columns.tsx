@@ -75,6 +75,20 @@ export const pageantTableColumns: Array<ColumnDef<PageantSummary>> = [
       return <TextBody>{formatted}</TextBody>
     },
   },
+  // {
+  //   id: 'soft-reset',
+  //   cell: ({ row }) => {
+  //     const pageant = row.original
+  //     return (
+  //       <Link
+  //         to={'/admin/console/pageants/$pageantId/soft-reset'}
+  //         params={{ pageantId: pageant.id }}
+  //       >
+  //         Soft Reset
+  //       </Link>
+  //     )
+  //   },
+  // },
   {
     id: 'actions',
     cell: ({ row }) => {

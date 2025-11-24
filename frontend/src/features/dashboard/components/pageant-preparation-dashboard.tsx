@@ -1,13 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { TextBody } from '@/components/text'
 import { Button } from '@/components/ui/button'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
+import ConfirmDialog from '@/components/confirm-dialog'
 
 export default function PageantPreparationDashboard() {
   const queryClient = useQueryClient()
   const { mutateAsync } = useStatusChangeMutate()
-  const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
+  const { data: selectedPageant, isLoading } = useSelectedPageant()
   if (isLoading || !selectedPageant) {
     return <TextBody>Loading Preperation Dashboard...</TextBody>
   }
@@ -27,7 +28,13 @@ export default function PageantPreparationDashboard() {
           Summary of pageant details will be show here. When pageant starts no
           modification will be allowed.
         </TextBody>
-        <Button onClick={onClick}>Start Pageant</Button>
+        <Button onClick={onClick}></Button>
+        <ConfirmDialog
+          triggerLabel="Start Pageant"
+          title="Start Pageant"
+          description="This action cannot be undone. Are you sure you want to move to the next stage?"
+          onConfirm={onClick}
+        />
       </div>
     </div>
   )

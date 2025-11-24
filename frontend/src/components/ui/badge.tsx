@@ -39,7 +39,12 @@ function Badge({
   return (
     <Comp
       data-slot="badge"
-      className={cn(badgeVariants({ variant }), textSubClassName, className)}
+      className={cn(
+        badgeVariants({ variant }),
+        'rounded-full px-4 py-2 w-fit',
+        textSubClassName,
+        className,
+      )}
       {...props}
     />
   )

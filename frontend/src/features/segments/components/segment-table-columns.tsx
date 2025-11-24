@@ -2,13 +2,14 @@ import { Link } from '@tanstack/react-router'
 import { Ellipsis } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { SegmentSummary } from '../schemas'
+import type { JSX } from 'react'
 import { TextBody } from '@/components/text'
 
 export type SegmentSummaryWithRenderedFormula = Omit<
   SegmentSummary,
   'formula'
 > & {
-  formula: React.ReactNode
+  formula: JSX.Element
 }
 
 export const segmentTableColumns: Array<
@@ -66,15 +67,11 @@ export const segmentTableColumns: Array<
       const formula: SegmentSummaryWithRenderedFormula['formula'] =
         row.getValue('formula')
 
-      if (!formula) {
-        return <TextBody>None</TextBody>
-      }
-
       return <div className="max-w-[1000px] whitespace-normal">{formula}</div>
     },
   },
   {
-    id: 'actions',
+    id: 'view-scores',
     cell: ({ row }) => {
       const segment = row.original
       return (
@@ -83,6 +80,20 @@ export const segmentTableColumns: Array<
           params={{ segmentId: segment.id }}
         >
           View Scores
+        </Link>
+      )
+    },
+  },
+  {
+    id: 'qualified-candidates',
+    cell: ({ row }) => {
+      const segment = row.original
+      return (
+        <Link
+          to={'/admin/console/segments/$segmentId/qualified'}
+          params={{ segmentId: segment.id }}
+        >
+          Get Qualified Candidates
         </Link>
       )
     },

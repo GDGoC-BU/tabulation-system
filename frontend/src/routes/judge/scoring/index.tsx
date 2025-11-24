@@ -1,258 +1,333 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import type { Segments } from '@/features/segments/schemas'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import useEmblaCarousel from 'embla-carousel-react'
+import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 import type { ScoreDetailed } from '@/features/scores/schemas'
-import type { CandidateSummary } from '@/features/candidates/schemas'
-import type { PhaseDetailed } from '@/features/phases/schemas'
+import type { PhaseDetailed, PhaseHierarchy } from '@/features/phases/schemas'
+import type {
+  CandidateGender,
+  CandidateHierarchy,
+} from '@/features/candidates/schemas'
 import { candidateGender } from '@/features/candidates/schemas'
 import { useAuthenticationStore } from '@/features/authentication/store/use-authentication-store'
-import { usePageantQuery } from '@/features/pageants/hooks/use-pageant-query'
-import Scoring from '@/components/scoring'
 import { useSelectedPageantIdStore } from '@/features/pageants/store/use-selected-pageant-id-store'
-import { useOngoingPhaseQuery } from '@/features/phases/hooks/use-ongoing-phase-query'
-import { TextBody, TextDisplay, TextSub } from '@/components/text'
-import { useSegmentsQuery } from '@/features/segments/hooks/use-segments-query'
-import { phaseSegmentStatusValue } from '@/schemas'
-import { useStompStore } from '@/store/stomp-store'
-import { useSegmentQuery } from '@/features/segments/hooks/use-segment-query'
-import { useScoresQuery } from '@/features/scores/hooks/use-scores-query'
-import { Input } from '@/components/ui/input'
-import useDebounce from '@/hooks/use-debounce'
-import useEditScoreMutate from '@/features/scores/hooks/use-edit-score-mutate'
-import splitCandidates from '@/features/candidates/lib/split-candidates'
+import Scoring from '@/components/scoring'
+import { TextBody, TextHeading, TextSub } from '@/components/text'
 import capitalizeWords from '@/lib/capitalize-words'
-import { useJudgeQuery } from '@/features/judges/hooks/use-judge-query'
-import { useOngoingSegmentQuery } from '@/features/segments/hooks/use-ongoing-segment-query'
+import judgeQueryOptions from '@/features/judges/query-options/judge-query-options'
+import scoresQueryOptions from '@/features/scores/query-options/scores-query-options'
+import splitCandidates from '@/features/candidates/lib/split-candidates'
+import { useStompStore } from '@/store/stomp-store'
+import { phaseSegmentStatusValue } from '@/schemas'
+import CandidateScoreCard from '@/features/scores/components/candidate-score-card'
+import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
+import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import Loading from '@/components/loading'
 
-function ScoreInputForm({
-  score,
-  onChangeScore,
+function ScoringTabsFacadeBodyNoActiveSegmentFallback({
+  phase,
 }: {
-  score: ScoreDetailed
-  onChangeScore: (id: string, value: number) => void
+  phase: PhaseDetailed | PhaseHierarchy
 }) {
-  const [scoreValue, setScoreValue] = useState(score.value)
-  const [isError, setIsError] = useState(false)
-  const debouncedScore = useDebounce(scoreValue, 1500)
-  const { mutateAsync: editScore } = useEditScoreMutate()
+  let title = 'No active segment'
+  let body = '👨🏻‍💻Kindly wait for the admin to start the next segment'
 
-  useEffect(() => {
-    if (isNaN(debouncedScore) || debouncedScore > score.criterion.maxScore) {
-      setIsError(true)
-      return
-    }
-    setIsError(false)
+  const PENDING = phaseSegmentStatusValue.enum.PENDING
+  const CLOSED = phaseSegmentStatusValue.enum.CLOSED
 
-    const changeScore = async () => {
-      const updatedScore = await editScore({
-        id: score.id,
-        value: debouncedScore,
-      })
-      onChangeScore(score.id, updatedScore.value)
-    }
-    changeScore()
-  }, [debouncedScore])
+  if (phase.segments.every((segment) => segment.status === CLOSED)) {
+    title = `${phase.name} has completed!`
+    body = '💖Thank you for participating in this pageant.'
+  } else if (phase.segments.every((segment) => segment.status === PENDING)) {
+    title = `${phase.name} has not started`
+    body = `✨Kindly wait for the admin to start the pageant`
+  }
 
   return (
-    <div className="flex flex-col items-center ">
-      <div className="grid grid-cols-2 gap-4 items-center">
-        <div className="justify-self-end">
-          <TextBody className="">{score.criterion.name}</TextBody>
-          {isError && (
-            <TextSub className="text-destructive text-end">
-              Invalid Score
-            </TextSub>
-          )}
-        </div>
-        <div className="justify-self-start flex flex-row gap-4 items-center">
-          <div className="w-fit">
-            <Input
-              defaultValue={score.value}
-              type="number"
-              min={0}
-              max={score.criterion.maxScore}
-              onChange={(e) => setScoreValue(parseInt(e.target.value))}
-            />
+    <Scoring.TabsFacade.Body className="w-full h-full grow grid place-items-center">
+      <div className="flex flex-col text-center gap-2">
+        <TextHeading>{title}</TextHeading>
+        <TextBody>{body}</TextBody>
+      </div>
+    </Scoring.TabsFacade.Body>
+  )
+}
+
+function CandidateScoringCards({
+  candidates,
+  scoresMap,
+  gender,
+}: {
+  candidates: Array<CandidateHierarchy>
+  scoresMap: Map<string, Array<ScoreDetailed>>
+  gender: CandidateGender
+}) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
+    WheelGesturesPlugin(),
+  ])
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev()
+  }, [emblaApi])
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext()
+  }, [emblaApi])
+
+  const FEMALE = candidateGender.enum.FEMALE
+  const MALE = candidateGender.enum.MALE
+
+  let genderBadgeClassNames = ''
+  if (gender === FEMALE) {
+    genderBadgeClassNames = 'bg-gender-female-primary'
+  } else if (gender === MALE) {
+    genderBadgeClassNames = 'bg-gender-male-primary'
+  }
+
+  let genderShadowClassNames = ''
+  if (gender === FEMALE) {
+    genderShadowClassNames = 'shadow-lg shadow-gender-female-secondary'
+  } else if (gender === MALE) {
+    genderShadowClassNames = 'shadow-lg shadow-gender-male-secondary'
+  }
+
+  let genderRingClassNames = ''
+  if (gender === FEMALE) {
+    genderRingClassNames = 'ring-gender-female-primary'
+  } else if (gender === MALE) {
+    genderRingClassNames = 'ring-gender-male-primary'
+  }
+
+  let genderLabel = ''
+  if (gender === FEMALE) {
+    genderLabel = 'Female'
+  } else if (gender === MALE) {
+    genderLabel = 'Male'
+  }
+
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
+    containScroll: 'keepSnaps',
+    dragFree: true,
+    active: false,
+  })
+
+  const onThumbClick = useCallback(
+    (index: number) => {
+      if (!emblaApi || !emblaThumbsApi) return
+      emblaApi.scrollTo(index)
+    },
+    [emblaApi, emblaThumbsApi],
+  )
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi || !emblaThumbsApi) return
+    setSelectedIndex(emblaApi.selectedScrollSnap())
+    emblaThumbsApi.scrollTo(emblaApi.selectedScrollSnap())
+  }, [emblaApi, emblaThumbsApi, setSelectedIndex])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    onSelect()
+
+    emblaApi.on('select', onSelect).on('reInit', onSelect)
+  }, [emblaApi, onSelect])
+
+  return (
+    <div className="overflow-hidden bg-muted flex flex-col gap-8 rounded-xl py-8 px-4 relative">
+      <Badge className={cn('mx-auto', genderBadgeClassNames)}>
+        <TextBody className="text-background">
+          {genderLabel} Candidates
+        </TextBody>
+      </Badge>
+      <div className="embla">
+        <div className="embla__viewport relative" ref={emblaRef}>
+          <div className="embla__container flex flex-row">
+            {candidates.map((candidate) => {
+              return (
+                <CandidateScoreCard
+                  className={cn('embla__slide mx-2', genderShadowClassNames)}
+                  key={candidate.id}
+                  candidate={candidate}
+                  scores={scoresMap.get(candidate.id) ?? []}
+                />
+              )
+            })}
           </div>
-          <TextSub>Max: {score.criterion.maxScore}</TextSub>
+          <div
+            onClick={scrollPrev}
+            className="absolute w-[calc(26%)] top-0 bottom-0 left-[-1%] bg-tranparent hover:cursor-pointer"
+          />
+          <div
+            onClick={scrollNext}
+            className="absolute w-[calc(26%)] top-0 bottom-0 right-[-1%] bg-tranparent hover:cursor-pointer"
+          />
+        </div>
+        <div className="embla-thumbs mt-4 w-full">
+          <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
+            <div className="embla-thumbs__container flex flex-row gap-3">
+              {candidates.map((_, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    'embla-thumbs__slide grow overflow-visible',
+                    index === selectedIndex
+                      ? 'embla-thumbs__slide--selected'
+                      : '',
+                  )}
+                >
+                  <button
+                    onClick={() => onThumbClick(index)}
+                    className={cn(
+                      'embla-thumbs__slide__number px-4 py-2 rounded-lg w-full hover:cursor-pointer bg-background transition-shadow',
+                      index === selectedIndex
+                        ? genderRingClassNames
+                        : 'ring-border',
+                      index === selectedIndex ? 'ring-[2px]' : 'ring-[1px]',
+                    )}
+                  >
+                    <TextBody>{index + 1}</TextBody>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="[&>*]:text-center mt-4 flex flex-col gap-[0px] w-fit mx-auto">
+          <TextSub>⬅️Use 2 fingers on the trackpad to drag➡️</TextSub>
+          <TextSub>Or click on the candidate cards</TextSub>
         </div>
       </div>
     </div>
   )
 }
 
-function CandidateScoreCard({
-  candidate,
-  scores = [],
-}: {
-  candidate: CandidateSummary
-  scores?: Array<ScoreDetailed>
-}) {
-  const [scoreValues, setScoreValues] = useState(() =>
-    Object.fromEntries(scores.map((score) => [score.id, score.value])),
-  )
-
-  useEffect(() => {
-    if (scores) {
-      setScoreValues(
-        Object.fromEntries(scores.map((score) => [score.id, score.value])),
-      )
-    }
-  }, [scores])
-
-  /* Prop drill and handle total score count client side to minimize expensive score fetching and keep it simple. */
-  const handleScoreChange = (id: string, value: number) => {
-    setScoreValues((prev) => ({
-      ...prev,
-      [id]: value,
-    }))
-  }
-
-  const totalScore = Object.values(scoreValues).reduce(
-    (sum, val) => sum + (isNaN(val) ? 0 : val),
-    0,
-  )
-
-  /* Determine the badge for each gender */
-  let GenderBadge = (
-    <Scoring.Card.Header.Badge className="bg-purple-400 font-semibold">
-      Mx.
-    </Scoring.Card.Header.Badge>
-  )
-  if (candidate.gender === candidateGender.enum.FEMALE) {
-    GenderBadge = (
-      <Scoring.Card.Header.Badge className="bg-pink-400 font-semibold">
-        Ms.
-      </Scoring.Card.Header.Badge>
-    )
-  } else if (candidate.gender === candidateGender.enum.MALE) {
-    GenderBadge = (
-      <Scoring.Card.Header.Badge className="bg-blue-400 font-semibold">
-        Mr.
-      </Scoring.Card.Header.Badge>
-    )
-  }
-
-  return (
-    <Scoring.Card>
-      <Scoring.Card.Header>
-        <Scoring.Card.Header.Title>
-          Candidate {candidate.number}
-        </Scoring.Card.Header.Title>
-        <Scoring.Card.Header.BadgeGroup>
-          {GenderBadge}
-          <Scoring.Card.Header.Badge>
-            Total Score: {totalScore}
-          </Scoring.Card.Header.Badge>
-        </Scoring.Card.Header.BadgeGroup>
-      </Scoring.Card.Header>
-      <Scoring.Card.Content>
-        <div className="flex flex-col gap-8">
-          {scores.map((score) => {
-            return (
-              <ScoreInputForm
-                key={score.id}
-                score={score}
-                onChangeScore={handleScoreChange}
-              />
-            )
-          })}
-        </div>
-      </Scoring.Card.Content>
-    </Scoring.Card>
-  )
-}
-
-// function NoActiveSegmentRenderer() {
-//   const { data: currentPhase } = useOngoingPhaseQuery()
-
-//   if (!currentPhase) return
-
-//   let title = 'No active segment'
-//   let body = 'Kindly wait for admin to start the next segment'
-
-//   const PENDING = phaseSegmentStatusValue.enum.PENDING
-//   const ONGOING = phaseSegmentStatusValue.enum.ONGOING
-//   const CLOSED = phaseSegmentStatusValue.enum.CLOSED
-
-//   if (currentPhase.segments.every((segment) => segment.status === CLOSED)) {
-//     title = `${currentPhase.name} has completed!`
-//     body = 'Thank you for participating in this pageant.'
-//   } else if (
-//     currentPhase.segments.every((segment) => segment.status === PENDING)
-//   ) {
-//     title = `${currentPhase.name} has not started`
-//     body = 'Kindly wait for admin to start a segment'
-//   }
-
-//   return (
-//     <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
-//       <div className="flex flex-col text-center gap-2">
-//         <Scoring.TabsFacade.Body.Title>{title}</Scoring.TabsFacade.Body.Title>
-//         <Scoring.TabsFacade.Body.Description>
-//           {body}
-//         </Scoring.TabsFacade.Body.Description>
-//       </div>
-//     </Scoring.TabsFacade.Body>
-//   )
-// }
-
 export const Route = createFileRoute('/judge/scoring/')({
-  component: JudgeScoring,
+  component: RouteComponent,
 })
 
-function JudgeScoring() {
-  const queryClient = useQueryClient()
-
+function RouteComponent() {
+  /* 
+  
+  ============================== STEP 1 ============================== 
+  
+  */
+  /* Get authenticated account and assigned pageant id */
   const { account, getAssignedPageantId } = useAuthenticationStore()
-  const { data: judge } = useJudgeQuery(account?.id)
-  const { setSelectedPageantId } = useSelectedPageantIdStore()
-  const { data: assignedPageant } = usePageantQuery(getAssignedPageantId())
 
-  const [currentSegments, setCurrentSegments] = useState<Segments>([])
-  const [ongoingSegmentId, setOngoingSegmentId] = useState<string | null>(null)
+  /* Use the assigned pageant id to fetch the pageant hierarchy */
+  const { data: assignedPageant, refetch: refetchAssignedPageant } = useQuery(
+    pageantHierarchyQueryOptions(getAssignedPageantId(), {
+      enabled: !!getAssignedPageantId(),
+      staleTime: Infinity,
+    }),
+  )
+  /* Set the selectedPageantId to attach Pageant-Id in the request headers 
+     once the fetched pageant arrives.
+     
+     Note: Don't assign getAssignedPageantId() directly as we need to verify
+     that the pageant actually exist in the backend. */
+  const { isPageantSelected, setSelectedPageantId } =
+    useSelectedPageantIdStore()
+  useEffect(() => {
+    if (assignedPageant) {
+      setSelectedPageantId(assignedPageant.id)
+    }
+  }, [assignedPageant])
 
-  const { data: currentPhase } = useOngoingPhaseQuery()
-  const { data: ongoingSegment } = useSegmentQuery(ongoingSegmentId)
-  const { data: scores } = useScoresQuery(
-    {
-      judgeId: account?.id,
-      segmentId: ongoingSegmentId ?? '',
-    },
-    /* Only run the query when all parameters are available */
-    !!account?.id && !!ongoingSegment?.id,
+  /* Fetch judge only if there is an account logged in and the Pageant-Id
+     has been set in the request headers */
+  const { data: judge } = useQuery(
+    judgeQueryOptions(account?.id, {
+      enabled: !!account?.id && isPageantSelected,
+    }),
   )
 
-  /* Group scores by candidate in a map for faster lookup */
-  const scoresByCandidate = useMemo(() => {
+  /* 
+  
+  ============================== STEP 2 ============================== 
+  
+  */
+  /* Get ongoing phase from the fetched pageant hierarchy */
+  const ongoingPhase = useMemo(() => {
+    if (!assignedPageant) return undefined
+    return assignedPageant.phases.find(
+      (phase) => phase.status === phaseSegmentStatusValue.enum.ONGOING,
+    )
+  }, [assignedPageant])
+
+  /* Get ongoing segment from the fetched pageant hierarchy */
+  const ongoingSegment = useMemo(() => {
+    if (!ongoingPhase) return undefined
+    return ongoingPhase.segments.find(
+      (segment) => segment.status === phaseSegmentStatusValue.enum.ONGOING,
+    )
+  }, [ongoingPhase])
+
+  /* Query the scores for the judge over the ongoing segment once the
+     parameters are fetched */
+  const { data: scores } = useQuery(
+    scoresQueryOptions(
+      {
+        judgeId: judge?.id,
+        segmentId: ongoingSegment?.id,
+      },
+      { enabled: !!judge?.id && !!ongoingSegment?.id },
+    ),
+  )
+
+  /* Group scores by candidate in a map for faster lookup once scores
+     are fetched */
+  const candidateScoresMap = useMemo(() => {
     const map = new Map<string, Array<ScoreDetailed>>()
     if (!scores) return map
 
     scores.forEach((score) => {
       const key = score.candidateId
-      if (!map.has(key)) map.set(key, [])
+      if (!map.has(key)) {
+        map.set(key, [])
+      }
       map.get(key)?.push(score)
     })
     return map
   }, [scores])
 
-  /* Temporary hack! Backend can return segments for a phase */
-  const { data: allSegments } = useSegmentsQuery()
+  /* Get the qualified candidates and group by gender */
+  const { femaleCandidates, maleCandidates } = useMemo(() => {
+    if (!ongoingSegment) {
+      return {
+        femaleCandidates: [],
+        maleCandidates: [],
+      }
+    }
+    const candidates = ongoingSegment.candidateQualifications
+      .filter((qualification) => qualification.isQualified)
+      .map((qualification) => qualification.candidate)
+    return splitCandidates(candidates)
+  }, [ongoingSegment])
 
-  /* Subscribe to /topic/pageants/${id}/ongoing-segment
-     To get the notified when the current ongoing segment change */
+  /* 
+  
+  ============================== STEP 3 ============================== 
+  
+  */
+  /* Subscribe to /topic/pageants/${id}/ongoing-segment to get notified 
+     when the current ongoing segment changes.
+     
+     NOTE: Only subscribe after the pageant and judge has been fetched.
+     This prevents unsynchronized data */
   useEffect(() => {
-    if (!assignedPageant) return
+    if (!assignedPageant || !judge) return
 
     const { subscribe } = useStompStore.getState()
-
     const subscription = subscribe(
       `/topic/pageants/${assignedPageant.id}/ongoing-segment`,
       (message) => {
         try {
           const data = JSON.parse(message.body)
-          setOngoingSegmentId(data?.id ?? null)
+          refetchAssignedPageant()
         } catch (err) {
           console.error('Failed to parse STOMP message', err)
         }
@@ -262,129 +337,83 @@ function JudgeScoring() {
     return () => {
       subscription?.unsubscribe()
     }
-  }, [assignedPageant])
+  }, [assignedPageant, judge, scores])
 
-  /* Set the selectedPageantId store to attach Pageant-Id in the request headers */
-  useEffect(() => {
-    if (assignedPageant) {
-      setSelectedPageantId(assignedPageant.id)
-    }
-  }, [assignedPageant])
+  /* Loading fallback */
+  if (!assignedPageant || !judge || !ongoingPhase) {
+    return (
+      <Scoring className="w-full h-screen">
+        <Scoring.Content className="grid place-items-center">
+          <Loading />
+        </Scoring.Content>
+      </Scoring>
+    )
+  }
 
-  /* Quick patch mentioned above: Filtering segments by the current phase. */
-  useEffect(() => {
-    if (allSegments && currentPhase) {
-      const filtered = allSegments.filter((segment) => {
-        if (segment.phase.id === currentPhase.id) {
-          return segment
-        }
-      })
-      setCurrentSegments(filtered)
-
-      /* On initial load, get the ongoing segment. Websocket will only
-           Notify changes after subscription. */
-      const ongoing = filtered.find(
-        (segment) => segment.status === phaseSegmentStatusValue.enum.ONGOING,
-      )
-      if (ongoing) {
-        setOngoingSegmentId(ongoing.id)
-      }
-    }
-  }, [allSegments, currentPhase])
-
-  const { groupA: candidateGroupA, groupB: candidateGroupB } = useMemo(() => {
-    if (!ongoingSegment) {
-      return {
-        groupA: [],
-        groupB: [],
-      }
-    }
-
-    return splitCandidates(ongoingSegment.qualifiedCandidates)
-  }, [ongoingSegment])
-
-  const ScoringContent = ongoingSegment ? (
-    <Scoring.TabsFacade.Body>
-      <Scoring.TabsFacade.Body.Title>
-        {ongoingSegment.name}
-      </Scoring.TabsFacade.Body.Title>
-      <div className="">
-        <Scoring.TabsFacade.Body.Description>
-          Enter the scores for each candidate in the segment.
-        </Scoring.TabsFacade.Body.Description>
-        <Scoring.TabsFacade.Body.Description>
-          {'->'} ❗Scores are saved automatically
-        </Scoring.TabsFacade.Body.Description>
-        <Scoring.TabsFacade.Body.Description>
-          {'->'} ❗Scoring will automatically close when a segment finishes
-        </Scoring.TabsFacade.Body.Description>
+  /* If there is no ongoing segment, display a fallback */
+  const ScoringTabsFacadeBody = ongoingSegment ? (
+    <Scoring.TabsFacade.Body className="flex flex-col gap-12">
+      <div className="flex flex-col gap-4 items-center">
+        <div className="[&>*]:text-center flex flex-col gap-1">
+          <TextHeading>{ongoingSegment.name}</TextHeading>
+          <TextBody>Score each candidate in the segment</TextBody>
+        </div>
+        <div className="flex flex-col items-center">
+          <TextBody>🔒Scores are saved automatically</TextBody>
+          <TextBody>🚫Scoring will close when a segment finishes</TextBody>
+          <TextBody>
+            👨🏻‍💻Contact organizers when there is a technical problem
+          </TextBody>
+        </div>
       </div>
-      <Scoring.TabsFacade.Body.Content className="grid grid-cols-2">
-        <div className="grid grid-cols-1 gap-4">
-          {candidateGroupA.map((candidate) => {
-            return (
-              <CandidateScoreCard
-                key={candidate.id}
-                candidate={candidate}
-                scores={scoresByCandidate.get(candidate.id)}
-              />
-            )
-          })}
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          {candidateGroupB.map((candidate) => {
-            return (
-              <CandidateScoreCard
-                key={candidate.id}
-                candidate={candidate}
-                scores={scoresByCandidate.get(candidate.id)}
-              />
-            )
-          })}
-        </div>
-      </Scoring.TabsFacade.Body.Content>
+      <div className="grid grid-rows-2 gap-4 select-none">
+        <CandidateScoringCards
+          gender={candidateGender.enum.FEMALE}
+          candidates={femaleCandidates}
+          scoresMap={candidateScoresMap}
+        />
+        <CandidateScoringCards
+          gender={candidateGender.enum.MALE}
+          candidates={maleCandidates}
+          scoresMap={candidateScoresMap}
+        />
+      </div>
     </Scoring.TabsFacade.Body>
   ) : (
-    /* Temporary body for inactive segments. Special cases apply
-       when all segments are PENDING and CLOSED  */
-    <Scoring.TabsFacade.Body className="w-full h-[500px] grow grid place-items-center">
-      <div className="flex flex-col text-center gap-2">
-        <Scoring.TabsFacade.Body.Title>
-          No active segment
-        </Scoring.TabsFacade.Body.Title>
-        <Scoring.TabsFacade.Body.Description>
-          Kindly wait for admin to start the next segment
-        </Scoring.TabsFacade.Body.Description>
-      </div>
-    </Scoring.TabsFacade.Body>
+    <ScoringTabsFacadeBodyNoActiveSegmentFallback phase={ongoingPhase} />
   )
 
   return (
     <Scoring>
       <Scoring.Header>
-        <TextDisplay>{assignedPageant?.title}</TextDisplay>
-        <Scoring.Header.Title>{currentPhase?.name}</Scoring.Header.Title>
+        <Scoring.Header.Display className="text-center">
+          {assignedPageant.title}
+        </Scoring.Header.Display>
+        <Scoring.Header.Title>{ongoingPhase.name}</Scoring.Header.Title>
         <Scoring.Header.Sub>
-          Welcome, {capitalizeWords(judge?.honorific ?? '') + '.'}{' '}
-          {capitalizeWords(judge?.firstName ?? '')}{' '}
-          {capitalizeWords(judge?.lastName ?? '')}
+          Welcome, {capitalizeWords(judge.honorific) + '.'}{' '}
+          {capitalizeWords(judge.firstName)} {capitalizeWords(judge.lastName)}!
         </Scoring.Header.Sub>
       </Scoring.Header>
       <Scoring.Content>
         <Scoring.TabsFacade>
           <Scoring.TabsFacade.List>
-            {currentSegments.map((segment) => {
-              return (
-                <Scoring.TabsFacade.List.Trigger
-                  key={segment.id}
-                  active={segment.id === ongoingSegmentId}
-                >
-                  {segment.name}
-                </Scoring.TabsFacade.List.Trigger>
-              )
-            })}
+            {ongoingPhase.segments
+              .sort((a, b) => a.sequence - b.sequence)
+              .map((segment) => {
+                return (
+                  <Scoring.TabsFacade.List.Trigger
+                    key={segment.id}
+                    active={
+                      segment.status === phaseSegmentStatusValue.enum.ONGOING
+                    }
+                  >
+                    {segment.name}
+                  </Scoring.TabsFacade.List.Trigger>
+                )
+              })}
           </Scoring.TabsFacade.List>
-          {ScoringContent}
+          {ScoringTabsFacadeBody}
         </Scoring.TabsFacade>
       </Scoring.Content>
     </Scoring>

@@ -1,10 +1,8 @@
 package com.michaelcanonizado.backend.security;
 
+import com.michaelcanonizado.backend.dtos.account.AccountCredentialDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.UnsupportedAccountTypeException;
-import com.michaelcanonizado.backend.models.Account;
-import com.michaelcanonizado.backend.models.Admin;
-import com.michaelcanonizado.backend.models.Judge;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -40,12 +38,12 @@ public class JwtService {
         this.secretKey = Encoders.BASE64URL.encode(sk.getEncoded());
     }
 
-    public String generateToken(Account account, Map<String, Object> extraClaims) {
-        String username = account.getUsername();
+    public String generateToken(AccountCredentialDTO account, Map<String, Object> extraClaims) {
+        String username = account.username();
         String role = getRole(account);
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
-        claims.put("account_id", account.getId());
+        claims.put("account_id", account.id());
         claims.putAll(extraClaims);
 
         Date issuedAt = Date.from(Instant.now());
@@ -62,14 +60,14 @@ public class JwtService {
                 .compact();
     }
 
-    private String getRole(Account account) {
-        if (account instanceof Admin) {
+    private String getRole(AccountCredentialDTO account) {
+        if (account.accountType().equals("Admin")) {
             return "ADMIN";
-        } else if (account instanceof Judge) {
+        } else if (account.accountType().equals("Judge")) {
             return "JUDGE";
         } else {
             throw new UnsupportedAccountTypeException(
-                    "Unknown account type encountered! Please contact admin.",
+                    "Unknown account type encountered!",
                     ErrorCode.UNSUPPORTED_ACCOUNT_TYPE
             );
         }

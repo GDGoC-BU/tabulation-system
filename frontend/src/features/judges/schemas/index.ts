@@ -7,6 +7,7 @@ export const judgeSummarySchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   honorific: honorificSchema,
+  number: z.number(),
   isOnline: z.boolean(),
   lastSeenAt: z.union([z.null(), zStringToDate]),
   createdAt: zStringToDate,

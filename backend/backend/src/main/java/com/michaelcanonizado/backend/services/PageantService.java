@@ -13,6 +13,8 @@ import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.specifications.CandidateSegmentQualificationSpecification;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
+import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class PageantService {
@@ -49,9 +50,36 @@ public class PageantService {
     @Autowired
     private PageantMapper mapper;
 
+    @Autowired
+    private CacheService cacheService;
+
+    @Autowired
+    private CacheKeyBuilder cacheKeyBuilder;
+
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
-        Pageant pageant = pageantRepository.save(mapper.toEntity(pageantCreateDTO));
-        return mapper.toSummaryDTO(pageant);
+        Pageant savedPageant = pageantRepository.save(mapper.toEntity(pageantCreateDTO));
+        PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
+
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", responseDTO.id()),
+                responseDTO
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", responseDTO.id(), "hierarchy"),
+                mapper.toHierarchyDTO(savedPageant)
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", responseDTO.id(), "context"),
+                mapper.toContextDTO(savedPageant)
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", "list", "all")
+        );
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -59,13 +87,38 @@ public class PageantService {
     })
     public PageantSummaryDTO startPageant(UUID id) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
+            return new EntityNotFoundException(
+                    "Pageant not found!",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
         });
 
         pageant.setStatus(PageantStatus.ONGOING);
         pageant.setStartedAt(LocalDateTime.now());
+        Pageant savedPageant = pageantRepository.save(pageant);
+        PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
 
-        return mapper.toSummaryDTO(pageantRepository.save(pageant));
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id),
+                responseDTO
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "hierarchy"),
+                mapper.toHierarchyDTO(savedPageant)
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "context"),
+                mapper.toContextDTO(savedPageant)
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", "list", "all")
+        );
+
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -77,8 +130,30 @@ public class PageantService {
         });
 
         pageant.setStatus(PageantStatus.FINALIZING);
+        Pageant savedPageant = pageantRepository.save(pageant);
+        PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
 
-        return mapper.toSummaryDTO(pageantRepository.save(pageant));
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id),
+                responseDTO
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "hierarchy"),
+                mapper.toHierarchyDTO(savedPageant)
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "context"),
+                mapper.toContextDTO(savedPageant)
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", "list", "all")
+        );
+
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -92,39 +167,133 @@ public class PageantService {
         pageant.setStatus(PageantStatus.CLOSED);
         pageant.setEndedAt(LocalDateTime.now());
 
-        return mapper.toSummaryDTO(pageantRepository.save(pageant));
+        Pageant savedPageant = pageantRepository.save(pageant);
+        PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
+
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id),
+                responseDTO
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "hierarchy"),
+                mapper.toHierarchyDTO(savedPageant)
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "context"),
+                mapper.toContextDTO(savedPageant)
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", "list", "all")
+        );
+
+        return responseDTO;
     }
 
     public PageantSummaryDTO getPageant(UUID id) {
-        Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
-        });
+        String CACHE_NAME = CacheNameConstants.TABULATION;
+        String CACHE_KEY = cacheKeyBuilder.build("pageants", id);
 
-        return mapper.toSummaryDTO(pageant);
+        PageantSummaryDTO responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                PageantSummaryDTO.class
+        );
+
+        if (responseDTO == null) {
+            responseDTO = mapper.toSummaryDTO(
+                    pageantRepository.findById(id).orElseThrow(() -> {
+                        return new EntityNotFoundException(
+                                "Pageant not found!",
+                                ErrorCode.ENTITY_NOT_FOUND
+                        );
+                    })
+            );
+
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    responseDTO
+            );
+        }
+
+        return responseDTO;
     }
-    public PageantHierarchyDTO getPageantHierarchy(UUID id) {
-        Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Pageant not found!", ErrorCode.ENTITY_NOT_FOUND);
-        });
 
-        return mapper.toHierarchyDTO(pageant);
+    @Transactional
+    public PageantHierarchyDTO getPageantHierarchy(UUID id) {
+        String CACHE_NAME = CacheNameConstants.TABULATION;
+        String CACHE_KEY = cacheKeyBuilder.build("pageants", id, "hierarchy");
+
+        PageantHierarchyDTO responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                PageantHierarchyDTO.class
+        );
+
+        if (responseDTO == null) {
+            responseDTO = mapper.toHierarchyDTO(
+                    pageantRepository.findById(id).orElseThrow(() -> {
+                        return new EntityNotFoundException(
+                                "Pageant not found!",
+                                ErrorCode.ENTITY_NOT_FOUND
+                        );
+                    })
+            );
+
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    responseDTO
+            );
+        }
+
+        return responseDTO;
     }
 
     public List<PageantSummaryDTO> getPageants() {
-        List<Pageant> pageants = pageantRepository.findAll();
-        return pageants
-                .stream()
-                .map(pageant -> {
-                    return mapper.toSummaryDTO(pageant);
-                }).toList();
+        String CACHE_NAME = CacheNameConstants.TABULATION;
+        String CACHE_KEY = cacheKeyBuilder.build("pageants", "list", "all");
+
+        List<PageantSummaryDTO> responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                List.class
+        );
+
+        if (responseDTO == null) {
+            responseDTO = pageantRepository.findAll().stream()
+                    .map(pageant -> {
+                        return mapper.toSummaryDTO(pageant);
+                    }).toList();
+
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    responseDTO
+            );
+        }
+
+        return responseDTO;
     }
 
     public PageantSummaryDTO updatePageant(UUID id, PageantUpdateDTO pageantUpdateDTO) {
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException("Can't update! Pageant not found.", ErrorCode.ENTITY_NOT_FOUND);
+            return new EntityNotFoundException(
+                    "Can't update! Pageant not found.",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
         });
 
-        /* Manually do the status check. Don't use @RequirePageantStatus() */
+        /* Manually do the status check. Don't use @RequirePageantStatus().
+
+           NOTE: This depends on how the frontend handled pageant delete. Pageant-Id
+           is only available in the request headers when the admin selects a pageant,
+           but the delete button could be shown in the table itself (no pageant is
+           selected here). */
         if (
             pageant.getStatus() != PageantStatus.PREPARATION &&
             pageant.getStatus() != PageantStatus.CLOSED
@@ -136,34 +305,60 @@ public class PageantService {
         }
 
         mapper.updateEntityFromDTO(pageant, pageantUpdateDTO);
-        return mapper.toSummaryDTO(pageantRepository.save(pageant));
+        Pageant savedPageant = pageantRepository.save(pageant);
+        PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
+
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id),
+                responseDTO
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "hierarchy"),
+                mapper.toHierarchyDTO(savedPageant)
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "context"),
+                mapper.toContextDTO(savedPageant)
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", "list", "all")
+        );
+
+        return responseDTO;
     }
 
     @Transactional
     public PageantSummaryDTO softResetPageant(UUID id) {
+        /* Get the Pageant */
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't reset! Pageant not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
-        /* Leaderboard reset */
+        /* Reset the Leaderboard for each of its Awards */
         List<Award> awards =  awardRepository.findAllByPageant_Id(id);
-        List<AwardLeaderboard> leaderboards = awards
+        List<AwardLeaderboard> leaderboardsForAllAwards = awards
                 .stream()
                 .flatMap(award -> award.getLeaderboard().stream())
                 .toList();
 
-        leaderboards.forEach(leaderboard -> leaderboard.setScore(0.0));
-        awardLeaderboardRepository.saveAll(leaderboards);
+        leaderboardsForAllAwards.forEach(leaderboard -> {
+            leaderboard.setScore(0.0);
+            leaderboard.setCriteriaBreakdown(null);
+        });
+        awardLeaderboardRepository.saveAll(leaderboardsForAllAwards);
 
-
-        /* Scores reset */
+        /* Reset its Scores */
         List<Score> scores = scoreRepository.findAll(
                 Specification.allOf(ScoreSpecification.hasPageant(id))
         );
         scores.forEach(score -> score.setValue(0));
         scoreRepository.saveAll(scores);
 
-        /* Reset Phase Statuses */
+        /* Reset Phase and Segment Statuses */
         List<Phase> phases = phaseRepository.findAllByPageant_Id(id);
         List<Segment> segments = phases
                 .stream()
@@ -172,19 +367,46 @@ public class PageantService {
 
         segments.forEach(segment -> segment.setStatus(PhaseSegmentStatus.PENDING));
         phases.forEach(phase -> phase.setStatus(PhaseSegmentStatus.PENDING));
-        pageant.setStatus(PageantStatus.PREPARATION);
+        segmentRepository.saveAll(segments);
+        phaseRepository.saveAll(phases);
 
         /* Reset Candidate-Segment Qualifications */
         List<CandidateSegmentQualification> candidateSegmentQualifications = csqRepository.findAll(
                 Specification.allOf(CandidateSegmentQualificationSpecification.hasPageant(id))
         );
-        candidateSegmentQualifications.forEach(csq -> csq.setQualified(true));
+        candidateSegmentQualifications.forEach((csq) -> {
+            csq.setQualified(true);
+            csq.setScore(0.0);
+            csq.setCriteriaBreakdown(null);
+        });
+        csqRepository.saveAll(candidateSegmentQualifications);
 
-        segmentRepository.saveAll(segments);
-        phaseRepository.saveAll(phases);
+        /* Reset Pageant status */
+        pageant.setStatus(PageantStatus.PREPARATION);
         Pageant savedPageant = pageantRepository.save(pageant);
+        PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
 
-        return mapper.toSummaryDTO(savedPageant);
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id),
+                responseDTO
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "hierarchy"),
+                mapper.toHierarchyDTO(savedPageant)
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "context"),
+                mapper.toContextDTO(savedPageant)
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", "list", "all")
+        );
+
+        return responseDTO;
     }
 
     public void deletePageant(UUID id) {
@@ -192,7 +414,6 @@ public class PageantService {
             return new EntityNotFoundException("Can't delete! Pageant not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
 
-        /* Manually do the status check. Don't use @RequirePageantStatus() */
         if (
             pageant.getStatus() != PageantStatus.PREPARATION &&
             pageant.getStatus() != PageantStatus.CLOSED
@@ -202,6 +423,23 @@ public class PageantService {
                     ErrorCode.PAGEANT_ACCESS_DENIED
             );
         }
+
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id)
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "hierarchy")
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", id, "context")
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", "list", "all")
+        );
 
         pageantRepository.deleteById(id);
     }

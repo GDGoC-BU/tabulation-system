@@ -1,15 +1,20 @@
 package com.michaelcanonizado.backend.aspects;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.dtos.pageant.PageantContextDTO;
+import com.michaelcanonizado.backend.dtos.pageant.PageantSummaryDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.PageantContextMissingException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantHeaderLookupFailureException;
 import com.michaelcanonizado.backend.exceptions.customs.PageantStatusException;
+import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.models.PageantStatus;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.contexts.PageantContext;
-import com.michaelcanonizado.backend.services.PageantCacheService;
+import com.michaelcanonizado.backend.services.CacheService;
+import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import com.michaelcanonizado.backend.utilities.RequestHeader;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -29,10 +34,16 @@ public class PageantStatusAspect {
     private PageantContext pageantContext;
 
     @Autowired
-    private PageantCacheService pageantCacheService;
+    private RequestHeader requestHeader;
 
     @Autowired
-    private RequestHeader requestHeader;
+    private PageantMapper pageantMapper;
+
+    @Autowired
+    private CacheService cacheService;
+
+    @Autowired
+    private CacheKeyBuilder cacheKeyBuilder;
 
     @Before("@within(requirePageantStatus) || @annotation(requirePageantStatus)")
     public void checkPageantStatus(RequirePageantStatus requirePageantStatus) {
@@ -43,8 +54,8 @@ public class PageantStatusAspect {
         String headerPageantId = requestHeader.getHeader(headerKey);
 
         /* No Pageant-Id attached in header */
-        if (headerPageantId == null || headerPageantId.isBlank()) {
-            pageantContext.setSelectedPageant(null);
+        if (headerPageantId == null || headerPageantId.trim().isBlank()) {
+            pageantContext.setPageant(null);
             throw new PageantContextMissingException(
                     "Entity locked under pageant status, but no Pageant-Id header is present!",
                     ErrorCode.PAGEANT_CONTEXT_MISSING
@@ -53,9 +64,16 @@ public class PageantStatusAspect {
 
         try {
             UUID pageantId = UUID.fromString(headerPageantId);
+            String CACHE_NAME = CacheNameConstants.TABULATION;
+            String CACHE_KEY = cacheKeyBuilder.build("pageants", pageantId, "context");
 
-            /* Check cache */
-            Pageant pageant = pageantCacheService.get(pageantId).orElseGet(() -> {
+            /* Check pageant in cache */
+            PageantContextDTO pageantDTO = cacheService.get(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    PageantContextDTO.class
+            );
+            if (pageantDTO == null) {
                 /* If not in cache, check database */
                 Pageant pageantInDatabase = pageantRepository.findById(pageantId).orElseThrow(() -> {
                     /* If it doesn't exist anywhere */
@@ -64,32 +82,33 @@ public class PageantStatusAspect {
                             ErrorCode.INVALID_REQUEST_HEADER
                     );
                 });
-
-                /* Update pageant cache */
-                pageantCacheService.put(pageantInDatabase);
-
-                /* Return the found pageant */
-                return pageantInDatabase;
-            });
-
+                pageantDTO = pageantMapper.toContextDTO(pageantInDatabase);
+                /* Update cache */
+                cacheService.put(
+                        CACHE_NAME,
+                        CACHE_KEY,
+                        pageantDTO
+                );
+            }
             /* Store pageant in context */
-            pageantContext.setSelectedPageant(pageant);
+            pageantContext.setPageant(pageantDTO);
         } catch (IllegalArgumentException e) {
             /* Pageant-Id is attached in header but invalid UUID format */
-            pageantContext.setSelectedPageant(null);
+            pageantContext.setPageant(null);
             throw new PageantHeaderLookupFailureException(
                     "Cannot resolve the attached '" + headerKey + "' header! Invalid UUID format.",
                     ErrorCode.INVALID_REQUEST_HEADER
             );
         }
 
-
         /* Get selected pageant status */
         PageantStatus currentStatus = pageantContext.getStatus();
 
         /* Check if current pageant status aligns with
            the required status to run the method */
-        boolean isAllowed = Arrays.asList(requirePageantStatus.value()).contains(currentStatus);
+        boolean isAllowed = Arrays
+                .asList(requirePageantStatus.value())
+                .contains(currentStatus);
         if (isAllowed) {
             return;
         }

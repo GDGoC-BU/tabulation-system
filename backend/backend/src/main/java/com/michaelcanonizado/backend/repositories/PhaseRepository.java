@@ -12,5 +12,6 @@ import java.util.UUID;
 @Repository
 public interface PhaseRepository extends JpaRepository<Phase, UUID> {
     Optional<Phase> findByStatus(PhaseSegmentStatus status);
+    List<Phase> findAllByStatusAndPageantId(PhaseSegmentStatus status, UUID pageantId);
     List<Phase> findAllByPageant_Id(UUID pageantId);
 }

@@ -1,12 +1,13 @@
 import { useController, useWatch } from 'react-hook-form'
+import { useQuery } from '@tanstack/react-query'
 import useFormulaCriterionLookup from '../hooks/use-formula-criterion-lookup'
 import deleteLastFormulaChunk from '../lib/delete-last-formula-chunk'
 import FormulaButton from './formula-button'
 import FormulaRenderer from './formula-renderer'
 import type { Control } from 'react-hook-form'
-import { usePageantHierarchyQuery } from '@/features/pageants/hooks/use-pageant-hierarchy'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import FormulaBadgeRenderer from '@/features/formula/components/formula-label-renderer'
+import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
 
 type ButtonItem = {
   className: string | null
@@ -45,9 +46,11 @@ export default function FormulaInput({
   const { field } = useController({ name, control })
   const formula = useWatch({ name, control }) || ''
 
-  const { data: selectedPageant } = useSelectedPageantQuery()
-  const { data: pageantHierarchy } = usePageantHierarchyQuery(
-    selectedPageant?.id,
+  const { data: selectedPageant } = useSelectedPageant()
+  const { data: pageantHierarchy } = useQuery(
+    pageantHierarchyQueryOptions(selectedPageant?.id, {
+      enabled: !!selectedPageant,
+    }),
   )
   const criterionLookup = useFormulaCriterionLookup(
     pageantHierarchy?.phases ?? [],

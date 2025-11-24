@@ -22,11 +22,7 @@ export default function FormulaBadgeRenderer({
 
   return (
     <TextBody className="flex flex-row gap-2">
-      <span className="">
-        ({' P'}
-        {criterionRelationship.phase.sequence} ){' '}
-        {criterionRelationship.phase.name}
-      </span>
+      <span className="">{criterionRelationship.phase.name}</span>
       <span className="">/</span>
       <span className="">{criterionRelationship.segment.name}</span>
       <span className="">/</span>

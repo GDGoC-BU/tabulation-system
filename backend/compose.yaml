@@ -1,0 +1,12 @@
+services:
+  redis:
+    image: redis:8.2.2
+    ports:
+      - "6379:6379"
+
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis

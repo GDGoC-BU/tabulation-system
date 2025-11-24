@@ -26,6 +26,15 @@ public class Segment {
     @Column(nullable = false)
     private int sequence;
 
+    /* A constraint should be placed in candidateLimit and formula!
+       Enforce data integrity in the entities and database!
+
+       Also add some logic to check that each segment has a funnel effect
+       on the candidate limit. I.e: candidate limit of the current segment
+       should be less than or equal to the previous segment.
+
+       Furthermore, get the candidates who are qualified on the previous segment,
+       not all candidates. */
     @Column(nullable = true)
     private Integer candidateLimit;
 
@@ -65,8 +74,7 @@ public class Segment {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @Getter(AccessLevel.NONE)
-    private List<CandidateSegmentQualification> candidateSegmentQualifications = new ArrayList<>();
+    private List<CandidateSegmentQualification> candidateQualifications = new ArrayList<>();
 
     public Segment(String name, int sequence, Integer candidateLimit, String formula, Phase phase) {
         this.name = name;
@@ -85,21 +93,21 @@ public class Segment {
         criterion.setSegment(null);
     }
 
-    public void addCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
-        candidateSegmentQualifications.add(candidateSegmentQualification);
-        candidateSegmentQualification.setSegment(this);
+    public void addCandidateQualification(CandidateSegmentQualification csq) {
+        candidateQualifications.add(csq);
+        csq.setSegment(this);
     }
-    public void removeCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
-        candidateSegmentQualifications.remove(candidateSegmentQualification);
-        candidateSegmentQualification.setSegment(null);
+    public void removeCandidateQualification(CandidateSegmentQualification csq) {
+        candidateQualifications.remove(csq);
+        csq.setSegment(null);
     }
 
     /* Infer the actual candidate data from the associative table */
-    public List<Candidate> getQualifiedCandidates() {
-        return candidateSegmentQualifications
-                .stream()
-                .filter(CandidateSegmentQualification::isQualified)
-                .map((CandidateSegmentQualification::getCandidate))
-                .toList();
-    }
+//    public List<Candidate> getQualifiedCandidates() {
+//        return candidateSegmentQualifications
+//                .stream()
+//                .filter(CandidateSegmentQualification::isQualified)
+//                .map((CandidateSegmentQualification::getCandidate))
+//                .toList();
+//    }
 }

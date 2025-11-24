@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
+import com.michaelcanonizado.backend.dtos.candidateSegmentQualification.CandidateSegmentQualificationHierarchyDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionHierarchyDTO;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 
@@ -13,6 +14,7 @@ public record SegmentHierarchyDTO(
         Integer candidateLimit,
         String formula,
         PhaseSegmentStatus status,
-        List<CriterionHierarchyDTO> criteria
+        List<CriterionHierarchyDTO> criteria,
+        List<CandidateSegmentQualificationHierarchyDTO> candidateQualifications
 ) {
 }

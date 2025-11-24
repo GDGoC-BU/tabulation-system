@@ -8,7 +8,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = {
+                PhaseMapper.class
+        }
+)
 public interface PageantMapper {
     Pageant toEntity(PageantCreateDTO pageantCreateDTO);
     /* Adding SummaryDTO -> Entity will make the enum mapping more complex.
@@ -19,8 +24,12 @@ public interface PageantMapper {
        Pageant toEntity(PageantSummaryDTO pageantSummaryDTO); */
     @Mapping(target = "status", qualifiedByName = "mapStatus")
     PageantSummaryDTO toSummaryDTO(Pageant pageant);
+
     @Mapping(target = "status", qualifiedByName = "mapStatus")
     PageantHierarchyDTO toHierarchyDTO(Pageant pageant);
+
+    @Mapping(target = "status", qualifiedByName = "mapStatus")
+    PageantContextDTO toContextDTO(Pageant pageant);
 
     void updateEntityFromDTO(@MappingTarget Pageant pageant, PageantUpdateDTO pageantUpdateDTO);
 

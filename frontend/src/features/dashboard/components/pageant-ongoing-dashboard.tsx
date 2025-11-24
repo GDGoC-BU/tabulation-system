@@ -1,14 +1,14 @@
 import { useMemo } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Phases } from '@/features/phases/schemas'
 import type { Segments } from '@/features/segments/schemas'
 import { TextBody } from '@/components/text'
-import { usePhasesQuery } from '@/features/phases/hooks/use-phases-query'
-import { useSegmentsQuery } from '@/features/segments/hooks/use-segments-query'
-import { Button } from '@/components/ui/button'
 import determineNextPhaseSegmentStatusAction from '@/features/state-machine/lib/determine-next-phase-segment-status-action'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
+import ConfirmDialog from '@/components/confirm-dialog'
+import phasesQueryOptions from '@/features/phases/query-options/phases-query-options'
+import segmentsQueryOptions from '@/features/segments/query-options/segments-query-options'
 
 function PhaseSegmentTable({
   phases,
@@ -55,9 +55,9 @@ function PhaseSegmentTable({
 }
 
 export default function PageantOngoingDashboard() {
-  const { data: selectedPageant } = useSelectedPageantQuery()
-  const { data: phases } = usePhasesQuery()
-  const { data: segments } = useSegmentsQuery()
+  const { data: selectedPageant } = useSelectedPageant()
+  const { data: phases } = useQuery(phasesQueryOptions())
+  const { data: segments } = useQuery(segmentsQueryOptions())
   const { mutateAsync: changeState } = useStatusChangeMutate()
   const queryClient = useQueryClient()
 
@@ -100,9 +100,15 @@ export default function PageantOngoingDashboard() {
           <PhaseSegmentTable phases={sortedPhases} segments={sortedSegments} />
         </div>
       </div>
-      <Button onClick={onClick}>
+      {/* <Button onClick={onClick}>
         {nextAction ? nextAction.label : 'Finalize Pageant'}
-      </Button>
+      </Button> */}
+      <ConfirmDialog
+        triggerLabel={nextAction ? nextAction.label : 'Finalize Pageant'}
+        title={nextAction ? nextAction.label : 'Finalize Pageant'}
+        description="This action cannot be undone. Are you sure you want to move to the next stage?"
+        onConfirm={onClick}
+      />
     </div>
   )
 }

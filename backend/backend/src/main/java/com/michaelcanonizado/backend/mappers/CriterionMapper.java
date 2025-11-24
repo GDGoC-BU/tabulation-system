@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.mappers;
 
+import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionHierarchyDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionUpdateDTO;
@@ -10,7 +11,9 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface CriterionMapper {
     Criterion toEntity(CriterionSummaryDTO criterionSummaryDTO);
+
     CriterionSummaryDTO toSummaryDTO(Criterion criterion);
+    CriterionBreakdownDTO toBreakdownDTO(Criterion criterion);
     CriterionHierarchyDTO toHierarchyDTO(Criterion criterion);
 
     void updateEntityFromDTO(@MappingTarget Criterion criterion, CriterionUpdateDTO criterionUpdateDTO);

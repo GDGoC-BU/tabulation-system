@@ -15,12 +15,13 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import { awardEditFormSchema } from '@/features/awards/schemas'
 import Console from '@/components/console'
 import FormulaInput from '@/features/formula/components/formula-input'
 import { TextBody, TextSub } from '@/components/text'
 import useEditAwardMutate from '@/features/awards/hooks/use-edit-award-mutate'
+import Loading from '@/components/loading'
 
 export const Route = createFileRoute('/admin/console/awards/$awardId/edit')({
   component: RouteComponent,
@@ -33,7 +34,7 @@ function RouteComponent() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
+  const { data: selectedPageant, isLoading } = useSelectedPageant()
 
   const form = useForm({
     resolver: zodResolver(awardEditFormSchema),
@@ -64,7 +65,7 @@ function RouteComponent() {
   if (isLoading) {
     return (
       <div className="p-4">
-        <TextBody>Loading...</TextBody>
+        <Loading />
       </div>
     )
   }

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import type { SegmentEditForm } from '@/features/segments/schemas'
 import {
@@ -14,13 +14,14 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useSelectedPageantQuery } from '@/features/pageants/hooks/use-selected-pageant-query'
+import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import Console from '@/components/console'
 import FormulaInput from '@/features/formula/components/formula-input'
-import { TextBody, TextSub } from '@/components/text'
-import { useSegmentQuery } from '@/features/segments/hooks/use-segment-query'
+import { TextSub } from '@/components/text'
 import { segmentEditFormSchema } from '@/features/segments/schemas'
 import useEditSegmentMutate from '@/features/segments/hooks/use-edit-segment-mutate'
+import Loading from '@/components/loading'
+import segmentQueryOptions from '@/features/segments/query-options/segment-query-options'
 
 export const Route = createFileRoute('/admin/console/segments/$segmentId/edit')(
   {
@@ -31,12 +32,12 @@ export const Route = createFileRoute('/admin/console/segments/$segmentId/edit')(
 function RouteComponent() {
   const { segmentId } = Route.useParams()
   const { mutateAsync: editSegment, error } = useEditSegmentMutate()
-  const { data: segment } = useSegmentQuery(segmentId)
+  const { data: segment } = useQuery(segmentQueryOptions(segmentId))
 
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const { data: selectedPageant, isLoading } = useSelectedPageantQuery()
+  const { data: selectedPageant, isLoading } = useSelectedPageant()
 
   const form = useForm({
     resolver: zodResolver(segmentEditFormSchema),
@@ -67,7 +68,7 @@ function RouteComponent() {
   if (isLoading) {
     return (
       <div className="p-4">
-        <TextBody>Loading...</TextBody>
+        <Loading />
       </div>
     )
   }

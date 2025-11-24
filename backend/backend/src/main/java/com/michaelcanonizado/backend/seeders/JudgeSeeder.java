@@ -29,11 +29,11 @@ public class JudgeSeeder implements DatabaseSeeder {
         Pageant pageant = pageantRepository.findAll().getFirst();
 
         List<Judge> judges = Arrays.asList(
-                new Judge("JUDGE_1","Comoda_2025", "Mickha Ella","Comoda", Honorific.MS, pageant),
-                new Judge("JUDGE_2","Custodio_2025", "Marae Alaine","Custodio", Honorific.MS, pageant),
-                new Judge("JUDGE_3","Llanto_2025", "Neal","Llanto", Honorific.DR, pageant),
-                new Judge("JUDGE_4","Santilla_2025", "Apple","Santilla", Honorific.MX, pageant),
-                new Judge("JUDGE_5","Orosco_2025", "Aujel","Orosco", Honorific.MR, pageant)
+                new Judge("JUDGE_1","Comoda_2025", "Mickha Ella","Comoda", Honorific.MS, 1, pageant),
+                new Judge("JUDGE_2","Custodio_2025", "Marae Alaine","Custodio", Honorific.MS, 2, pageant),
+                new Judge("JUDGE_3","Llanto_2025", "Neal","Llanto", Honorific.DR, 3, pageant),
+                new Judge("JUDGE_4","Santilla_2025", "Apple","Santilla", Honorific.MX, 4, pageant),
+                new Judge("JUDGE_5","Orosco_2025", "Aujel","Orosco", Honorific.MR, 5, pageant)
         );
 
         judges.forEach(judge -> {

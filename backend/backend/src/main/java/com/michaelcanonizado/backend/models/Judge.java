@@ -25,6 +25,9 @@ public class Judge extends Account {
     @Column(nullable = false)
     private Honorific honorific;
 
+    @Column(nullable = false)
+    private int number;
+
     @JsonBackReference
     @ManyToOne(
             optional = false,
@@ -42,12 +45,13 @@ public class Judge extends Account {
     )
     private List<Score> scores  = new ArrayList<>();
 
-    public Judge(String username, String passwordHash, String firstName, String lastName, Honorific honorific, Pageant pageant) {
+    public Judge(String username, String passwordHash, String firstName, String lastName, Honorific honorific, int number, Pageant pageant) {
         super(username, passwordHash);
-        this.pageant = pageant;
         this.firstName = firstName;
         this.lastName = lastName;
         this.honorific = honorific;
+        this.number = number;
+        this.pageant = pageant;
     }
 
     public void addScore(Score score) {

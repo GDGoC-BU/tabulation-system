@@ -1,13 +1,12 @@
 import { candidateGender } from './../schemas/index'
-import type { CandidateDetailed, CandidateSummary } from '../schemas'
 
-export default function splitCandidates(
-  candidates: Array<CandidateDetailed | CandidateSummary>,
-) {
+export default function splitCandidates<
+  T extends { gender: any; number: number },
+>(candidates: Array<T>) {
   /* Group A prioritizes FEMALES */
-  const groupA: Array<CandidateDetailed | CandidateSummary> = []
+  const groupA: Array<T> = []
   /* GroupB prioritizes MALES */
-  const groupB: Array<CandidateDetailed | CandidateSummary> = []
+  const groupB: Array<T> = []
 
   const FEMALE = candidateGender.enum.FEMALE
   const MALE = candidateGender.enum.MALE
@@ -24,7 +23,7 @@ export default function splitCandidates(
   const sortedGroupB = groupB.sort((a, b) => a.number - b.number)
 
   return {
-    groupA: sortedGroupA,
-    groupB: sortedGroupB,
+    femaleCandidates: sortedGroupA,
+    maleCandidates: sortedGroupB,
   }
 }

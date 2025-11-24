@@ -8,16 +8,15 @@ import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
-import com.michaelcanonizado.backend.exceptions.customs.PhaseStatusException;
+import com.michaelcanonizado.backend.exceptions.customs.PhaseSegmentStatusException;
 import com.michaelcanonizado.backend.mappers.PhaseMapper;
-import com.michaelcanonizado.backend.models.Pageant;
-import com.michaelcanonizado.backend.models.PageantStatus;
-import com.michaelcanonizado.backend.models.Phase;
-import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
+import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import com.michaelcanonizado.backend.repositories.PhaseRepository;
-import jakarta.validation.Valid;
+import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
+import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +31,20 @@ public class PhaseService {
     @Autowired
     private PageantRepository pageantRepository;
 
+    /* Lazy inject the mapper to break the circular dependency:
+       PhaseService → PhaseMapper → SegmentMapper → PhaseService */
+    @Lazy
     @Autowired
     private PhaseMapper mapper;
 
     @Autowired
     private PageantContext pageantContext;
+
+    @Autowired
+    private CacheService cacheService;
+
+    @Autowired
+    private CacheKeyBuilder cacheKeyBuilder;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
@@ -52,9 +60,25 @@ public class PhaseService {
                     ErrorCode.ENTITY_NOT_FOUND
             );
         });
-
         phase.setPageant(pageant);
-        return mapper.toDetailedDTO(phaseRepository.save(phase));
+        Phase savedPhase = phaseRepository.save(phase);
+        PhaseDetailedDTO responseDTO = mapper.toDetailedDTO(savedPhase);
+
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", responseDTO.id()),
+                responseDTO
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "list", "all")
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "hierarchy")
+        );
+
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -71,7 +95,30 @@ public class PhaseService {
         pageantContext.assertAccess(phase.getPageant().getId());
         /* TO-IMPLEMENT: Ensure that only 1 has the state ONGOING */
         phase.setStatus(PhaseSegmentStatus.ONGOING);
-        return mapper.toDetailedDTO(phaseRepository.save(phase));
+        Phase savedPhase = phaseRepository.save(phase);
+        PhaseDetailedDTO responseDTO = mapper.toDetailedDTO(savedPhase);
+
+        UUID selectedPageantId = pageantContext.getId();
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "ongoing"),
+                responseDTO
+        );
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", id),
+                responseDTO
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "list", "all")
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "hierarchy")
+        );
+
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -87,7 +134,38 @@ public class PhaseService {
         });
         pageantContext.assertAccess(phase.getPageant().getId());
         phase.setStatus(PhaseSegmentStatus.CLOSED);
-        return mapper.toDetailedDTO(phaseRepository.save(phase));
+        Phase savedPhase = phaseRepository.save(phase);
+        PhaseDetailedDTO responseDTO = mapper.toDetailedDTO(savedPhase);
+
+        UUID selectedPageantId = pageantContext.getId();
+        PhaseDetailedDTO cachedOngoingPhase = cacheService.get(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "ongoing"),
+                PhaseDetailedDTO.class
+        );
+
+        /* Check if the current cached ongoing phase is being closed. If it is, remove it from cache */
+        if (cachedOngoingPhase.id().equals(responseDTO.id())) {
+            cacheService.evict(
+                    CacheNameConstants.TABULATION,
+                    cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "ongoing")
+            );
+        }
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", id),
+                responseDTO
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "list", "all")
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "hierarchy")
+        );
+
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -96,34 +174,89 @@ public class PhaseService {
     })
     @Transactional
     public PhaseDetailedDTO getPhase(UUID id) {
-        Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
-           return new EntityNotFoundException(
-                   "Phase not found!",
-                   ErrorCode.ENTITY_NOT_FOUND
-           );
-        });
-        pageantContext.assertAccess(phase.getPageant().getId());
-        return mapper.toDetailedDTO(phase);
+        UUID selectedPageantId = pageantContext.getId();
+        String CACHE_NAME = CacheNameConstants.TABULATION;
+        String CACHE_KEY = cacheKeyBuilder.build("pageants", selectedPageantId, "phases", id);
+
+        PhaseDetailedDTO responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                PhaseDetailedDTO.class
+        );
+
+        if (responseDTO == null) {
+            Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
+                return new EntityNotFoundException(
+                        "Phase not found!",
+                        ErrorCode.ENTITY_NOT_FOUND
+                );
+            });
+            pageantContext.assertAccess(phase.getPageant().getId());
+            responseDTO = mapper.toDetailedDTO(phase);
+
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    responseDTO
+            );
+        }
+
+        return responseDTO;
     }
 
     @RequirePageantStatus({
-            PageantStatus.ONGOING
+            PageantStatus.PREPARATION,
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public PhaseDetailedDTO getOngoingPhase() {
         UUID selectedPageantId = pageantContext.getId();
-        List<Phase> phases =  phaseRepository.findAllByPageant_Id(selectedPageantId);
+        String CACHE_NAME = CacheNameConstants.TABULATION;
+        String CACHE_KEY = cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "ongoing");
 
-        /* Revisit this. Might want to add a check to verify that only 1 phase should be ongoing */
+        PhaseDetailedDTO responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                PhaseDetailedDTO.class
+        );
 
-        /* This is doesnt check if it belongs to the pageant! */
-        Phase ongoingPhase = phaseRepository.findByStatus(PhaseSegmentStatus.ONGOING).orElseThrow(() -> {
-            return new EntityNotFoundException(
-                    "No ongoing phase for pageant!",
-                    ErrorCode.ENTITY_NOT_FOUND
+        /* Revisit this. The return of this method could be a DTO(there is an ongoing phase) or a
+           null(no ongoing phase). If there is no ongoing phase, the database query always runs. */
+        if (responseDTO != null) {
+            return responseDTO;
+        }
+
+        /* Revisit this. Might want to add a more robust check to verify that only 1 segment should be ongoing */
+        List<Phase> ongoingPhases = phaseRepository
+                .findAllByStatusAndPageantId(
+                        PhaseSegmentStatus.ONGOING,
+                        selectedPageantId
+                );
+
+        /* Only 1 segment should be ongoing */
+        if (ongoingPhases.size() > 1) {
+            throw new PhaseSegmentStatusException(
+                    "Multiple ongoing phases found for pageant " + selectedPageantId,
+                    ErrorCode.PHASE_SEGMENT_ILLEGAL_STATE
             );
-        });
+        }
 
-        return mapper.toDetailedDTO(ongoingPhase);
+        responseDTO = ongoingPhases.stream()
+                .findFirst()
+                .map(mapper::toDetailedDTO)
+                .orElse(null);
+
+        if (responseDTO == null) {
+            return null;
+        }
+
+        cacheService.put(
+                CACHE_NAME,
+                CACHE_KEY,
+                responseDTO
+        );
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -132,13 +265,32 @@ public class PhaseService {
     })
     public List<PhaseSummaryDTO> getPhases() {
         UUID selectedPageantId = pageantContext.getId();
-        return phaseRepository
-                .findAllByPageant_Id(selectedPageantId)
-                .stream()
-                .map(phase -> {
-                    return mapper.toSummaryDTO(phase);
-                })
-                .toList();
+        String CACHE_NAME = CacheNameConstants.TABULATION;
+        String CACHE_KEY = cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "list", "all");
+
+        List<PhaseSummaryDTO> responseDTO = cacheService.get(
+                CACHE_NAME,
+                CACHE_KEY,
+                List.class
+        );
+
+        if (responseDTO == null) {
+            responseDTO = phaseRepository
+                    .findAllByPageant_Id(selectedPageantId)
+                    .stream()
+                    .map(phase -> {
+                        return mapper.toSummaryDTO(phase);
+                    })
+                    .toList();
+
+            cacheService.put(
+                    CACHE_NAME,
+                    CACHE_KEY,
+                    responseDTO
+            );
+        }
+
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -148,9 +300,28 @@ public class PhaseService {
         Phase phase = phaseRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! Phase not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
+
         pageantContext.assertAccess(phase.getPageant().getId());
         mapper.updateEntityFromDTO(phase, phaseUpdateDTO);
-        return mapper.toDetailedDTO(phaseRepository.save(phase));
+        Phase savedPhase = phaseRepository.save(phase);
+        PhaseDetailedDTO responseDTO = mapper.toDetailedDTO(savedPhase);
+
+        UUID selectedPageantId = pageantContext.getId();
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", id),
+                responseDTO
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "list", "all")
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "hierarchy")
+        );
+
+        return responseDTO;
     }
 
     @RequirePageantStatus({
@@ -161,6 +332,21 @@ public class PhaseService {
             return new EntityNotFoundException("Can't delete! Phase not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
         pageantContext.assertAccess(phase.getPageant().getId());
+
+        UUID selectedPageantId = pageantContext.getId();
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", id)
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "phases", "list", "all")
+        );
+        cacheService.evict(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", selectedPageantId, "hierarchy")
+        );
+
         phaseRepository.deleteById(id);
     }
 

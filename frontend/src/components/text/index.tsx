@@ -2,7 +2,7 @@ import type { ComponentClassNameAndChildrenProp } from '@/types'
 import { cn } from '@/lib/utils'
 
 export const textDisplayClassName =
-  'font-heading text-[89.76px] leading-[85px] font-[600] tracking-[-0.05em]'
+  'font-heading text-[67.34px] leading-[85px] font-[600] tracking-[-0.05em]'
 export const TextDisplay = ({
   className,
   children,
@@ -32,7 +32,7 @@ export const TextHeading = ({
 }
 
 export const textBodyClassName =
-  'font-body text-[16px] leading-[20px] font-[500] tracking-[-px]'
+  'font-body text-[16px] leading-[20px] font-[400] tracking-[-px]'
 export const TextBody = ({
   className,
   children,
@@ -47,7 +47,7 @@ export const TextBody = ({
 }
 
 export const textSubClassName =
-  'font-body  text-[12px] leading-[16px] font-[400] tracking-[0]'
+  'font-body text-[12px] leading-[16px] font-[400] tracking-[0]'
 export const TextSub = ({
   className,
   children,

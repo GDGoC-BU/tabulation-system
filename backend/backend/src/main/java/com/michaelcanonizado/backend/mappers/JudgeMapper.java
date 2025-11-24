@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.mappers;
 
+import com.michaelcanonizado.backend.dtos.judge.JudgeBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeCreateDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeSummaryDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeUpdateDTO;
@@ -15,6 +16,7 @@ public interface JudgeMapper {
     Judge toEntity(JudgeCreateDTO judgeCreateDTO);
 
     JudgeSummaryDTO toSummaryDTO(Judge judge);
+    JudgeBreakdownDTO toBreakdownDTO(Judge judge);
 
     void updateEntityFromDTO(@MappingTarget Judge judge, JudgeUpdateDTO judgeUpdateDTO);
 }
