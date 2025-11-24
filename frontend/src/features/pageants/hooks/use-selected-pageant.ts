@@ -4,5 +4,5 @@ import pageantQueryOptions from '../query-options/pageant-query-options'
 
 export function useSelectedPageant() {
   const { selectedPageantId: id } = useSelectedPageantIdStore((state) => state)
-  return useQuery(pageantQueryOptions(id))
+  return useQuery(pageantQueryOptions(id, { enabled: !!id }))
 }

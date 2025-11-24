@@ -25,7 +25,6 @@ import {
 } from '@/components/ui/sidebar'
 import { TextBody } from '@/components/text'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
-import { pageantStatusValue } from '@/schemas'
 
 const pageantAction = [
   {

@@ -54,7 +54,7 @@ function RouteComponent() {
 
   if (isResultLoading || isAwardLoading) {
     return (
-      <div className="border rounded-lg p-4">
+      <div className="border rounded-lg p-4 grow">
         <TextBody>Calculating {award?.name}...</TextBody>
       </div>
     )
@@ -65,7 +65,7 @@ function RouteComponent() {
   )
 
   return (
-    <div className="p-4">
+    <div className="p-4 grow">
       <div className="w-full flex flex-col gap-24">
         <div className="border rounded-lg p-4">
           <div className="mb-2">
