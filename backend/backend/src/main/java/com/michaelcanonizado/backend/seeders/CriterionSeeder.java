@@ -27,6 +27,7 @@ public class CriterionSeeder implements DatabaseSeeder {
     private final CriterionRepository criterionRepository;
 
     private final List<CriterionItem> criteria = Arrays.asList(
+            /* Coronation Night Criterion */
             new CriterionItem("Stage Presence", 35, "Production Number"),
             new CriterionItem("Performance And Execution", 30, "Production Number"),
             new CriterionItem("Projection and Personality", 25, "Production Number"),
@@ -45,7 +46,20 @@ public class CriterionSeeder implements DatabaseSeeder {
 
             new CriterionItem("Intelligence", 50, "Final Question and Answer"),
             new CriterionItem("Relevance", 25, "Final Question and Answer"),
-            new CriterionItem("Poise and Personality", 25, "Final Question and Answer")
+            new CriterionItem("Poise and Personality", 25, "Final Question and Answer"),
+
+            /* Closed Door Interview Criterion */
+            new CriterionItem("Presence and Projection", 15, "Swimwear"),
+            new CriterionItem("Poise", 10, "Swimwear"),
+            new CriterionItem("Physical Well-being and Vitality", 5, "Swimwear"),
+
+            new CriterionItem("Attire, Elegance, and Grace", 20, "Formal Attire"),
+            new CriterionItem("Stage Presence", 10, "Formal Attire"),
+
+            new CriterionItem("Intelligence", 20, "Question & Answer"),
+            new CriterionItem("Poise and Personality", 20, "Question & Answer")
+
+
     );
 
     @Autowired
