@@ -6,7 +6,6 @@ import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.repositories.JudgeRepository;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -29,11 +28,23 @@ public class JudgeSeeder implements DatabaseSeeder {
         Pageant pageant = pageantRepository.findAll().getFirst();
 
         List<Judge> judges = Arrays.asList(
-                new Judge("JUDGE_1","Comoda_2025", "Mickha Ella","Comoda", Honorific.MS, 1, pageant),
-                new Judge("JUDGE_2","Custodio_2025", "Marae Alaine","Custodio", Honorific.MS, 2, pageant),
-                new Judge("JUDGE_3","Llanto_2025", "Neal","Llanto", Honorific.DR, 3, pageant),
-                new Judge("JUDGE_4","Santilla_2025", "Apple","Santilla", Honorific.MX, 4, pageant),
-                new Judge("JUDGE_5","Orosco_2025", "Aujel","Orosco", Honorific.MR, 5, pageant)
+                /* Closed-Door Interview Judges */
+                new Judge("a","", "James Edward","Tambobong", Honorific.MR, 1, pageant),
+                new Judge("b","", "Rhondon","Ricafort", Honorific.MR, 2, pageant),
+                new Judge("c","", "Neal","Llanto", Honorific.DR, 3, pageant),
+                new Judge("d","", "John Paul","Regaspi", Honorific.MX, 4, pageant),
+                new Judge("e","", "Phoebe Kate","Calisin", Honorific.MS, 5, pageant),
+
+                /* Coronation Night Judges */
+                new Judge("f","", "Patrixia Sherly","Santos", Honorific.ATTY, 6, pageant),
+                new Judge("g","", "Richard","Milante", Honorific.MR, 7, pageant),
+                new Judge("h","", "Abelardo Billy","Balin", Honorific.MR, 8, pageant),
+                new Judge("i","", "Juan","Sarte", Honorific.MR, 9, pageant),
+                new Judge("j","", "Jorim","Sumangid", Honorific.MX, 10, pageant),
+                new Judge("k","", "Alexandra Krishna","Orino", Honorific.MS, 11, pageant),
+                new Judge("l","", "Gabriel","Aguirre", Honorific.MR, 12, pageant),
+                new Judge("m","", "Margarette Siat","Briton", Honorific.MS, 13, pageant),
+                new Judge("n","", "Eileen Kae","Relao", Honorific.MS, 14, pageant)
         );
 
         judges.forEach(judge -> {

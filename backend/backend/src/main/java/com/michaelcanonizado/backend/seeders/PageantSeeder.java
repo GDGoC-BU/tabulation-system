@@ -17,6 +17,6 @@ public class PageantSeeder implements DatabaseSeeder {
 
     @Override
     public void seed() {
-        repository.save(new Pageant("Mr. and Ms. College Of Industrial Technology 2025"));
+        repository.save(new Pageant("Mr. and Ms. Bicol University 2025"));
     }
 }

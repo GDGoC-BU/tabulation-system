@@ -6,6 +6,7 @@ public enum Honorific {
     MX,
     MRS,
     DR,
+    ATTY,
     HON,
     PROF
 }
