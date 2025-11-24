@@ -8,14 +8,12 @@ import com.michaelcanonizado.backend.models.Pageant;
 import com.michaelcanonizado.backend.repositories.CandidateRepository;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
 import com.michaelcanonizado.backend.repositories.PageantRepository;
+import com.michaelcanonizado.backend.utilities.CollegeCandidateData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Component
 public class CandidateSeeder implements DatabaseSeeder {
@@ -62,34 +60,37 @@ public class CandidateSeeder implements DatabaseSeeder {
     private void seedRealData() {
         Pageant pageant = pageantRepository.findAll().getFirst();
         List<College> colleges =  collegeRepository.findAll();
-        College selectedCollege = colleges.stream()
-                .filter(college -> college.getCode().equals("BUCIT"))
-                .findFirst().orElseThrow(() -> {
-                    return new RuntimeException("Candidate is being seeded on a college that doesn't exist!");
-                });
+        List<Candidate> candidates = new ArrayList<>();
 
-        List<Candidate> candidates = Arrays.asList(
-                new Candidate(1, "KC", "Luces", CandidateGender.FEMALE, 20, selectedCollege, pageant),
-                new Candidate(1, "Harry", "Clemente", CandidateGender.MALE, 20, selectedCollege, pageant),
+        for (College college : colleges) {
+            CollegeCandidateData.CollegeTemp collegeTemp = CollegeCandidateData.collegesByCode.get(college.getCode());
 
-                new Candidate(2, "Kyla Mae", "Caceres", CandidateGender.FEMALE, 20, selectedCollege, pageant),
-                new Candidate(2, "Aries Carl", "Aycardo", CandidateGender.MALE, 20, selectedCollege, pageant),
+            if (collegeTemp != null) {
+                for (CollegeCandidateData.CandidateTemp candidateTemp : collegeTemp.getCandidates()) {
+                    System.out.printf(
+                            "Seeding %s: #%d %s %s | %s%n",
+                            college.getCode(),
+                            collegeTemp.getNumber(),
+                            candidateTemp.getFirstName(),
+                            candidateTemp.getLastName(),
+                            candidateTemp.getGender()
+                    );
 
-                new Candidate(3, "Rea Nicole", "Antivola", CandidateGender.FEMALE, 20, selectedCollege, pageant),
-                new Candidate(3, "Jay Rich", "Bañadera", CandidateGender.MALE, 20, selectedCollege, pageant),
-
-                new Candidate(4, "Trisha", "Paliza", CandidateGender.FEMALE, 20, selectedCollege, pageant),
-                new Candidate(4, "Hans", "Balete", CandidateGender.MALE, 20, selectedCollege, pageant),
-
-                new Candidate(5, "Sushmita", "Singh", CandidateGender.FEMALE, 20, selectedCollege, pageant),
-                new Candidate(5, "Hans Sedric", "Basallote", CandidateGender.MALE, 20, selectedCollege, pageant),
-
-                new Candidate(6, "Mary Grace", "Sarabia", CandidateGender.FEMALE, 20, selectedCollege, pageant),
-                new Candidate(6, "Mckile", "Magdaong", CandidateGender.MALE, 20, selectedCollege, pageant),
-
-                new Candidate(7, "Pearl Amirey", "Espinili", CandidateGender.FEMALE, 20, selectedCollege, pageant),
-                new Candidate(7, "Andrei Hartzel", "Lirio", CandidateGender.MALE, 20, selectedCollege, pageant)
-        );
+                    Candidate candidate = new Candidate(
+                            collegeTemp.getNumber(),
+                            candidateTemp.getFirstName(),
+                            candidateTemp.getLastName(),
+                            candidateTemp.getGender(),
+                            candidateTemp.getAge(),
+                            college,
+                            pageant
+                            );
+                    candidates.add(candidate);
+                }
+            } else {
+                System.err.println("No seed data for " + college.getName());
+            }
+        }
 
         candidateRepository.saveAll(candidates);
     }

@@ -2,35 +2,16 @@ package com.michaelcanonizado.backend.seeders;
 
 import com.michaelcanonizado.backend.models.College;
 import com.michaelcanonizado.backend.repositories.CollegeRepository;
+import com.michaelcanonizado.backend.utilities.CollegeCandidateData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class CollegeSeeder implements DatabaseSeeder {
     private final CollegeRepository repository;
-
-    private final List<College> colleges = Arrays.asList(
-            new College("BUCAF", "Bicol University College of AF"),
-            new College("BUCAL", "Bicol University College of Arts and Letters"),
-            new College("BUCBEM", "Bicol University College of Business, Economics, and Management"),
-            new College("BUCE", "Bicol University College of Education"),
-            new College("BUCENG", "Bicol University College of Engineering"),
-            new College("BUCIT", "Bicol University College of Industrial Technology"),
-            new College("BUCN", "Bicol University College of Nursing"),
-            new College("BUCS", "Bicol University College of Science"),
-            new College("BUCSSP", "Bicol University College of Social Sciences and Philosophy"),
-            new College("BUGC", "Bicol University Guinobatan/Gubat Campuss"),
-            new College("BUIDeA", "Bicol University College of Architecture"),
-            new College("BUIPESR", "Bicol University IPSER"),
-            new College("BUJMRIGD", "Bicol University JMRIGD"),
-            new College("BUPC", "Bicol University Polangui Campus"),
-            new College("BUTC", "Bicol University Tobaco Campus")
-    );
 
     @Autowired
     public CollegeSeeder(CollegeRepository repository) {
@@ -39,6 +20,15 @@ public class CollegeSeeder implements DatabaseSeeder {
 
     @Override
     public void seed() {
-        colleges.forEach(repository::save);
+        List<College> colleges = new ArrayList<>();
+        for (CollegeCandidateData.CollegeTemp collegeTemp : CollegeCandidateData.colleges) {
+            colleges.add(
+                    new College(
+                            collegeTemp.getCode(),
+                            collegeTemp.getName()
+                    )
+            );
+        }
+        repository.saveAll(colleges);
     }
 }
