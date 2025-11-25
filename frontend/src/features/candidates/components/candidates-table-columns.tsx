@@ -36,11 +36,11 @@ export const candidatesTableColumns: Array<ColumnDef<CandidateSummary>> = [
     },
   },
   {
-    accessorKey: 'age',
-    header: 'Age',
+    accessorKey: 'college',
+    header: 'College',
     cell: ({ row }) => {
-      const age: CandidateSummary['age'] = row.getValue('age')
-      return <TextBody>{age}</TextBody>
+      const college: CandidateSummary['college'] = row.getValue('college')
+      return <TextBody>{college.code}</TextBody>
     },
   },
 ]
