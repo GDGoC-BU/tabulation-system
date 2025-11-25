@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { TextBody } from '@/components/text'
-import { Button } from '@/components/ui/button'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
 import ConfirmDialog from '@/components/confirm-dialog'
@@ -28,7 +27,6 @@ export default function PageantPreparationDashboard() {
           Summary of pageant details will be show here. When pageant starts no
           modification will be allowed.
         </TextBody>
-        <Button onClick={onClick}></Button>
         <ConfirmDialog
           triggerLabel="Start Pageant"
           title="Start Pageant"
