@@ -170,7 +170,9 @@ public class PhaseService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     @Transactional
     public PhaseDetailedDTO getPhase(UUID id) {
@@ -261,7 +263,9 @@ public class PhaseService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public List<PhaseSummaryDTO> getPhases() {
         UUID selectedPageantId = pageantContext.getId();
