@@ -14,18 +14,17 @@ import java.util.List;
 
 @Component
 public class ScoreSeeder implements DatabaseSeeder {
-    private final ScoreRepository scoreRepository;
-    private final CandidateRepository candidateRepository;
-    private final CriterionRepository criterionRepository;
-    private final JudgeRepository judgeRepository;
+    @Autowired
+    private ScoreRepository scoreRepository;
 
     @Autowired
-    public ScoreSeeder(ScoreRepository scoreRepository, CandidateRepository candidateRepository, CriterionRepository criterionRepository, JudgeRepository judgeRepository) {
-        this.scoreRepository = scoreRepository;
-        this.candidateRepository = candidateRepository;
-        this.criterionRepository = criterionRepository;
-        this.judgeRepository = judgeRepository;
-    }
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private CriterionRepository criterionRepository;
+
+    @Autowired
+    private JudgeRepository judgeRepository;
 
     @Transactional
     @Override
@@ -39,12 +38,28 @@ public class ScoreSeeder implements DatabaseSeeder {
         candidates.forEach(candidate -> {
             criteria.forEach(criterion -> {
                 judges.forEach(judge -> {
+                    int scoreMaxValue = criterion.getMaxScore();
+                    int randomScoreValue;
+                    if (scoreMaxValue <= 5) {
+                        randomScoreValue = faker.number().numberBetween(
+                                (int) Math.floor(scoreMaxValue * 0.5),
+                                scoreMaxValue
+                        );
+                    } else if (scoreMaxValue <= 10) {
+                        randomScoreValue = faker.number().numberBetween(
+                                (int) Math.floor(scoreMaxValue * 0.6),
+                                scoreMaxValue
+                        );
+                    } else {
+                        randomScoreValue = faker.number().numberBetween(
+                                (int) Math.floor(scoreMaxValue * 0.75),
+                                scoreMaxValue
+                        );
+                    }
+
                     Score score = new Score(
                             0,
-//                            ),aker.number().numberBetween(
-//                                    0,
-//                                    criterion.getMaxScore()
-//                            ),
+//                            randomScoreValue,
                             judge,
                             candidate,
                             criterion

@@ -359,6 +359,9 @@ function RouteComponent() {
           <TextBody>Score each candidate in the segment</TextBody>
         </div>
         <div className="flex flex-col items-center">
+          <TextBody>
+            ❗Please recheck your scores! It Can't be changed once submitted
+          </TextBody>
           <TextBody>🔒Scores are saved automatically</TextBody>
           <TextBody>🚫Scoring will close when a segment finishes</TextBody>
           <TextBody>

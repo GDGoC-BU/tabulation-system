@@ -18,16 +18,16 @@ import java.util.*;
 @Component
 public class CandidateSeeder implements DatabaseSeeder {
     private final Faker faker = new Faker();
-    private final CandidateRepository candidateRepository;
-    private final CollegeRepository collegeRepository;
-    private final PageantRepository pageantRepository;
 
     @Autowired
-    public CandidateSeeder(CandidateRepository candidateRepository, CollegeRepository collegeRepository, PageantRepository pageantRepository) {
-        this.candidateRepository = candidateRepository;
-        this.collegeRepository = collegeRepository;
-        this.pageantRepository = pageantRepository;
-    }
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private CollegeRepository collegeRepository;
+
+    @Autowired
+    private PageantRepository pageantRepository;
+
 
     private void seedRandom() {
         Pageant pageant = pageantRepository.findAll().getFirst();
@@ -67,15 +67,6 @@ public class CandidateSeeder implements DatabaseSeeder {
 
             if (collegeTemp != null) {
                 for (CollegeCandidateData.CandidateTemp candidateTemp : collegeTemp.getCandidates()) {
-                    System.out.printf(
-                            "Seeding %s: #%d %s %s | %s%n",
-                            college.getCode(),
-                            collegeTemp.getNumber(),
-                            candidateTemp.getFirstName(),
-                            candidateTemp.getLastName(),
-                            candidateTemp.getGender()
-                    );
-
                     Candidate candidate = new Candidate(
                             collegeTemp.getNumber(),
                             candidateTemp.getFirstName(),

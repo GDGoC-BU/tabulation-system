@@ -82,7 +82,9 @@ public class CriterionService {
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
-            PageantStatus.ONGOING
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED
     })
     public List<CriterionSummaryDTO> getCriteria() {
         UUID selectedPageantId = pageantContext.getId();

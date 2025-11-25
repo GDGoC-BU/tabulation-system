@@ -174,6 +174,14 @@ function RouteComponent() {
     )
   }
 
+  if (judges?.length === 0) {
+    return (
+      <div className="w-full grow grid place-items-center">
+        <TextBody>No judges!</TextBody>
+      </div>
+    )
+  }
+
   return (
     <div className="grow select-none px-4 pb-4 flex flex-col">
       <div className="py-8 relative w-full flex flex-row items-center justify-center">

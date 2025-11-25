@@ -38,11 +38,20 @@ export const awardLeadboardTableColumns: Array<
     },
   },
   {
+    id: 'candidateCollege',
+    header: 'Candidate College',
+    cell: ({ row }) => {
+      const candidate: AwardLeaderboardSummary['candidate'] =
+        row.original.candidate
+      return <TextBody>{candidate.college.code}</TextBody>
+    },
+  },
+  {
     accessorKey: 'score',
     header: 'Score',
     cell: ({ row }) => {
       const score: AwardLeaderboardSummary['score'] = row.getValue('score')
-      const formattedScore = score === 0 ? score : score.toFixed(3)
+      const formattedScore = score === 0 ? score : score.toFixed(5)
       return <TextBody>{formattedScore}</TextBody>
     },
   },
