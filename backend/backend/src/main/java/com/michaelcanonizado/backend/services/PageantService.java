@@ -16,6 +16,7 @@ import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -332,6 +333,7 @@ public class PageantService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheNameConstants.TABULATION, allEntries = true)
     public PageantSummaryDTO softResetPageant(UUID id) {
         /* Get the Pageant */
         Pageant pageant = pageantRepository.findById(id).orElseThrow(() -> {
@@ -383,30 +385,13 @@ public class PageantService {
 
         /* Reset Pageant status */
         pageant.setStatus(PageantStatus.PREPARATION);
+
+        /* Reset Pageant startedAt and endedAt */
+        pageant.setStartedAt(null);
+        pageant.setEndedAt(null);
+
         Pageant savedPageant = pageantRepository.save(pageant);
-        PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
-
-        cacheService.put(
-                CacheNameConstants.TABULATION,
-                cacheKeyBuilder.build("pageants", id),
-                responseDTO
-        );
-        cacheService.put(
-                CacheNameConstants.TABULATION,
-                cacheKeyBuilder.build("pageants", id, "hierarchy"),
-                mapper.toHierarchyDTO(savedPageant)
-        );
-        cacheService.put(
-                CacheNameConstants.TABULATION,
-                cacheKeyBuilder.build("pageants", id, "context"),
-                mapper.toContextDTO(savedPageant)
-        );
-        cacheService.evict(
-                CacheNameConstants.TABULATION,
-                cacheKeyBuilder.build("pageants", "list", "all")
-        );
-
-        return responseDTO;
+        return mapper.toSummaryDTO(savedPageant);
     }
 
     public void deletePageant(UUID id) {
