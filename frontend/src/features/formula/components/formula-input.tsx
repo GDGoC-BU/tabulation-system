@@ -85,7 +85,7 @@ export default function FormulaInput({
       </div>
 
       <div className="p-4 flex flex-row gap-4">
-        <div className="grid grid-cols-4 gap-1">
+        <div className="grid grid-cols-4 gap-1 h-[235px]">
           <div className="col-span-4 grid grid-cols-3 gap-1">
             <FormulaButton disabled={true}>{'<-'}</FormulaButton>
             <FormulaButton disabled={true}>{'->'}</FormulaButton>
@@ -104,22 +104,29 @@ export default function FormulaInput({
             )
           })}
         </div>
-        <div className="overflow-y-scroll gap-1 flex flex-col h-[235px]">
-          {Object.values(criterionLookup).map((criterionRelationship) => {
-            return (
-              <FormulaButton
-                key={criterionRelationship.criterion.id}
-                onClick={() =>
-                  handleButtonInput(` ${criterionRelationship.criterion.id}`)
-                }
-              >
-                <FormulaBadgeRenderer
-                  simplified={false}
-                  criterionRelationship={criterionRelationship}
-                />
-              </FormulaButton>
-            )
-          })}
+        <div className="overflow-y-scroll gap-1 flex flex-col h-[400px]">
+          {Object.values(criterionLookup)
+            .sort((a, b) => {
+              if (a.phase.sequence != b.phase.sequence) {
+                return a.phase.sequence - b.phase.sequence
+              }
+              return a.segment.sequence - b.segment.sequence
+            })
+            .map((criterionRelationship) => {
+              return (
+                <FormulaButton
+                  key={criterionRelationship.criterion.id}
+                  onClick={() =>
+                    handleButtonInput(` ${criterionRelationship.criterion.id}`)
+                  }
+                >
+                  <FormulaBadgeRenderer
+                    simplified={false}
+                    criterionRelationship={criterionRelationship}
+                  />
+                </FormulaButton>
+              )
+            })}
         </div>
       </div>
     </div>
