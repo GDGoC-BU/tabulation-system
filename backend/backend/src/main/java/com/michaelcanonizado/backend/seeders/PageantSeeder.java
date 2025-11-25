@@ -8,12 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PageantSeeder implements DatabaseSeeder {
-    private final PageantRepository repository;
-
     @Autowired
-    public PageantSeeder(PageantRepository repository) {
-        this.repository = repository;
-    }
+    private PageantRepository repository;
 
     @Override
     public void seed() {

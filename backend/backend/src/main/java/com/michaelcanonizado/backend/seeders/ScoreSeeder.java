@@ -14,18 +14,17 @@ import java.util.List;
 
 @Component
 public class ScoreSeeder implements DatabaseSeeder {
-    private final ScoreRepository scoreRepository;
-    private final CandidateRepository candidateRepository;
-    private final CriterionRepository criterionRepository;
-    private final JudgeRepository judgeRepository;
+    @Autowired
+    private ScoreRepository scoreRepository;
 
     @Autowired
-    public ScoreSeeder(ScoreRepository scoreRepository, CandidateRepository candidateRepository, CriterionRepository criterionRepository, JudgeRepository judgeRepository) {
-        this.scoreRepository = scoreRepository;
-        this.candidateRepository = candidateRepository;
-        this.criterionRepository = criterionRepository;
-        this.judgeRepository = judgeRepository;
-    }
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private CriterionRepository criterionRepository;
+
+    @Autowired
+    private JudgeRepository judgeRepository;
 
     @Transactional
     @Override
@@ -41,7 +40,7 @@ public class ScoreSeeder implements DatabaseSeeder {
                 judges.forEach(judge -> {
                     Score score = new Score(
                             0,
-//                            ),aker.number().numberBetween(
+//                            faker.number().numberBetween(
 //                                    0,
 //                                    criterion.getMaxScore()
 //                            ),

@@ -11,12 +11,8 @@ import java.util.List;
 
 @Component
 public class CollegeSeeder implements DatabaseSeeder {
-    private final CollegeRepository repository;
-
     @Autowired
-    public CollegeSeeder(CollegeRepository repository) {
-        this.repository = repository;
-    }
+    private CollegeRepository repository;
 
     @Override
     public void seed() {

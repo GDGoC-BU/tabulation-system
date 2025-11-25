@@ -19,6 +19,7 @@ export const honorificSchema = z.enum([
   'MRS',
   'HON',
   'DR',
+  'ATTY',
   'PROF',
 ])
 export type Honorific = z.infer<typeof honorificSchema>

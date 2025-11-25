@@ -14,16 +14,15 @@ import java.util.List;
 
 @Component
 public class CandidateSegmentQualificationSeeder implements DatabaseSeeder {
-    private final CandidateSegmentQualificationRepository csqRepository;
-    private final CandidateRepository candidateRepository;
-    private final SegmentRepository segmentRepository;
+    @Autowired
+    private CandidateSegmentQualificationRepository csqRepository;
 
     @Autowired
-    public CandidateSegmentQualificationSeeder(CandidateSegmentQualificationRepository csqRepository, CandidateRepository candidateRepository, SegmentRepository segmentRepository) {
-        this.csqRepository = csqRepository;
-        this.candidateRepository = candidateRepository;
-        this.segmentRepository = segmentRepository;
-    }
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private SegmentRepository segmentRepository;
+
 
     @Transactional
     @Override
