@@ -38,12 +38,28 @@ public class ScoreSeeder implements DatabaseSeeder {
         candidates.forEach(candidate -> {
             criteria.forEach(criterion -> {
                 judges.forEach(judge -> {
+                    int scoreMaxValue = criterion.getMaxScore();
+                    int randomScoreValue;
+                    if (scoreMaxValue <= 5) {
+                        randomScoreValue = faker.number().numberBetween(
+                                (int) Math.floor(scoreMaxValue * 0.5),
+                                scoreMaxValue
+                        );
+                    } else if (scoreMaxValue <= 10) {
+                        randomScoreValue = faker.number().numberBetween(
+                                (int) Math.floor(scoreMaxValue * 0.6),
+                                scoreMaxValue
+                        );
+                    } else {
+                        randomScoreValue = faker.number().numberBetween(
+                                (int) Math.floor(scoreMaxValue * 0.75),
+                                scoreMaxValue
+                        );
+                    }
+
                     Score score = new Score(
                             0,
-//                            faker.number().numberBetween(
-//                                    0,
-//                                    criterion.getMaxScore()
-//                            ),
+//                            randomScoreValue,
                             judge,
                             candidate,
                             criterion
