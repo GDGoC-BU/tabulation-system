@@ -218,6 +218,7 @@ public class SegmentService {
     }
 
     @RequirePageantStatus({
+            PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
             PageantStatus.FINALIZING,
             PageantStatus.CLOSED,

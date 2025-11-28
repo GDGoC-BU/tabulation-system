@@ -82,8 +82,7 @@ export const segmentCandidateQualifications: Array<
     cell: ({ row }) => {
       const score: CandidateSegmentQualificationSummary['score'] =
         row.getValue('score')
-      const formattedScore =
-        score === 0 || score === null ? 0 : score.toFixed(3)
+      const formattedScore = score === 0 || score === null ? 0 : score
       return <TextBody>{formattedScore}</TextBody>
     },
   },
