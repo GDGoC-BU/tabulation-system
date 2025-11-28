@@ -65,7 +65,7 @@ function CandidateScoreCard({
           </div>
         </div>
       </div>
-      <div className="px-7 py-6 grid place-items-center w-full">
+      <div className="px-1 py-6 grid place-items-center w-full">
         <div className="flex flex-col gap-2">
           {scores
             .sort((a, b) => {

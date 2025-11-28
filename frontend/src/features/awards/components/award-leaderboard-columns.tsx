@@ -60,7 +60,7 @@ export const awardLeadboardTableColumns: Array<
     header: 'Breakdown',
     cell: ({ row, table }) => {
       const leaderboard: AwardLeaderboardSummary = row.original
-      const formula: string = table.options.meta?.formula ?? ''
+      const formula = table.options.meta?.formula
 
       if (!formula || formula.length === 0) {
         return <TextBody>No formula passed</TextBody>

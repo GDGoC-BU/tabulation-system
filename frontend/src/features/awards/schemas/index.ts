@@ -6,7 +6,7 @@ export const awardLeaderboardSummarySchema = z.object({
   id: z.string(),
   candidate: candidateSummarySchema,
   score: z.number(),
-  criteriaBreakdown: z.array(criteriaBreakdownSchema),
+  criteriaBreakdown: z.union([z.null(), z.array(criteriaBreakdownSchema)]),
 })
 export type AwardLeaderboardSummary = z.infer<
   typeof awardLeaderboardSummarySchema
