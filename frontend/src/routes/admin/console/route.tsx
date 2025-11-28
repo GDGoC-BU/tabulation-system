@@ -6,7 +6,8 @@ import Navigation from '@/features/navigation/components'
 import { accountRoleSchema } from '@/features/authentication/schemas'
 
 export const Route = createFileRoute('/admin/console')({
-  beforeLoad: async ({ context, location }) => {
+  beforeLoad: async ({ context }) => {
+    // beforeLoad: async ({ context, location }) => {
     /* Wait for zustand to load from locale storage */
     await waitForStoreHydration(useAuthenticationStore)
 

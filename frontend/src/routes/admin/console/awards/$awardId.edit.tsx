@@ -19,7 +19,7 @@ import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pagea
 import { awardEditFormSchema } from '@/features/awards/schemas'
 import Console from '@/components/console'
 import FormulaInput from '@/features/formula/components/formula-input'
-import { TextBody, TextSub } from '@/components/text'
+import { TextSub } from '@/components/text'
 import useEditAwardMutate from '@/features/awards/hooks/use-edit-award-mutate'
 import Loading from '@/components/loading'
 
