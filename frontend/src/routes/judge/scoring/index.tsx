@@ -326,7 +326,7 @@ function RouteComponent() {
       `/topic/pageants/${assignedPageant.id}/ongoing-segment`,
       (message) => {
         try {
-          const data = JSON.parse(message.body)
+          JSON.parse(message.body)
           refetchAssignedPageant()
         } catch (err) {
           console.error('Failed to parse STOMP message', err)

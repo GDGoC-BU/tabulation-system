@@ -32,7 +32,7 @@ export function useAwardsCalculation(awards?: Awards) {
     })),
   })
 
-  const results = queries.map((query, i) => ({
+  const results = queries.map((query) => ({
     data: query.data,
     isLoading: query.isLoading,
     isError: query.isError,
