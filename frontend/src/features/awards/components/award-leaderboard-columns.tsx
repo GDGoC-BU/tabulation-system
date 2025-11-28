@@ -51,7 +51,7 @@ export const awardLeadboardTableColumns: Array<
     header: 'Score',
     cell: ({ row }) => {
       const score: AwardLeaderboardSummary['score'] = row.getValue('score')
-      const formattedScore = score === 0 ? score : score.toFixed(5)
+      const formattedScore = score === 0 ? score : score
       return <TextBody>{formattedScore}</TextBody>
     },
   },
