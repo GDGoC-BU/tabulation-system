@@ -153,8 +153,10 @@ public class AwardService {
     }
 
     @RequirePageantStatus({
+            PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
-            PageantStatus.FINALIZING
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED,
     })
     @Transactional
     public AwardDetailedDTO calculateAwardResult(UUID id) {

@@ -58,8 +58,8 @@ public class ScoreSeeder implements DatabaseSeeder {
                     }
 
                     Score score = new Score(
-                            0,
-//                            randomScoreValue,
+//                            0,
+                            randomScoreValue,
                             judge,
                             candidate,
                             criterion
