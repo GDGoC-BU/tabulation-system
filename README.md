@@ -20,7 +20,58 @@ An offline tabulation system that manages multiple pageants, designed for real-t
    * Zustand
 
 
-## 🚀 Current Features
+## 💻 How to Run
+
+### Prerequisites
+* Node.js (v22+)
+* Java (v21+)
+* Maven (v3.9.11+)
+* PostgreSQL (v17+ installed locally)
+* Docker
+* VSCode (Frontend)
+* IntelliJ (Backend)
+
+### 1) Clone the repository
+```
+git clone git@github.com:GDGoC-BU/tabulation-system.git
+cd tabulation-system
+```
+
+### 2) Setup the Backend
+1) Navigate to the backend folder
+```
+cd backend
+```
+2) Update `backend/src/main/resources/application.properties:` with your respective postgreSQL credentials. Ensure that the respective database (TabulationDemo) exists! You need to create it manually.
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/TabulationDemo
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+```
 
 
+3) Run Docker Desktop in the background
 
+4) Build the backend
+```
+./mvnw clean install
+```
+
+5) Run the backend (or start from IntelliJ)
+```
+./mvnw spring-boot:run
+```
+
+### 2) Setup the Frontend
+1) Navigate to the backend folder
+```
+cd frontend
+```
+2) Install the dependencies
+```
+npm install
+```
+2) Start the development server
+```
+npm run dev
+```
