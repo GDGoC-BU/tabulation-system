@@ -30,7 +30,7 @@ public class JudgeSeeder implements DatabaseSeeder {
         List<Judge> judges = Arrays.asList(
                 /* Closed-Door Interview Judges */
                 new Judge("JUDGE_1","Tambobong_2025", "James Edward","Tambobong", Honorific.MR, 1, pageant),
-                new Judge("JUDGE_2","Ricafort_2025", "Rhondon","Ricafort", Honorific.MR, 2, pageant),
+                new Judge("JUDGE_2","Azul_2025", "Asher Jade","Azul", Honorific.MR, 2, pageant),
                 new Judge("JUDGE_3","Llanto_2025", "Neal","Llanto", Honorific.DR, 3, pageant),
                 new Judge("JUDGE_4","Regaspi_2025", "John Paul","Regaspi", Honorific.MX, 4, pageant),
                 new Judge("JUDGE_5","Calisin_2025", "Phoebe Kate","Calisin", Honorific.MS, 5, pageant),

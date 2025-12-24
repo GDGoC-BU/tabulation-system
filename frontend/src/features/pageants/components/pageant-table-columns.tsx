@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import PageantTitle from './pageant-title'
 import PageantEditFormDialog from './pageant-edit-form-dialog'
 import type { ColumnDef } from '@tanstack/react-table'

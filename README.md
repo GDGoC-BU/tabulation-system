@@ -1,54 +1,94 @@
-# 🗳️ Tabulation Demo
-An offline tabulation system that can manage multiple pageants, designed for critical real-time scoring and result computation.  
+# 🗳️ GDGoC BU Tabulation System
+An offline tabulation system that manages multiple pageants, designed for real-time scoring and critical result computation. Primarly used in the annual university-wide Mr. and Ms. Bicol University, and other college wide pageants aroung the university.
 
----
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Spring Boot (A dedicated backend is required to make the system robust and work offline)
-- **Frontend**: Vite + ReactJS or NextJS (still deciding) 
-- **Database**: PostgreSQL
-- **Logging**: Spring Logback
+* **Backend**
+   * Spring Boot
+   * Mapstruct
+   * Lombok
+   * Redis
+   * PostgreSQL
+* **Frontend**
+   * ReactJS
+   * TailwindCSS
+   * Tanstack (Router, Query, Table)
+   * ShadCN
+   * Axios
+   * Zod
+   * Zustand
 
----
+## 🚀 Features
+* Multi-pageant management
+* Runs completely locally with LAN
+* Real-time judge scoring sheets with websockets
+* Automatic scoring saves
+* Admin dashboard
+* Award configurations
+* Dynamic formula builder with string-based expression evaluation with SpEL
+* Evaluated criteria breakdown for each candidate
+* Handles multi-phased pageants
+* Funnel candidates per segments
+* Candidate leaderboards for awards and segments
+* Fast response time with caching
+* Admin and judge authentication
 
-## 🚀 Current To-Implement
+## 💻 How to Run
 
-### 1. Codebase
-- Strong coding standards
-- Good documentation
-- Separation of concerns
-- Maintainable
-- Onboarding friendly
+### Prerequisites
+* Node.js (v22+)
+* Java (v21+)
+* Maven (v3.9.11+)
+* PostgreSQL (v17+ installed locally)
+* Docker
+* VSCode (Frontend)
+* IntelliJ (Backend)
 
-### 2. Frontend
-- Beautiful UI yet seamless UX
+### 1) Clone the repository
+```
+git clone git@github.com:GDGoC-BU/tabulation-system.git
+cd tabulation-system
+```
 
-### 3. LAN-based Connectivity  
-- Works without internet, only requires local router/switch to asssign IP addresses.  
-- Backend runs on one laptop, clients discover and connect within LAN.
+### 2) Setup the Backend
+1) Navigate to the backend folder
+```
+cd backend
+```
+2) Update `backend/src/main/resources/application.properties:` with your respective postgreSQL credentials. Ensure that the respective database (TabulationDemo) exists! You need to create it manually.
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/TabulationDemo
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+```
 
-### 4. High Reliability
-- Dedicated backend built for **<10 clients**, focused on robustness over scalability.  
-- **Short heartbeat intervals (2–3s)** for instant disconnect detection.
-- Potential for **backup server promotion** if the main backend fails (future improvement).
-- Aggressive Autosave judge-form state incase of disconnection. Like how Google Docs/Forms saves state even without submition
 
-### 5. Admin Dashboard  
-- Realtime Dashboard using websockets
-- View connectivity of all clients and judges (Online, Disconnected, Offline).
-- View current scores
-- Contestant leaderboard
-- Instant notification if judge/s disconnects
+3) Run Docker Desktop in the background
 
-### 6. Dynamic Formulas
-- Each pageant will have their own set of awards and each award has its own formula. The admin will be provided with a formula maker at the dashboard, and that formula will be evaluated using a formula engine made with SpEL (Spring Expression Language). This is the main thing that will allow the system to be reusable and manage multiple pageants.
+4) Build the backend
+```
+./mvnw clean install
+```
 
-### 7. Logging  
-- Logs for minute details of different subsystems for tracking:  
-  - **Connectivity logs** (client heartbeats, disconnects, reconnects)  
-  - **Input logs** (judges’ scoring inputs, corrections)  
-  - **System logs** (server errors, warnings)
+5) Run the backend (or start from IntelliJ)
+```
+./mvnw spring-boot:run
+```
 
-### 8. Data Export
-- Save event details after event 
+### 3) Setup the Frontend
+1) Navigate to the backend folder
+```
+cd frontend
+```
+2) Install the dependencies
+```
+npm install
+```
+2) Start the development server
+```
+npm run dev
+```
+
+### 4) Data seeding
+1) Contact admins for further instructions on how to seed dummy pageant data
