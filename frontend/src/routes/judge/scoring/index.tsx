@@ -168,7 +168,7 @@ function CandidateScoringCards({
         <div className="embla-thumbs mt-4 w-full">
           <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
             <div className="embla-thumbs__container flex flex-row gap-3">
-              {candidates.map((_, index) => (
+              {candidates.map((candidate, index) => (
                 <div
                   key={index}
                   className={cn(
@@ -188,7 +188,7 @@ function CandidateScoringCards({
                       index === selectedIndex ? 'ring-[2px]' : 'ring-[1px]',
                     )}
                   >
-                    <TextBody>{index + 1}</TextBody>
+                    <TextBody>{candidate.number}</TextBody>
                   </button>
                 </div>
               ))}
