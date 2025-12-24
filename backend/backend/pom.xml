@@ -12,7 +12,7 @@
 	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>backend</name>
-	<description>Backend for Tabulation Demo</description>
+	<description>Backend for GDGoC Tabulation System</description>
 	<url/>
 	<licenses>
 		<license/>
