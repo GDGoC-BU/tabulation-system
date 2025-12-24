@@ -19,6 +19,20 @@ An offline tabulation system that manages multiple pageants, designed for real-t
    * Zod
    * Zustand
 
+## 🚀 Features
+* Multi-pageant management
+* Runs completely locally with LAN
+* Real-time judge scoring sheets with websockets
+* Automatic scoring saves
+* Admin dashboard
+* Award configurations
+* Dynamic formula builder with string-based expression evaluation with SpEL
+* Evaluated criteria breakdown for each candidate
+* Handles multi-phased pageants
+* Funnel candidates per segments
+* Candidate leaderboards for awards and segments
+* Fast response time with caching
+* Admin and judge authentication
 
 ## 💻 How to Run
 
@@ -62,7 +76,7 @@ spring.datasource.password=${DB_PASSWORD}
 ./mvnw spring-boot:run
 ```
 
-### 2) Setup the Frontend
+### 3) Setup the Frontend
 1) Navigate to the backend folder
 ```
 cd frontend
@@ -75,3 +89,6 @@ npm install
 ```
 npm run dev
 ```
+
+### 4) Data seeding
+1) Contact admins for further instructions on how to seed dummy pageant data
