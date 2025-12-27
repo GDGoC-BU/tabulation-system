@@ -1,5 +1,10 @@
-import * as Blockly from 'blockly'
 import { useEffect, useRef } from 'react'
+import * as Blockly from 'blockly'
+import { toolbox } from './toolbox'
+import './blocks'
+import './generators'
+import { javascriptGenerator } from 'blockly/javascript'
+import { Button } from '@/components/ui/button'
 
 export default function BlocklyWorkspace() {
   const blocklyRef = useRef<HTMLDivElement | null>(null)
@@ -9,10 +14,7 @@ export default function BlocklyWorkspace() {
     if (!blocklyRef.current) return
 
     workspaceRef.current = Blockly.inject(blocklyRef.current, {
-      toolbox: {
-        kind: 'flyoutToolbox',
-        contents: [],
-      },
+      toolbox,
       trashcan: true,
       scrollbars: true,
     })
@@ -22,5 +24,37 @@ export default function BlocklyWorkspace() {
     }
   })
 
-  return <div ref={blocklyRef} style={{ width: '100%', height: '100%' }} />
+  const generateCode = () => {
+    if (!workspaceRef.current) return ''
+
+    const code = javascriptGenerator.workspaceToCode(workspaceRef.current)
+
+    console.log(code)
+    return code
+  }
+
+  const getTopBlocks = () => {
+    if (!workspaceRef.current) return
+
+    const root = workspaceRef.current.getTopBlocks(true)
+    console.log(root)
+  }
+
+  const getJSON = () => {
+    if (!workspaceRef.current) return
+
+    const json = Blockly.serialization.workspaces.save(workspaceRef.current)
+    console.log(json)
+  }
+
+  return (
+    <div className="h-full relative">
+      <div className="absolute top-4 right-4 z-[999] flex flex-col gap-4">
+        <Button onClick={generateCode}>Generate Code</Button>
+        <Button onClick={getTopBlocks}>Get top blocks</Button>
+        <Button onClick={getJSON}>Get JSON</Button>
+      </div>
+      <div ref={blocklyRef} className="h-full z-[998]" />
+    </div>
+  )
 }
