@@ -1,4 +1,4 @@
 export const toolbox = {
   kind: 'flyoutToolbox',
-  contents: [{ kind: 'block', type: 'number-literal' }],
+  contents: [{ kind: 'block', type: 'number_literal' }],
 }

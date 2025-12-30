@@ -19,6 +19,10 @@ export default function BlocklyWorkspace() {
       trashcan: true,
       scrollbars: true,
     })
+    Blockly.serialization.blocks.append(
+      { type: 'formula_root' },
+      workspaceRef.current,
+    )
 
     return () => {
       workspaceRef.current?.dispose()
