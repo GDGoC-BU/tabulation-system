@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
-import * as Blockly from 'blockly'
-import { toolbox } from './toolbox'
 import './blocks'
 import './generators'
+
+import { useEffect, useRef } from 'react'
+import * as Blockly from 'blockly'
 import { javascriptGenerator } from 'blockly/javascript'
+import { toolbox } from './toolbox'
 import { Button } from '@/components/ui/button'
 
 export default function BlocklyWorkspace() {
