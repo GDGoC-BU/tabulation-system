@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import BlocklyWorkspace from '@/features/blockly/components/blockly-workspace'
+import Workspace from '@/features/blockly/workspace'
 
 export const Route = createFileRoute('/admin/console/blockly')({
   component: RouteComponent,
@@ -8,7 +8,7 @@ export const Route = createFileRoute('/admin/console/blockly')({
 function RouteComponent() {
   return (
     <div className="grow">
-      <BlocklyWorkspace />
+      <Workspace />
     </div>
   )
 }

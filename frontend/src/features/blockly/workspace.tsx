@@ -7,7 +7,7 @@ import { javascriptGenerator } from 'blockly/javascript'
 import { toolbox } from './toolbox'
 import { Button } from '@/components/ui/button'
 
-export default function BlocklyWorkspace() {
+export default function Workspace() {
   const blocklyRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
 
