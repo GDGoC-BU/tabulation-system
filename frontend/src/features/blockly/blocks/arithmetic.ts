@@ -14,11 +14,11 @@ Blockly.defineBlocksWithJsonArray([
         type: 'field_dropdown',
         name: 'OPERATOR',
         options: [
-          ['+', 'add'],
-          ['-', 'minus'],
-          ['×', 'multiply'],
-          ['÷', 'divide'],
-          ['^', 'exponent'],
+          ['+', 'ADD'],
+          ['-', 'MINUS'],
+          ['×', 'MULTIPLY'],
+          ['÷', 'DIVIDE'],
+          ['^', 'EXPONENT'],
         ],
       },
       {
