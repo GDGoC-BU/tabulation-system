@@ -57,6 +57,12 @@ const pageantAction = [
     icon: Route,
     badgeValue: 0,
   },
+  {
+    title: 'Blockly',
+    url: '/admin/console/blockly',
+    icon: Route,
+    badgeValue: 0,
+  },
 ]
 
 export default function Vertical() {

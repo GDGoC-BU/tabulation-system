@@ -21,6 +21,7 @@ import { Route as AdminConsoleJudgesRouteImport } from './routes/admin/console/j
 import { Route as AdminConsoleDashboardRouteImport } from './routes/admin/console/dashboard'
 import { Route as AdminConsoleCollegesRouteImport } from './routes/admin/console/colleges'
 import { Route as AdminConsoleCandidatesRouteImport } from './routes/admin/console/candidates'
+import { Route as AdminConsoleBlocklyRouteImport } from './routes/admin/console/blockly'
 import { Route as AdminConsoleSegmentsIndexRouteImport } from './routes/admin/console/segments/index'
 import { Route as AdminConsolePageantsIndexRouteImport } from './routes/admin/console/pageants/index'
 import { Route as AdminConsoleAwardsIndexRouteImport } from './routes/admin/console/awards/index'
@@ -92,6 +93,11 @@ const AdminConsoleCandidatesRoute = AdminConsoleCandidatesRouteImport.update({
   path: '/candidates',
   getParentRoute: () => AdminConsoleRouteRoute,
 } as any)
+const AdminConsoleBlocklyRoute = AdminConsoleBlocklyRouteImport.update({
+  id: '/blockly',
+  path: '/blockly',
+  getParentRoute: () => AdminConsoleRouteRoute,
+} as any)
 const AdminConsoleSegmentsIndexRoute =
   AdminConsoleSegmentsIndexRouteImport.update({
     id: '/segments/',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
   '/judge/scoring': typeof JudgeScoringRouteRouteWithChildren
+  '/admin/console/blockly': typeof AdminConsoleBlocklyRoute
   '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
   '/admin/console/colleges': typeof AdminConsoleCollegesRoute
   '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/console/blockly': typeof AdminConsoleBlocklyRoute
   '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
   '/admin/console/colleges': typeof AdminConsoleCollegesRoute
   '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin/console': typeof AdminConsoleRouteRouteWithChildren
   '/judge/scoring': typeof JudgeScoringRouteRouteWithChildren
+  '/admin/console/blockly': typeof AdminConsoleBlocklyRoute
   '/admin/console/candidates': typeof AdminConsoleCandidatesRoute
   '/admin/console/colleges': typeof AdminConsoleCollegesRoute
   '/admin/console/dashboard': typeof AdminConsoleDashboardRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/console'
     | '/judge/scoring'
+    | '/admin/console/blockly'
     | '/admin/console/candidates'
     | '/admin/console/colleges'
     | '/admin/console/dashboard'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/console/blockly'
     | '/admin/console/candidates'
     | '/admin/console/colleges'
     | '/admin/console/dashboard'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/console'
     | '/judge/scoring'
+    | '/admin/console/blockly'
     | '/admin/console/candidates'
     | '/admin/console/colleges'
     | '/admin/console/dashboard'
@@ -389,6 +401,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConsoleCandidatesRouteImport
       parentRoute: typeof AdminConsoleRouteRoute
     }
+    '/admin/console/blockly': {
+      id: '/admin/console/blockly'
+      path: '/blockly'
+      fullPath: '/admin/console/blockly'
+      preLoaderRoute: typeof AdminConsoleBlocklyRouteImport
+      parentRoute: typeof AdminConsoleRouteRoute
+    }
     '/admin/console/segments/': {
       id: '/admin/console/segments/'
       path: '/segments'
@@ -463,6 +482,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminConsoleRouteRouteChildren {
+  AdminConsoleBlocklyRoute: typeof AdminConsoleBlocklyRoute
   AdminConsoleCandidatesRoute: typeof AdminConsoleCandidatesRoute
   AdminConsoleCollegesRoute: typeof AdminConsoleCollegesRoute
   AdminConsoleDashboardRoute: typeof AdminConsoleDashboardRoute
@@ -482,6 +502,7 @@ interface AdminConsoleRouteRouteChildren {
 }
 
 const AdminConsoleRouteRouteChildren: AdminConsoleRouteRouteChildren = {
+  AdminConsoleBlocklyRoute: AdminConsoleBlocklyRoute,
   AdminConsoleCandidatesRoute: AdminConsoleCandidatesRoute,
   AdminConsoleCollegesRoute: AdminConsoleCollegesRoute,
   AdminConsoleDashboardRoute: AdminConsoleDashboardRoute,
