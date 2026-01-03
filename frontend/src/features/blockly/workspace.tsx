@@ -1,7 +1,7 @@
 import './blocks'
 import './generators'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
 import { javascriptGenerator } from 'blockly/javascript'
 import { useQuery } from '@tanstack/react-query'
@@ -9,14 +9,14 @@ import pageantHierarchyQueryOptions from '../pageants/query-options/pageant-hier
 import { useSelectedPageant } from '../pageants/hooks/use-selected-pageant'
 import { generateCriterionLookup } from '../criteria/lib/generate-criterion-lookup'
 import { toolbox } from './toolbox'
-import { useCriterionDropdownStore } from './store/use-criterion-dropdown'
+import { useBlocklyStore } from './store/use-blockly-store'
 import { Button } from '@/components/ui/button'
 
 export default function Workspace() {
   const blocklyRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
 
-  const { setCriterionLookup } = useCriterionDropdownStore((state) => state)
+  const { setCriterionLookup } = useBlocklyStore((state) => state)
 
   const { data: selectedPageant, isLoading: isSelectedPageantLoading } =
     useSelectedPageant()

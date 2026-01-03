@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import { useCriterionDropdownStore } from './../store/use-criterion-dropdown'
+import { useBlocklyStore } from '../store/use-blockly-store'
 
 Blockly.defineBlocksWithJsonArray([
   {
@@ -24,7 +24,7 @@ Blockly.Extensions.register('criterion_dropdown_extension', function () {
     /*
     NOTE: This function runs whenever the dropdown is used!
     */
-    const { criterionLookup } = useCriterionDropdownStore.getState()
+    const { criterionLookup } = useBlocklyStore.getState()
     if (!criterionLookup) return [['Loading...', 'X']]
 
     const sortedCriteria = Object.values(criterionLookup).sort((a, b) => {
