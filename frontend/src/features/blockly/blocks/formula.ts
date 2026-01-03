@@ -8,7 +8,7 @@ Blockly.Blocks['formula_root'] = {
         {
           type: 'input_value',
           name: 'FORMULA_RESULT',
-          check: 'Number',
+          check: ['Number', 'String'],
         },
       ],
       colour: 200,

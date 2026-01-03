@@ -8,7 +8,7 @@ Blockly.defineBlocksWithJsonArray([
       {
         type: 'input_value',
         name: 'LEFT_VALUE',
-        check: 'Number',
+        check: ['Number', 'String'],
       },
       {
         type: 'field_dropdown',
@@ -24,7 +24,7 @@ Blockly.defineBlocksWithJsonArray([
       {
         type: 'input_value',
         name: 'RIGHT_VALUE',
-        check: 'Number',
+        check: ['Number', 'String'],
       },
     ],
     output: 'Number',
