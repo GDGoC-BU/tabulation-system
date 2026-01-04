@@ -122,9 +122,15 @@ export default function Workspace() {
   return (
     <div className="h-full relative">
       <div className="absolute top-4 right-4 z-[999] flex flex-col gap-4">
-        <Button onClick={generateCode}>Generate Code</Button>
-        <Button onClick={getTopBlocks}>Get top blocks</Button>
-        <Button onClick={getJSON}>Get JSON</Button>
+        <Button type="button" onClick={generateCode}>
+          Generate Code
+        </Button>
+        <Button type="button" onClick={getTopBlocks}>
+          Get top blocks
+        </Button>
+        <Button type="button" onClick={getJSON}>
+          Get JSON
+        </Button>
       </div>
       <div>blockly</div>
       <div ref={blocklyRef} className="h-full z-[998]" />
