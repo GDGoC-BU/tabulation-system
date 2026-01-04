@@ -132,7 +132,6 @@ export default function Workspace() {
           Get JSON
         </Button>
       </div>
-      <div>blockly</div>
       <div ref={blocklyRef} className="h-full z-[998]" />
     </div>
   )
