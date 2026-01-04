@@ -16,7 +16,10 @@ import { Button } from '@/components/ui/button'
 export default function Workspace({
   onFormulaChange,
 }: {
-  onFormulaChange?: (value: string) => void
+  onFormulaChange?: (formula: {
+    expression: string
+    serialized: { [key: string]: any }
+  }) => void
 }) {
   /* Refs to inject Blockly workspace*/
   const blocklyRef = useRef<HTMLDivElement | null>(null)
@@ -86,7 +89,8 @@ export default function Workspace({
     const workspace = workspaceRef.current
 
     /* Trigger the callback on workspace change
-    Note: This listener runs on ALL workspace changes. */
+    Note: This listener runs on ALL workspace changes.
+    Find a way to debounce this later or take a different approach */
     const onFormulaChangeListener = (event: Abstract) => {
       if (!onFormulaChange) return
       if (event.isUiEvent) return
@@ -105,15 +109,23 @@ export default function Workspace({
         .find((b) => b.type === 'formula_root')
       if (!formulaRootBlock) return
 
-      /* Initialize the code-generator and generate the code */
       javascriptGenerator.init(workspace)
+
+      /* Generate the code */
       const value = javascriptGenerator.blockToCode(formulaRootBlock, true)
       /* Output could be: 
       1) Values: [String, Order]
       2) Statements: String
       Only extract the final statement */
-      const formula = Array.isArray(value) ? 'Statement' : value
-      onFormulaChange(formula)
+      const formulaString = Array.isArray(value) ? 'Statement' : value
+
+      /* Serialize the workspace.
+      NOTE: This saves the whole state of the workspace,
+      even blocks not attached to formula_root. This feature can be
+      kept, or remove the other top blocks nad just keep formula_root. */
+      const json = Blockly.serialization.workspaces.save(workspace)
+
+      onFormulaChange({ expression: formulaString, serialized: json })
     }
     workspace.addChangeListener(onFormulaChangeListener)
 

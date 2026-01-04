@@ -12,8 +12,11 @@ export default function FormulaInput({
   const { field } = useController({ name, control })
   const formula = useWatch({ name, control }) || ''
 
-  const onFormulaChange = (value: string) => {
-    console.log('Formula: ', value)
+  const onFormulaChange = (f: {
+    expression: string
+    serialized: { [key: string]: any }
+  }) => {
+    console.log('Formula: ', f)
   }
 
   return (
