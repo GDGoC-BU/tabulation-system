@@ -7,7 +7,7 @@ import Table from '@/components/table'
 import { TextBody } from '@/components/text'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
-import FormulaRenderer from '@/features/formula/components/formula-renderer'
+import FormulaRenderer from '@/features/formula/deprecated-components/formula-renderer'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
 import segmentsQueryOptions from '@/features/segments/query-options/segments-query-options'
 

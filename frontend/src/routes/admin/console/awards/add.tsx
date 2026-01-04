@@ -95,19 +95,22 @@ function AdminConsoleAwardsAdd() {
         </Console.Header.Title>
       </Console.Header>
       <Console.Content>
-        <div className="">
+        <div className="h-full">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="gap-4 flex h-full flex-col"
+            >
               <div className="grid grid-cols-2 gap-4">
                 {NameFormField}
                 {CandidateLimitFormField}
               </div>
-              <div className="">
+              <div className="grow">
                 <FormField
                   control={form.control}
                   name="formula"
                   render={() => (
-                    <FormItem>
+                    <FormItem className="flex flex-col h-full">
                       <FormLabel>Formula</FormLabel>
                       <FormMessage className="" />
                       <FormulaInput name="formula" control={form.control} />

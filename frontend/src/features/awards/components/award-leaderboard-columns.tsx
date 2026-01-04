@@ -1,4 +1,4 @@
-import BreakdownRenderer from '../../formula/components/breakdown-renderer'
+import BreakdownRenderer from '../../formula/deprecated-components/breakdown-renderer'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { AwardLeaderboardSummary } from '../schemas'
 import { TextBody } from '@/components/text'

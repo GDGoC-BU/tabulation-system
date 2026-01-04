@@ -9,7 +9,7 @@ Blockly.defineBlocksWithJsonArray([
       {
         type: 'field_dropdown',
         name: 'CRITERION',
-        options: [['Loading...', 'X']],
+        options: [['Dummy option, cant pass empty array or null.', 'X']],
       },
     ],
     output: 'String',
@@ -21,49 +21,18 @@ Blockly.defineBlocksWithJsonArray([
 Blockly.Extensions.register('criterion_dropdown_extension', function () {
   // @ts-ignore. Code below is pulled from blockly documention. Find a way to make it typesafe
   this.getField('CRITERION').setOptions(function () {
-    /*
-    NOTE: This function runs whenever the dropdown is used!
-    */
-    const { criterionLookup } = useBlocklyStore.getState()
-    if (!criterionLookup) return [['Loading...', 'X']]
+    /* NOTE: This function runs whenever the dropdown is used! */
+    const { criterionDropdownOptions } = useBlocklyStore.getState()
 
-    const sortedCriteria = Object.values(criterionLookup).sort((a, b) => {
-      if (a.phase.sequence !== b.phase.sequence) {
-        return a.phase.sequence - b.phase.sequence
-      }
-      return a.segment.sequence - b.segment.sequence
-    })
+    let options = null
+    if (criterionDropdownOptions === null) {
+      options = [['Loading criterions', 'X']]
+    } else if (criterionDropdownOptions.length === 0) {
+      options = [['No criterions available', 'X']]
+    } else {
+      options = criterionDropdownOptions
+    }
 
-    const options: Array<[string, string] | 'separator'> = []
-    let currentSequence: null | number = null
-
-    sortedCriteria.forEach((criterion) => {
-      /* Add separator after each segment */
-      if (!currentSequence) {
-        currentSequence = criterion.segment.sequence
-      }
-      if (currentSequence != criterion.segment.sequence) {
-        options.push('separator')
-        currentSequence = criterion.segment.sequence
-      }
-
-      options.push([
-        `${criterion.phase.name} / ${criterion.segment.name} / ${criterion.criterion.name}`,
-        `${criterion.criterion.id}`,
-      ])
-    })
     return options
   })
 })
-
-/*
-Blockly.Extensions.register('criterion_dropdown_extension', function () {
-  this.getField('CRITERION').setOptions(function () {
-    const options: Array<[string, string]> = []
-    dummyCriteria.forEach((criterion) => {
-      options.push([criterion.name, criterion.id])
-    })
-    return options
-  })
-})
-*/
