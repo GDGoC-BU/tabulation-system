@@ -10,9 +10,14 @@ import { useSelectedPageant } from '../pageants/hooks/use-selected-pageant'
 import { generateCriterionLookup } from '../criteria/lib/generate-criterion-lookup'
 import { toolbox } from './toolbox'
 import { useBlocklyStore } from './store/use-blockly-store'
+import type { Abstract } from 'node_modules/blockly/core/events/events_abstract'
 import { Button } from '@/components/ui/button'
 
-export default function Workspace() {
+export default function Workspace({
+  onFormulaChange,
+}: {
+  onFormulaChange?: (value: string) => void
+}) {
   /* Refs to inject Blockly workspace*/
   const blocklyRef = useRef<HTMLDivElement | null>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
@@ -67,46 +72,76 @@ export default function Workspace() {
   }, [pageantHierarchy])
 
   useEffect(() => {
-    /* If workspace div hasnt mounted */
+    /* If workspace div hasn't mounted */
     if (!blocklyRef.current) return
     /* If workspace has already been injected */
     if (workspaceRef.current) return
 
+    /* Inject the workspace */
     workspaceRef.current = Blockly.inject(blocklyRef.current, {
       toolbox,
       trashcan: true,
       scrollbars: true,
     })
-    Blockly.serialization.blocks.append(
-      { type: 'formula_root' },
-      workspaceRef.current,
-    )
+    const workspace = workspaceRef.current
+
+    /* Trigger the callback on workspace change
+    Note: This listener runs on ALL workspace changes. */
+    const onFormulaChangeListener = (event: Abstract) => {
+      if (!onFormulaChange) return
+      if (event.isUiEvent) return
+      if (
+        event.type !== Blockly.Events.BLOCK_CHANGE &&
+        event.type !== Blockly.Events.BLOCK_MOVE &&
+        event.type !== Blockly.Events.BLOCK_CREATE &&
+        event.type !== Blockly.Events.BLOCK_DELETE
+      ) {
+        return
+      }
+
+      /* Get the formula_root */
+      const formulaRootBlock = workspace
+        .getTopBlocks(false)
+        .find((b) => b.type === 'formula_root')
+      if (!formulaRootBlock) return
+
+      /* Initialize the code-generator and generate the code */
+      javascriptGenerator.init(workspace)
+      const value = javascriptGenerator.blockToCode(formulaRootBlock, true)
+      /* Output could be: 
+      1) Values: [String, Order]
+      2) Statements: String
+      Only extract the final statement */
+      const formula = Array.isArray(value) ? 'Statement' : value
+      onFormulaChange(formula)
+    }
+    workspace.addChangeListener(onFormulaChangeListener)
+
+    /* Append the root level formula block */
+    Blockly.serialization.blocks.append({ type: 'formula_root' }, workspace)
 
     return () => {
-      workspaceRef.current?.dispose()
+      workspace.dispose()
+      workspace.removeChangeListener(onFormulaChangeListener)
       workspaceRef.current = null
     }
   }, [])
 
   const generateCode = () => {
     if (!workspaceRef.current) return ''
-
     const code = javascriptGenerator.workspaceToCode(workspaceRef.current)
-
     console.log(code)
     return code
   }
 
   const getTopBlocks = () => {
     if (!workspaceRef.current) return
-
     const root = workspaceRef.current.getTopBlocks(true)
     console.log(root)
   }
 
   const getJSON = () => {
     if (!workspaceRef.current) return
-
     const json = Blockly.serialization.workspaces.save(workspaceRef.current)
     console.log(json)
   }

@@ -12,9 +12,13 @@ export default function FormulaInput({
   const { field } = useController({ name, control })
   const formula = useWatch({ name, control }) || ''
 
+  const onFormulaChange = (value: string) => {
+    console.log('Formula: ', value)
+  }
+
   return (
     <div className="grow">
-      <Workspace />
+      <Workspace onFormulaChange={onFormulaChange} />
     </div>
   )
 }
