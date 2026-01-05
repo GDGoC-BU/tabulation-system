@@ -1,5 +1,6 @@
 import { useController } from 'react-hook-form'
 import type { Control } from 'react-hook-form'
+import type { Formula } from '../schemas'
 import Workspace from '@/features/blockly/workspace'
 
 export default function FormulaInput({
@@ -11,11 +12,8 @@ export default function FormulaInput({
 }) {
   const { field } = useController({ name, control })
 
-  const onFormulaChange = (f: {
-    text: string
-    serialized: { [key: string]: any }
-  }) => {
-    field.onChange({ text: f.text, serialized: f.serialized })
+  const onFormulaChange = (formula: Formula) => {
+    field.onChange({ text: formula.text, workspace: formula.workspace })
   }
 
   return (

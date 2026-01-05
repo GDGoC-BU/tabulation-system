@@ -11,15 +11,13 @@ import { generateCriterionLookup } from '../criteria/lib/generate-criterion-look
 import { toolbox } from './toolbox'
 import { useBlocklyStore } from './store/use-blockly-store'
 import type { Abstract } from 'node_modules/blockly/core/events/events_abstract'
+import type { Formula } from '../formula/schemas'
 import { Button } from '@/components/ui/button'
 
 export default function Workspace({
   onFormulaChange,
 }: {
-  onFormulaChange?: (formula: {
-    text: string
-    serialized: { [key: string]: any }
-  }) => void
+  onFormulaChange?: (formula: Formula) => void
 }) {
   /* Refs to inject Blockly workspace*/
   const blocklyRef = useRef<HTMLDivElement | null>(null)
@@ -125,7 +123,7 @@ export default function Workspace({
       kept, or remove the other top blocks nad just keep formula_root. */
       const json = Blockly.serialization.workspaces.save(workspace)
 
-      onFormulaChange({ text: formulaText, serialized: json })
+      onFormulaChange({ text: formulaText, workspace: json })
     }
     workspace.addChangeListener(onFormulaChangeListener)
 

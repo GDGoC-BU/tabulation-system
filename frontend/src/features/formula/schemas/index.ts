@@ -5,5 +5,6 @@ export const formulaSchema = z.object({
   text: z.string().min(1, {
     message: 'Formula is required',
   }),
-  serialized: jsonSchema,
+  workspace: jsonSchema,
 })
+export type Formula = z.infer<typeof formulaSchema>

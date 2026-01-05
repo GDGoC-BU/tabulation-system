@@ -37,7 +37,7 @@ function AdminConsoleAwardsAdd() {
       candidateLimit: '',
       formula: {
         text: '',
-        serialized: {},
+        workspace: {},
       },
     },
   })
