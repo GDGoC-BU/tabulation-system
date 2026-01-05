@@ -1,6 +1,7 @@
 import z from 'zod'
 import { candidateSummarySchema } from '@/features/candidates/schemas'
 import { criteriaBreakdownSchema } from '@/schemas'
+import { formulaSchema } from '@/features/formula/schemas'
 
 export const awardLeaderboardSummarySchema = z.object({
   id: z.string(),
@@ -46,9 +47,7 @@ export const awardAddFormSchema = z.object({
     .min(1, {
       message: 'Enter how many candidates will get this award',
     }),
-  formula: z.string().min(1, {
-    error: 'Formula is required',
-  }),
+  formula: formulaSchema,
 })
 export type AwardAddForm = z.infer<typeof awardAddFormSchema>
 

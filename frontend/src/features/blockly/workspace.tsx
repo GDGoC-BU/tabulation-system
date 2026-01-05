@@ -17,7 +17,7 @@ export default function Workspace({
   onFormulaChange,
 }: {
   onFormulaChange?: (formula: {
-    expression: string
+    text: string
     serialized: { [key: string]: any }
   }) => void
 }) {
@@ -117,7 +117,7 @@ export default function Workspace({
       1) Values: [String, Order]
       2) Statements: String
       Only extract the final statement */
-      const formulaString = Array.isArray(value) ? 'Statement' : value
+      const formulaText = Array.isArray(value) ? 'Statement' : value
 
       /* Serialize the workspace.
       NOTE: This saves the whole state of the workspace,
@@ -125,7 +125,7 @@ export default function Workspace({
       kept, or remove the other top blocks nad just keep formula_root. */
       const json = Blockly.serialization.workspaces.save(workspace)
 
-      onFormulaChange({ expression: formulaString, serialized: json })
+      onFormulaChange({ text: formulaText, serialized: json })
     }
     workspace.addChangeListener(onFormulaChangeListener)
 

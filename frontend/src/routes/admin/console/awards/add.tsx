@@ -35,7 +35,10 @@ function AdminConsoleAwardsAdd() {
     defaultValues: {
       name: '',
       candidateLimit: '',
-      formula: '',
+      formula: {
+        text: '',
+        serialized: {},
+      },
     },
   })
 
@@ -108,16 +111,19 @@ function AdminConsoleAwardsAdd() {
               <div className="grow">
                 <FormField
                   control={form.control}
-                  name="formula"
+                  /* Error message is determined from formula.text, bind <FormulaMessage/> to it */
+                  name="formula.text"
                   render={() => (
                     <FormItem className="flex flex-col h-full">
                       <FormLabel>Formula</FormLabel>
                       <FormMessage className="" />
+                      {/* Actual formula object is still being targeted here */}
                       <FormulaInput name="formula" control={form.control} />
                     </FormItem>
                   )}
                 />
               </div>
+              {/* Server side error */}
               {/* {isError && <TextSub className="text-destructive">{error}</TextSub>} */}
               <div className="flex flex-row gap-4">
                 <Button type="button" variant="outline">

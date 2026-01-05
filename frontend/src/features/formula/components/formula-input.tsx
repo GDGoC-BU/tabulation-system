@@ -1,4 +1,4 @@
-import { useController, useWatch } from 'react-hook-form'
+import { useController } from 'react-hook-form'
 import type { Control } from 'react-hook-form'
 import Workspace from '@/features/blockly/workspace'
 
@@ -10,13 +10,12 @@ export default function FormulaInput({
   control: Control<any>
 }) {
   const { field } = useController({ name, control })
-  const formula = useWatch({ name, control }) || ''
 
   const onFormulaChange = (f: {
-    expression: string
+    text: string
     serialized: { [key: string]: any }
   }) => {
-    console.log('Formula: ', f)
+    field.onChange({ text: f.text, serialized: f.serialized })
   }
 
   return (

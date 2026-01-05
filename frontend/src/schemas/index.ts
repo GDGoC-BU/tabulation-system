@@ -24,6 +24,25 @@ export const honorificSchema = z.enum([
 ])
 export type Honorific = z.infer<typeof honorificSchema>
 
+type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | Array<Json>
+  | { [key: string]: Json }
+
+export const jsonSchema: z.ZodType<Json> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.null(),
+    z.array(jsonSchema),
+    z.record(z.string(), jsonSchema),
+  ]),
+)
+
 export const criteriaBreakdownSchema = z.object({
   /* NOTE: Move the individual fields to their respective schema fiels in features.
      But beware of the cyclic dependencies. */
