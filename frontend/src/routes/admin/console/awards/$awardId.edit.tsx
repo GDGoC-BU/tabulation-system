@@ -1,10 +1,9 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import type { AwardEditForm } from '@/features/awards/schemas'
-import { useAwardQuery } from '@/features/awards/hooks/use-award-query'
 import {
   Form,
   FormControl,
@@ -18,23 +17,32 @@ import { Button } from '@/components/ui/button'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import { awardEditFormSchema } from '@/features/awards/schemas'
 import Console from '@/components/console'
-import FormulaInput from '@/features/formula/deprecated-components/formula-input'
+import FormulaInput from '@/features/formula/components/formula-input'
 import { TextSub } from '@/components/text'
 import useEditAwardMutate from '@/features/awards/hooks/use-edit-award-mutate'
 import Loading from '@/components/loading'
+import awardQueryOptions from '@/features/awards/query-options/award-query-options'
 
 export const Route = createFileRoute('/admin/console/awards/$awardId/edit')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { awardId } = Route.useParams()
-  const { data: award } = useAwardQuery(awardId)
-  const { mutateAsync: editAward, error } = useEditAwardMutate()
-  const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { mutateAsync: editAward, error } = useEditAwardMutate()
 
-  const { data: selectedPageant, isLoading } = useSelectedPageant()
+  /* Check if a pageant is selecteed */
+  const { data: selectedPageant, isLoading: isSelectedPageantLoading } =
+    useSelectedPageant()
+  /* Get award id */
+  const { awardId } = Route.useParams()
+  /* Fetch award details if pageant is selected */
+  const { data: award, isLoading: isAwardLoading } = useQuery(
+    awardQueryOptions(awardId, {
+      enabled: !!selectedPageant,
+    }),
+  )
 
   const form = useForm({
     resolver: zodResolver(awardEditFormSchema),
@@ -42,10 +50,14 @@ function RouteComponent() {
       id: '',
       name: '',
       candidateLimit: '',
-      formula: '',
+      formula: {
+        text: '',
+        workspace: {},
+      },
     },
   })
 
+  /* When the Award data arrives, set the form values */
   useEffect(() => {
     if (!award) return
     form.reset({
@@ -62,7 +74,7 @@ function RouteComponent() {
     })
   }
 
-  if (isLoading) {
+  if (isSelectedPageantLoading || isAwardLoading) {
     return (
       <div className="p-4">
         <Loading />
@@ -124,22 +136,31 @@ function RouteComponent() {
         <Console.Header.Title>Editing {award?.name}</Console.Header.Title>
       </Console.Header>
       <Console.Content>
-        <div className="">
+        <div className="h-full">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="gap-4 flex h-full flex-col"
+            >
               <div className="grid grid-cols-2 gap-4">
                 {NameFormField}
                 {CandidateLimitFormField}
               </div>
-              <div className="">
+              <div className="grow">
                 <FormField
                   control={form.control}
-                  name="formula"
+                  /* Error message is determined from formula.text, bind <FormulaMessage/> to it */
+                  name="formula.text"
                   render={() => (
-                    <FormItem>
+                    <FormItem className="flex flex-col h-full">
                       <FormLabel>Formula</FormLabel>
                       <FormMessage className="" />
-                      <FormulaInput name="formula" control={form.control} />
+                      {/* Actual formula object is still being targeted here */}
+                      <FormulaInput
+                        initialFormula={award?.formula}
+                        name="formula"
+                        control={form.control}
+                      />
                     </FormItem>
                   )}
                 />
