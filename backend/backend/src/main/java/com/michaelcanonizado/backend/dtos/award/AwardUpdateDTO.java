@@ -13,7 +13,7 @@ public record AwardUpdateDTO(
         @Min(value = 1, message = ">= 1")
         int candidateLimit,
 
-        @NotBlank(message = "required")
+        @NotNull(message = "required")
         Formula formula
 ) {
 }
