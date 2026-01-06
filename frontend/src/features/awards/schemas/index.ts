@@ -20,7 +20,7 @@ export const awardSummarySchema = z.object({
   id: z.string(),
   name: z.string(),
   candidateLimit: z.int(),
-  formula: z.string(),
+  formula: formulaSchema,
 })
 export type AwardSummary = z.infer<typeof awardSummarySchema>
 
@@ -28,7 +28,7 @@ export const awardDetailedSchema = z.object({
   id: z.string(),
   name: z.string(),
   candidateLimit: z.int(),
-  formula: z.string(),
+  formula: formulaSchema,
   leaderboard: awardLeaderboardsSchema,
 })
 export type AwardDetailed = z.infer<typeof awardDetailedSchema>
@@ -65,8 +65,6 @@ export const awardEditFormSchema = z.object({
     .min(1, {
       message: 'Enter how many candidates will get this award',
     }),
-  formula: z.string().min(1, {
-    error: 'Formula is required',
-  }),
+  formula: formulaSchema,
 })
 export type AwardEditForm = z.infer<typeof awardEditFormSchema>

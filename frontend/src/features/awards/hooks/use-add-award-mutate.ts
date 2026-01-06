@@ -12,8 +12,7 @@ export default function useAddAwardMutate() {
           candidateLimit: data.candidateLimit,
           formula: data.formula,
         }
-        console.log('Body: ', body)
-        // await api.post(`/awards`, body)
+        await api.post(`/awards`, body)
         return true
       } catch (error) {
         throw errorResolver(error)

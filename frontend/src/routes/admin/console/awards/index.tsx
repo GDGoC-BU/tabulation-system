@@ -54,7 +54,7 @@ function AdminConsoleAwards() {
         /* Really patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
         formula: (
           <FormulaRenderer
-            formula={rawFormula}
+            formula={rawFormula.text}
             criterionLookup={criterionLookup}
           />
         ),
