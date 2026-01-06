@@ -1,11 +1,9 @@
 package com.michaelcanonizado.backend.dtos.award;
 
-import com.michaelcanonizado.backend.models.CandidateGender;
+import com.michaelcanonizado.backend.models.Formula;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
 
 public record AwardCreateDTO(
         @NotBlank(message = "required")
@@ -15,7 +13,7 @@ public record AwardCreateDTO(
         @Min(value = 1, message = ">= 1")
         int candidateLimit,
 
-        @NotBlank(message = "required")
-        String formula
+        @NotNull(message = "required")
+        Formula formula
 ) {
 }

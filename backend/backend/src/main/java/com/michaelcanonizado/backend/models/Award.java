@@ -29,8 +29,8 @@ public class Award {
     @Column(nullable = false)
     private int candidateLimit;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String formula;
+    @Embedded
+    private Formula formula;
 
     @JsonBackReference
     @ManyToOne(
@@ -48,7 +48,7 @@ public class Award {
     )
     private List<AwardLeaderboard> leaderboard = new ArrayList<>();
 
-    public Award(String name, int candidateLimit, String formula, Pageant pageant) {
+    public Award(String name, int candidateLimit, Formula formula, Pageant pageant) {
         this.name = name;
         this.candidateLimit = candidateLimit;
         this.formula = formula;
