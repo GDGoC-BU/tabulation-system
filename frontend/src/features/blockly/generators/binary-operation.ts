@@ -1,6 +1,6 @@
 import { Order, javascriptGenerator } from 'blockly/javascript'
 
-javascriptGenerator.forBlock['arithmetic'] = function (block, generator) {
+javascriptGenerator.forBlock['binary_operation'] = function (block, generator) {
   const OPERATORS = {
     ADD: { label: '+', order: Order.ADDITION },
     MINUS: { label: '-', order: Order.SUBTRACTION },
