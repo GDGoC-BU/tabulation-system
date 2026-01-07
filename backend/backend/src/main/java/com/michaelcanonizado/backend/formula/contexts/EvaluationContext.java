@@ -1,6 +1,6 @@
 package com.michaelcanonizado.backend.formula.contexts;
 
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.functions.FunctionRegistry;
+import com.michaelcanonizado.backend.formula.functions.FunctionRegistry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

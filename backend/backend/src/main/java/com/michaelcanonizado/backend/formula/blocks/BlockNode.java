@@ -1,9 +1,9 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.contexts.EvaluationContext;
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.contexts.TypeContext;
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.values.Value;
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.values.ValueType;
+import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
+import com.michaelcanonizado.backend.formula.contexts.TypeContext;
+import com.michaelcanonizado.backend.formula.values.Value;
+import com.michaelcanonizado.backend.formula.values.ValueType;
 
 /* Models a Block. Each block must implement its own BlockNode,
 * defining their inputs, operations, and outputs. If the block acts

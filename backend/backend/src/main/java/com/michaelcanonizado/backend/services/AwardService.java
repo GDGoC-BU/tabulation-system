@@ -1,34 +1,24 @@
 package com.michaelcanonizado.backend.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.award.AwardDetailedDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardCreateDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
-import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
-import com.michaelcanonizado.backend.dtos.phase.PhaseBreakdownDTO;
-import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
-import com.michaelcanonizado.backend.dtos.segment.SegmentBreakdownDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
+import com.michaelcanonizado.backend.formula.FormulaTreeBuilder;
 import com.michaelcanonizado.backend.mappers.*;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.contexts.PageantContext;
-import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import com.michaelcanonizado.backend.utilities.FormulaEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class AwardService {
@@ -76,6 +66,9 @@ public class AwardService {
 
     @Autowired
     private FormulaEncoder formulaEncoder;
+
+    @Autowired
+    private FormulaTreeBuilder formulaTreeBuilder;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,

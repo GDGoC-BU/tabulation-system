@@ -1,10 +1,10 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.contexts.EvaluationContext;
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.contexts.TypeContext;
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.values.NumberValue;
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.values.Value;
-import com.michaelcanonizado.GDGoCTabulationSandbox.formula.values.ValueType;
+import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
+import com.michaelcanonizado.backend.formula.contexts.TypeContext;
+import com.michaelcanonizado.backend.formula.values.NumberValue;
+import com.michaelcanonizado.backend.formula.values.Value;
+import com.michaelcanonizado.backend.formula.values.ValueType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
