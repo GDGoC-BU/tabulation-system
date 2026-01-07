@@ -80,7 +80,7 @@ function RouteComponent() {
             <div className="flex flex-row gap-2">
               <TextBody>Formula: </TextBody>
               <FormulaRenderer
-                formula={awardResult?.formula ?? ''}
+                formula={awardResult?.formula.text ?? ''}
                 criterionLookup={criterionLookup}
               />
             </div>
@@ -94,7 +94,7 @@ function RouteComponent() {
                 columns={awardLeadboardTableColumns}
                 data={groupA}
                 limit={awardResult?.candidateLimit ?? 0}
-                formula={awardResult?.formula ?? ''}
+                formula={awardResult?.formula.text ?? ''}
               />
             </div>
             <div className="flex flex-col gap-2 mt-8">
@@ -105,7 +105,7 @@ function RouteComponent() {
                 columns={awardLeadboardTableColumns}
                 data={groupB}
                 limit={awardResult?.candidateLimit ?? 0}
-                formula={awardResult?.formula ?? ''}
+                formula={awardResult?.formula.text ?? ''}
               />
             </div>
           </div>
