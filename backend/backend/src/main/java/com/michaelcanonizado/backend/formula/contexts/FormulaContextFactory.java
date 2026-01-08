@@ -4,7 +4,10 @@ import com.michaelcanonizado.backend.formula.functions.FunctionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class FormulaContextFactory {
@@ -12,11 +15,13 @@ public class FormulaContextFactory {
     private FunctionRegistry functionRegistry;
 
     public EvaluationContext createEvaluationContext(
-            MathContext mathContext
+            MathContext mathContext,
+            Map<UUID, BigDecimal> criterionScores
     ) {
         return new EvaluationContext(
                 mathContext,
-                functionRegistry
+                functionRegistry,
+                criterionScores
         );
     }
 

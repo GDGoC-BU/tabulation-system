@@ -4,7 +4,10 @@ import com.michaelcanonizado.backend.formula.functions.FunctionRegistry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Map;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Getter
@@ -18,4 +21,5 @@ import java.math.MathContext;
 public final class EvaluationContext {
     private final MathContext mathContext;
     private final FunctionRegistry functionRegistry;
+    private final Map<UUID, BigDecimal> criterionScores;
 }

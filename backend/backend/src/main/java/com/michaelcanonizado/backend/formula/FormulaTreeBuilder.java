@@ -3,13 +3,13 @@ package com.michaelcanonizado.backend.formula;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.FormulaTreeException;
-import com.michaelcanonizado.backend.formula.blocks.BinaryOperationNode;
-import com.michaelcanonizado.backend.formula.blocks.BinaryOperator;
-import com.michaelcanonizado.backend.formula.blocks.BlockNode;
-import com.michaelcanonizado.backend.formula.blocks.NumberLiteralNode;
+import com.michaelcanonizado.backend.formula.blocks.*;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Component
 public class FormulaTreeBuilder {
@@ -21,12 +21,21 @@ public class FormulaTreeBuilder {
         );
     }
 
-    private BlockNode parseCriterionDropdown(JsonNode block) {
-        String criterionId = block.get("fields").get("CRITERION").asText();
-        return new NumberLiteralNode(new BigDecimal("0"));
+    private BlockNode parseCriterionDropdown(JsonNode block, Set<UUID> criterionIdCollector) {
+        String criterionId = block.get("fields").get("CRITERION").asText().trim();
+        try {
+            UUID criterionUUID = UUID.fromString(criterionId);
+            criterionIdCollector.add(criterionUUID);
+            return new CriterionNode(criterionUUID);
+        } catch (Exception e) {
+            throw new FormulaTreeException(
+                    "Error building Formula Tree. Cannot convert \"" + criterionId + "\" to a UUID",
+                    ErrorCode.FORMULA_TREE_BUILDING_ERROR
+            );
+        }
     }
 
-    private BlockNode parseBinaryOperation(JsonNode block) {
+    private BlockNode parseBinaryOperation(JsonNode block, Set<UUID> criterionIdCollector) {
         /* Recursively convert the left and right blockly block */
         JsonNode leftBlock = block
                 .get("inputs")
@@ -53,20 +62,20 @@ public class FormulaTreeBuilder {
         };
 
         return new BinaryOperationNode(
-                buildBlock(leftBlock),
+                buildBlock(leftBlock, criterionIdCollector),
                 operator,
-                buildBlock(rightBlock)
+                buildBlock(rightBlock, criterionIdCollector)
         );
     }
 
-    private BlockNode buildBlock(JsonNode block) {
+    private BlockNode buildBlock(JsonNode block, Set<UUID> criterionIdCollector) {
         /* Recursively convert each blockly block to a BlockNode */
         String blockType = block.get("type").asText();
 
         return switch (blockType) {
             case "number_literal" -> parseNumberLiteral(block);
-            case "criterion_dropdown" -> parseCriterionDropdown(block);
-            case "binary_operation" -> parseBinaryOperation(block);
+            case "criterion_dropdown" -> parseCriterionDropdown(block, criterionIdCollector);
+            case "binary_operation" -> parseBinaryOperation(block, criterionIdCollector);
             default -> throw new FormulaTreeException(
                     "Can't determine BlockNode for blocky block: " + blockType,
                     ErrorCode.FORMULA_TREE_BUILDING_ERROR
@@ -75,7 +84,7 @@ public class FormulaTreeBuilder {
 
     }
 
-    public BlockNode build(JsonNode serializedBlocklyWorkspace) {
+    public FormulaTree build(JsonNode serializedBlocklyWorkspace) {
         try {
             /* Directly read from the JsonNode serialized workspace to avoid writing verbose
             classes to deserialize it to java classes. */
@@ -99,8 +108,13 @@ public class FormulaTreeBuilder {
             /* Get the block connected to "formula_root", this will be the root of the formula tree */
             JsonNode formulaInput = blocklyFormulaRoot.get("inputs").get("FORMULA_RESULT").get("block");
 
+            Set<UUID> criterionIdCollector = new HashSet<>();
+
             /* Recursively build the formula tree */
-            return buildBlock(formulaInput);
+            return new FormulaTree(
+                    buildBlock(formulaInput, criterionIdCollector),
+                    criterionIdCollector
+            );
         }
         /* Catches JsonNode and the custom class exceptions in the /formula package */
         catch (Exception e) {
