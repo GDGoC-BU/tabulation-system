@@ -13,67 +13,66 @@ import java.math.BigDecimal;
 
 @Component
 public class FormulaTreeBuilder {
+    private BlockNode parseNumberLiteral(JsonNode block) {
+        return new NumberLiteralNode(
+                new BigDecimal(
+                        block.get("fields").get("VALUE").asText()
+                )
+        );
+    }
+
+    private BlockNode parseCriterionDropdown(JsonNode block) {
+        String criterionId = block.get("fields").get("CRITERION").asText();
+        return new NumberLiteralNode(new BigDecimal("0"));
+    }
+
+    private BlockNode parseBinaryOperation(JsonNode block) {
+        /* Recursively convert the left and right blockly block */
+        JsonNode leftBlock = block
+                .get("inputs")
+                .get("LEFT_VALUE")
+                .get("block");
+        JsonNode rightBlock = block
+                .get("inputs")
+                .get("RIGHT_VALUE")
+                .get("block");
+
+        /* Convert the operation */
+        String operatorString = block.get("fields").get("OPERATOR").asText();
+        BinaryOperator operator = switch (operatorString) {
+            case "ADD" -> BinaryOperator.ADD;
+            case "SUBTRACT" -> BinaryOperator.SUBTRACT;
+            case "MULTIPLY" -> BinaryOperator.MULTIPLY;
+            case "DIVIDE" -> BinaryOperator.DIVIDE;
+            default -> {
+                throw new FormulaTreeException(
+                        "Unknown binary_operation operator: " + operatorString,
+                        ErrorCode.FORMULA_TREE_BUILDING_ERROR
+                );
+            }
+        };
+
+        return new BinaryOperationNode(
+                buildBlock(leftBlock),
+                operator,
+                buildBlock(rightBlock)
+        );
+    }
+
     private BlockNode buildBlock(JsonNode block) {
         /* Recursively convert each blockly block to a BlockNode */
         String blockType = block.get("type").asText();
 
-        /* number_literal */
-        switch (blockType) {
-            case "number_literal" -> {
-                return new NumberLiteralNode(
-                        new BigDecimal(
-                                block.get("fields").get("VALUE").asText()
-                        )
-                );
-            }
+        return switch (blockType) {
+            case "number_literal" -> parseNumberLiteral(block);
+            case "criterion_dropdown" -> parseCriterionDropdown(block);
+            case "binary_operation" -> parseBinaryOperation(block);
+            default -> throw new FormulaTreeException(
+                    "Can't determine BlockNode for blocky block: " + blockType,
+                    ErrorCode.FORMULA_TREE_BUILDING_ERROR
+            );
+        };
 
-
-            /* criterion_dropdown */
-            case "criterion_dropdown" -> {
-                String criterionId = block.get("fields").get("CRITERION").asText();
-                return new NumberLiteralNode(new BigDecimal("0"));
-            }
-
-
-            /* binary_operation */
-            case "binary_operation" -> {
-                /* Recursively convert the left and right blockly block */
-                JsonNode leftBlock = block
-                        .get("inputs")
-                        .get("LEFT_VALUE")
-                        .get("block");
-                JsonNode rightBlock = block
-                        .get("inputs")
-                        .get("RIGHT_VALUE")
-                        .get("block");
-
-                /* Convert the operation */
-                String operatorString = block.get("fields").get("OPERATOR").asText();
-                BinaryOperator operator = switch (operatorString) {
-                    case "ADD" -> BinaryOperator.ADD;
-                    case "SUBTRACT" -> BinaryOperator.SUBTRACT;
-                    case "MULTIPLY" -> BinaryOperator.MULTIPLY;
-                    case "DIVIDE" -> BinaryOperator.DIVIDE;
-                    default -> {
-                        throw new FormulaTreeException(
-                                "Unknown binary_operation operator: " + operatorString,
-                                ErrorCode.FORMULA_TREE_BUILDING_ERROR
-                        );
-                    }
-                };
-
-                return new BinaryOperationNode(
-                        buildBlock(leftBlock),
-                        operator,
-                        buildBlock(rightBlock)
-                );
-            }
-        }
-
-        throw new FormulaTreeException(
-                "Can't determine BlockNode for blocky block: " + blockType,
-                ErrorCode.FORMULA_TREE_BUILDING_ERROR
-        );
     }
 
     public BlockNode build(JsonNode serializedBlocklyWorkspace) {
