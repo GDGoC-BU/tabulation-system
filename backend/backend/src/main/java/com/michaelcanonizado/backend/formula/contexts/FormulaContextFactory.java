@@ -16,12 +16,12 @@ public class FormulaContextFactory {
 
     public EvaluationContext createEvaluationContext(
             MathContext mathContext,
-            Map<UUID, BigDecimal> criterionScores
+            Map<UUID, BigDecimal> criteriaValues
     ) {
         return new EvaluationContext(
                 mathContext,
                 functionRegistry,
-                criterionScores
+                criteriaValues
         );
     }
 

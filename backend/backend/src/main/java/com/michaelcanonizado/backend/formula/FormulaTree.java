@@ -11,5 +11,5 @@ import java.util.UUID;
 @Getter
 public class FormulaTree {
     private BlockNode formulaNode;
-    private Set<UUID> criterionsInFormula;
+    private Set<UUID> criterionIdsInFormula;
 }

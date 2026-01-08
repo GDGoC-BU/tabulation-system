@@ -44,7 +44,8 @@ export default function BreakdownRenderer({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Badge key={index} variant="outline" className="">
-                  {averageScore.toFixed(5)}
+                  {averageScore}
+                  {/* {averageScore.toFixed(5)} */}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent className="flex flex-col items-center gap-4 p-4">

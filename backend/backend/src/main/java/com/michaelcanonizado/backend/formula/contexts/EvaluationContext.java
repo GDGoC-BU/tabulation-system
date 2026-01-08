@@ -21,5 +21,5 @@ import java.util.UUID;
 public final class EvaluationContext {
     private final MathContext mathContext;
     private final FunctionRegistry functionRegistry;
-    private final Map<UUID, BigDecimal> criterionScores;
+    private final Map<UUID, BigDecimal> criteriaValues;
 }

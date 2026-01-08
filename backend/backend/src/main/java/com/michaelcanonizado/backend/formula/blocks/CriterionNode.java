@@ -16,7 +16,7 @@ public class CriterionNode implements BlockNode {
 
     @Override
     public Value evaluate(EvaluationContext context) {
-        BigDecimal score = context.getCriterionScores().get(id);
+        BigDecimal score = context.getCriteriaValues().get(id);
 
         if (score == null) {
 //            score is not in the criterionScore map
