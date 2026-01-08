@@ -9,6 +9,11 @@ import com.michaelcanonizado.backend.dtos.award.AwardUpdateDTO;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.formula.FormulaTreeBuilder;
+import com.michaelcanonizado.backend.formula.blocks.BlockNode;
+import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
+import com.michaelcanonizado.backend.formula.contexts.TypeContext;
+import com.michaelcanonizado.backend.formula.functions.FunctionRegistry;
+import com.michaelcanonizado.backend.formula.values.NumberValue;
 import com.michaelcanonizado.backend.mappers.*;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
@@ -18,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.*;
 
 @Service
@@ -159,6 +166,29 @@ public class AwardService {
             );
         });
         pageantContext.assertAccess(award.getPageant().getId());
+
+        System.out.println("======================================");
+
+        // Convert serialized blockly workspace to AST
+        JsonNode serializedBlocklyWorkspace = award.getFormula().getWorkspace();
+        BlockNode formulaRoot = formulaTreeBuilder.build(serializedBlocklyWorkspace);
+
+        // Create contexts
+        FunctionRegistry functionRegistry = new FunctionRegistry();
+        TypeContext typeContext = new TypeContext(functionRegistry);
+        EvaluationContext evaluationContext = new EvaluationContext(
+                new MathContext(10),
+                functionRegistry
+        );
+
+        // Evaluate AST
+        System.out.println("Output Type: " + formulaRoot.getType(typeContext));
+        BigDecimal result = ((NumberValue) formulaRoot.evaluate(evaluationContext)).value();
+        System.out.println("Result: " + result);
+
+        // Evaluate Breakdown
+
+        System.out.println("======================================");
         return awardMapper.toDetailedDTO(award);
     }
 
