@@ -7,12 +7,19 @@ import com.michaelcanonizado.backend.formula.values.NumberListValue;
 import com.michaelcanonizado.backend.formula.values.NumberValue;
 import com.michaelcanonizado.backend.formula.values.Value;
 import com.michaelcanonizado.backend.formula.values.ValueType;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AverageFunction implements FunctionDefinition {
+@Component
+public final class AverageFunction implements FormulaFunction {
+    @Override
+    public String name() {
+        return "average";
+    }
+
     @Override
     public Value evaluate(List<BlockNode> arguments, EvaluationContext context) {
         List<BigDecimal> values = new ArrayList<>();

@@ -9,7 +9,8 @@ import com.michaelcanonizado.backend.formula.values.ValueType;
 import java.util.List;
 
 /* Models the function definition for higher level blocks */
-public interface FunctionDefinition {
+public interface FormulaFunction {
+    String name();
     Value evaluate(List<BlockNode> arguments, EvaluationContext context);
     ValueType getReturnType(List<BlockNode> arguments, TypeContext context);
 }

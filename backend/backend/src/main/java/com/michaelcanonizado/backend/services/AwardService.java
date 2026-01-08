@@ -11,7 +11,9 @@ import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.formula.FormulaTreeBuilder;
 import com.michaelcanonizado.backend.formula.blocks.BlockNode;
 import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
+import com.michaelcanonizado.backend.formula.contexts.FormulaContextFactory;
 import com.michaelcanonizado.backend.formula.contexts.TypeContext;
+import com.michaelcanonizado.backend.formula.functions.FormulaFunction;
 import com.michaelcanonizado.backend.formula.functions.FunctionRegistry;
 import com.michaelcanonizado.backend.formula.values.NumberValue;
 import com.michaelcanonizado.backend.mappers.*;
@@ -76,6 +78,9 @@ public class AwardService {
 
     @Autowired
     private FormulaTreeBuilder formulaTreeBuilder;
+
+    @Autowired
+    private FormulaContextFactory formulaContextFactory;
 
     @RequirePageantStatus({
             PageantStatus.PREPARATION,
@@ -174,12 +179,10 @@ public class AwardService {
         BlockNode formulaRoot = formulaTreeBuilder.build(serializedBlocklyWorkspace);
 
         // Create contexts
-        FunctionRegistry functionRegistry = new FunctionRegistry();
-        TypeContext typeContext = new TypeContext(functionRegistry);
-        EvaluationContext evaluationContext = new EvaluationContext(
-                new MathContext(10),
-                functionRegistry
+        EvaluationContext evaluationContext = formulaContextFactory.createEvaluationContext(
+                new MathContext(10)
         );
+        TypeContext typeContext = formulaContextFactory.createTypeContext();
 
         // Evaluate AST
         System.out.println("Output Type: " + formulaRoot.getType(typeContext));
