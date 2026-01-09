@@ -116,7 +116,7 @@ public class AwardService {
         candidates.forEach(candidate -> {
             awardLeaderboards.add(
                     new AwardLeaderboard(
-                            0.0,
+                            BigDecimal.ZERO,
                             candidate,
                             savedAward
                     )
@@ -317,8 +317,7 @@ public class AwardService {
                                 template.getPhase(),
                                 template.getSegment(),
                                 template.getCriterion(),
-                                /* CHANGE DATA TYPE TO BigDecimal */
-                                average.doubleValue(),
+                                average,
                                 scoreBreakdowns
                         )
                 );
@@ -349,8 +348,7 @@ public class AwardService {
 
             /* Set candidate's award leaderboard score value */
             AwardLeaderboard candidateLeaderboardRow = awardLeaderboardMap.get(candidate.getId());
-            /* CHANGE AwardLeaderboard.score DATA TYPE TO BE BigDecimal! */
-            candidateLeaderboardRow.setScore(result.doubleValue());
+            candidateLeaderboardRow.setScore(result);
 
             /* Add candidate's breakdown */
             candidateLeaderboardRow.setCriteriaBreakdown(

@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -411,7 +412,7 @@ public class SegmentService {
                         breakdownTemplate.getPhase(),
                         breakdownTemplate.getSegment(),
                         breakdownTemplate.getCriterion(),
-                        averageScore,
+                        BigDecimal.valueOf(averageScore),
                         scoresBreakdown
                 );
                 criteriaBreakdowns.add(criteriaBreakdown);

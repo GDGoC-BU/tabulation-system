@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -104,7 +105,7 @@ public class CandidateService {
         awards.forEach(award -> {
             awardLeaderboards.add(
                     new AwardLeaderboard(
-                            0.0,
+                            BigDecimal.ZERO,
                             savedCandidate,
                             award
                     )
