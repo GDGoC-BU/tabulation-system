@@ -18,7 +18,7 @@ export default function Workspace({
   initialFormula,
   onFormulaChange,
 }: {
-  initialFormula?: Formula | undefined
+  initialFormula?: Formula | undefined | null
   onFormulaChange?: (formula: Formula) => void
 }) {
   /* Refs to inject Blockly workspace */

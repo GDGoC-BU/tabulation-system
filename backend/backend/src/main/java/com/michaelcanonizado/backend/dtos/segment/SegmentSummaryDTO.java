@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
+import com.michaelcanonizado.backend.models.Formula;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 
 import java.util.UUID;
@@ -10,7 +11,7 @@ public record SegmentSummaryDTO(
         String name,
         int sequence,
         Integer candidateLimit,
-        String formula,
+        Formula formula,
         PhaseSegmentStatus status,
         /* FIX THIS. PhaseDetailedDTO shows its segments and the segment shows their phase? unnecessary.
            But for now keep it, the frontend depends on this relationship. */

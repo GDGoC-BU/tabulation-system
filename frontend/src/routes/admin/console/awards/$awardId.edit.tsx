@@ -83,6 +83,9 @@ function RouteComponent() {
   }
 
   async function onSubmit(values: AwardEditForm) {
+    if (values.candidateLimit === 0) {
+      values.candidateLimit = null
+    }
     const isSuccess = await editAward(values)
     if (isSuccess) {
       form.reset()

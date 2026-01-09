@@ -250,258 +250,258 @@ public class SegmentService {
     }
 
     private void calculateCandidateQualificationsHelper(Segment segment, UUID pageantId) {
-        /* NOTE: Refer to AwardService for a more detailed documentation of the flow.
-           This method is just a reflection of the logic used there with minor tweaks. */
-
-        /* Extract criterion ids from formula */
-        Set<UUID> criteriaIdsInFormula = formulaEncoder.extractEncodedUUIDs(segment.getFormula());
-
-        /* Fetch the criteria in the formula */
-        List<Criterion> criteriaInFormula = criterionRepository.findAllById(criteriaIdsInFormula);
-
-        /* Load criteria in a Map for faster lookup */
-        Map<UUID, Criterion> criteriaMap = criteriaInFormula
-                .stream()
-                .collect(
-                        Collectors.toMap(
-                                Criterion::getId,
-                                Function.identity(),
-                                (existing, replacement) -> existing
-                        )
-                );
-
-        /* Pregenerate the phase-segment-criterion details for the breakdowns. */
-        Map<UUID, CriteriaBreakdown> criteriaBreakdownTemplates = new HashMap<>();
-        for (UUID criterionId : criteriaIdsInFormula) {
-            Criterion criterion = criteriaMap.get(criterionId);
-
-            PhaseBreakdownDTO phaseBreakdown = phaseMapper.toBreakdownDTO(criterion.getSegment().getPhase());
-            SegmentBreakdownDTO segmentBreakdown = segmentMapper.toBreakdownDTO(criterion.getSegment());
-            CriterionBreakdownDTO criterionBreakdown = criterionMapper.toBreakdownDTO(criterion);
-
-            criteriaBreakdownTemplates.put(
-                    criterionId,
-                    new CriteriaBreakdown(
-                            phaseBreakdown,
-                            segmentBreakdown,
-                            criterionBreakdown,
-                            null,
-                            null
-                    )
-            );
-        }
-
-        /* Get candidates and construct the necessary Maps */
-        List<Candidate> candidates = candidateRepository
-                .findAllByPageant_Id(pageantId);
-
-        Map<UUID, CandidateGender> candidateGenders = candidates
-                .stream()
-                .collect(Collectors.toMap(
-                        Candidate::getId,
-                        Candidate::getGender
-                ));
-
-        List<UUID> candidateIds = candidates
-                .stream()
-                .map(Candidate::getId)
-                .toList();
-
-        /* Fetch relevant scores: */
-        List<Score> scores = scoreRepository.findAll(
-                Specification.allOf(
-                        /* Scores that belong to the selected pageant */
-                        ScoreSpecification.hasPageant(pageantId),
-                        /* Scores that belong to the fetched candidates */
-                        ScoreSpecification.hasCandidates(candidateIds),
-                        /* Scores for criteria that is included in the formula */
-                        ScoreSpecification.hasCriteria(new ArrayList<>(criteriaIdsInFormula))
-                )
-        );
-
-        /* Map to search for scores for a candidate over a criterion
-           Map<CandidateID, Map<CriterionId, List<Score>>> */
-        Map<UUID, Map<UUID, List<Score>>> scoreMap = new HashMap<>();
-        for (Score score : scores) {
-            UUID candidateId = score.getCandidate().getId();
-            UUID criterionId = score.getCriterion().getId();
-
-            scoreMap
-                    .computeIfAbsent(candidateId, k -> new HashMap<>())
-                    .computeIfAbsent(criterionId, k -> new ArrayList<>())
-                    .add(score);
-        }
-
-        /* Group the criterion averages per candidate
-           Map<CandidateId, Map<EncodedCriterionId, Average Score>> */
-        Map<UUID, Map<String, Double>> candidateCriterionAverages = scores
-                .stream()
-                .collect(
-                        Collectors.groupingBy(
-                                score -> {
-                                    return score.getCandidate().getId();
-                                },
-                                Collectors.groupingBy(score -> {
-                                            return formulaEncoder.encodeUUID(score.getCriterion().getId());
-                                        },
-                                        Collectors.averagingInt(Score::getValue)
-                                )
-                        )
-                );
-
-        /* Get candidateSegmentQualification rows of the candidates */
-        List<CandidateSegmentQualification> candidateSegmentQualifications = csqRepository.findAll(
-                Specification.allOf(
-                        CandidateSegmentQualificationSpecification.hasSegment(segment.getId()),
-                        CandidateSegmentQualificationSpecification.hasCandidates(candidateIds)
-                )
-        );
-        /* Map<CandidateId, CSQ> */
-        Map<UUID, CandidateSegmentQualification> csqMap =
-                candidateSegmentQualifications
-                        .stream()
-                        .collect(
-                                Collectors.toMap(
-                                        csqRow -> csqRow.getCandidate().getId(),
-                                        Function.identity()
-                                )
-                        );
-
-        /* Collect the results */
-        List<CandidateSegmentQualification> femaleCandidateResults = new ArrayList<>();
-        List<CandidateSegmentQualification> maleCandidateResults = new ArrayList<>();
-
-        /* Create shared parser */
-        ExpressionParser parser = new SpelExpressionParser();
-        /* Parse the formula and reuse it. Parsing is expensive! */
-        Expression expression = parser.parseExpression(segment.getFormula());
-        /* Loop through all candidates and use their criterion averages to fill the formula */
-        candidateCriterionAverages.forEach((candidateId, criterionAverages) -> {
-            /* Load the criterion averages into context */
-            StandardEvaluationContext context = new StandardEvaluationContext(criterionAverages);
-            /* Substitute the criterion score average in the formula */
-            criterionAverages.forEach(context::setVariable);
-            /* Evaluate the expression */
-            Double result = expression.getValue(context, Double.class);
-
-            CandidateSegmentQualification csq = csqMap.get(candidateId);
-            csq.setScore(result);
-
-            List<CriteriaBreakdown> criteriaBreakdowns = new ArrayList<>();
-            criteriaIdsInFormula.forEach(criterionId -> {
-                /* Get scores for the current candidate and current criterion */
-                List<Score> scoresForCriterion = scoreMap
-                        .getOrDefault(candidateId, Map.of())
-                        .getOrDefault(criterionId, List.of());
-
-                /* Get pregenerated breakdown for the current criterion */
-                CriteriaBreakdown breakdownTemplate = criteriaBreakdownTemplates.get(criterionId);
-
-                /* Get the calculate score from the existing map. */
-                Double averageScore = candidateCriterionAverages
-                        .getOrDefault(candidateId, Collections.emptyMap())
-                        .getOrDefault(formulaEncoder.encodeUUID(criterionId), 0.0);
-
-                List<ScoreBreakdownDTO> scoresBreakdown = scoresForCriterion
-                        .stream()
-                        .map(score -> {
-                            return scoreMapper.toBreakdownDTO(score);
-                        }).toList();
-
-                CriteriaBreakdown criteriaBreakdown = new CriteriaBreakdown(
-                        breakdownTemplate.getPhase(),
-                        breakdownTemplate.getSegment(),
-                        breakdownTemplate.getCriterion(),
-                        BigDecimal.valueOf(averageScore),
-                        scoresBreakdown
-                );
-                criteriaBreakdowns.add(criteriaBreakdown);
-            });
-            csq.setCriteriaBreakdown(criteriaBreakdowns);
-
-            /* Group the CSQs by gender */
-            if (candidateGenders.get(candidateId).equals(CandidateGender.FEMALE)) {
-                femaleCandidateResults.add(csq);
-            } else if (candidateGenders.get(candidateId).equals(CandidateGender.MALE)) {
-                maleCandidateResults.add(csq);
-            }
-        });
-
-        /* Sort scores in descending order */
-        femaleCandidateResults.sort((a, b) -> {
-            return Double.compare(b.getScore(), a.getScore());
-        });
-        maleCandidateResults.sort((a, b) -> {
-            return Double.compare(b.getScore(), a.getScore());
-        });
-
-        /* Determine CSQ rank, isQualified, and isTied */
-        for (int i = 0; i < femaleCandidateResults.size(); i++) {
-            int currentRank = i + 1;
-            CandidateSegmentQualification currentCSQ = femaleCandidateResults.get(i);
-            Double currentScore = currentCSQ.getScore();
-
-            /* Set the rank */
-            currentCSQ.setRank(currentRank);
-            /* Mark as qualified if within the candidate limit */
-            currentCSQ.setQualified(currentRank <= segment.getCandidateLimit());
-
-            /* Count the number of tied candidates so we can just offset if there is a tie */
-            int tieCount = 0;
-            /* Check following candidates for ties */
-            for (int j = i + 1; j < femaleCandidateResults.size(); j++) {
-                CandidateSegmentQualification nextCSQ = femaleCandidateResults.get(j);
-
-                /* If the next candidate has a different score, i.e: no tie, break out */
-                if (Math.abs(nextCSQ.getScore() - currentScore) > 1e-9) break;
-
-                /* Tied candidates will have the same: rank, isQualified, and tie values */
-                nextCSQ.setRank(currentRank);
-                nextCSQ.setQualified(currentRank <= segment.getCandidateLimit());
-                nextCSQ.setTied(true);
-                currentCSQ.setTied(true);
-
-                tieCount++;
-            }
-
-            /* Skip over tied candidates since we have already set their fields */
-            i += tieCount;
-        }
-
-        for (int i = 0; i < maleCandidateResults.size(); i++) {
-            int currentRank = i + 1;
-            CandidateSegmentQualification currentCSQ = maleCandidateResults.get(i);
-            Double currentScore = currentCSQ.getScore();
-
-            /* Set the rank */
-            currentCSQ.setRank(currentRank);
-            /* Mark as qualified if within the candidate limit */
-            currentCSQ.setQualified(currentRank <= segment.getCandidateLimit());
-
-            /* Count the number of tied candidates so we can just offset if there is a tie */
-            int tieCount = 0;
-            /* Check following candidates for ties */
-            for (int j = i + 1; j < maleCandidateResults.size(); j++) {
-                CandidateSegmentQualification nextCSQ = maleCandidateResults.get(j);
-
-                /* If the next candidate has a different score, i.e: no tie, break out */
-                if (Math.abs(nextCSQ.getScore() - currentScore) > 1e-9) break;
-
-                /* Tied candidates will have the same: rank, isQualified, and tie values */
-                nextCSQ.setRank(currentRank);
-                nextCSQ.setQualified(currentRank <= segment.getCandidateLimit());
-                nextCSQ.setTied(true);
-                currentCSQ.setTied(true);
-
-                tieCount++;
-            }
-
-            /* Skip over tied candidates since we have already set their fields */
-            i += tieCount;
-        }
-
-        csqRepository.saveAll(femaleCandidateResults);
-        csqRepository.saveAll(maleCandidateResults);
+//        /* NOTE: Refer to AwardService for a more detailed documentation of the flow.
+//           This method is just a reflection of the logic used there with minor tweaks. */
+//
+//        /* Extract criterion ids from formula */
+//        Set<UUID> criteriaIdsInFormula = formulaEncoder.extractEncodedUUIDs(segment.getFormula());
+//
+//        /* Fetch the criteria in the formula */
+//        List<Criterion> criteriaInFormula = criterionRepository.findAllById(criteriaIdsInFormula);
+//
+//        /* Load criteria in a Map for faster lookup */
+//        Map<UUID, Criterion> criteriaMap = criteriaInFormula
+//                .stream()
+//                .collect(
+//                        Collectors.toMap(
+//                                Criterion::getId,
+//                                Function.identity(),
+//                                (existing, replacement) -> existing
+//                        )
+//                );
+//
+//        /* Pregenerate the phase-segment-criterion details for the breakdowns. */
+//        Map<UUID, CriteriaBreakdown> criteriaBreakdownTemplates = new HashMap<>();
+//        for (UUID criterionId : criteriaIdsInFormula) {
+//            Criterion criterion = criteriaMap.get(criterionId);
+//
+//            PhaseBreakdownDTO phaseBreakdown = phaseMapper.toBreakdownDTO(criterion.getSegment().getPhase());
+//            SegmentBreakdownDTO segmentBreakdown = segmentMapper.toBreakdownDTO(criterion.getSegment());
+//            CriterionBreakdownDTO criterionBreakdown = criterionMapper.toBreakdownDTO(criterion);
+//
+//            criteriaBreakdownTemplates.put(
+//                    criterionId,
+//                    new CriteriaBreakdown(
+//                            phaseBreakdown,
+//                            segmentBreakdown,
+//                            criterionBreakdown,
+//                            null,
+//                            null
+//                    )
+//            );
+//        }
+//
+//        /* Get candidates and construct the necessary Maps */
+//        List<Candidate> candidates = candidateRepository
+//                .findAllByPageant_Id(pageantId);
+//
+//        Map<UUID, CandidateGender> candidateGenders = candidates
+//                .stream()
+//                .collect(Collectors.toMap(
+//                        Candidate::getId,
+//                        Candidate::getGender
+//                ));
+//
+//        List<UUID> candidateIds = candidates
+//                .stream()
+//                .map(Candidate::getId)
+//                .toList();
+//
+//        /* Fetch relevant scores: */
+//        List<Score> scores = scoreRepository.findAll(
+//                Specification.allOf(
+//                        /* Scores that belong to the selected pageant */
+//                        ScoreSpecification.hasPageant(pageantId),
+//                        /* Scores that belong to the fetched candidates */
+//                        ScoreSpecification.hasCandidates(candidateIds),
+//                        /* Scores for criteria that is included in the formula */
+//                        ScoreSpecification.hasCriteria(new ArrayList<>(criteriaIdsInFormula))
+//                )
+//        );
+//
+//        /* Map to search for scores for a candidate over a criterion
+//           Map<CandidateID, Map<CriterionId, List<Score>>> */
+//        Map<UUID, Map<UUID, List<Score>>> scoreMap = new HashMap<>();
+//        for (Score score : scores) {
+//            UUID candidateId = score.getCandidate().getId();
+//            UUID criterionId = score.getCriterion().getId();
+//
+//            scoreMap
+//                    .computeIfAbsent(candidateId, k -> new HashMap<>())
+//                    .computeIfAbsent(criterionId, k -> new ArrayList<>())
+//                    .add(score);
+//        }
+//
+//        /* Group the criterion averages per candidate
+//           Map<CandidateId, Map<EncodedCriterionId, Average Score>> */
+//        Map<UUID, Map<String, Double>> candidateCriterionAverages = scores
+//                .stream()
+//                .collect(
+//                        Collectors.groupingBy(
+//                                score -> {
+//                                    return score.getCandidate().getId();
+//                                },
+//                                Collectors.groupingBy(score -> {
+//                                            return formulaEncoder.encodeUUID(score.getCriterion().getId());
+//                                        },
+//                                        Collectors.averagingInt(Score::getValue)
+//                                )
+//                        )
+//                );
+//
+//        /* Get candidateSegmentQualification rows of the candidates */
+//        List<CandidateSegmentQualification> candidateSegmentQualifications = csqRepository.findAll(
+//                Specification.allOf(
+//                        CandidateSegmentQualificationSpecification.hasSegment(segment.getId()),
+//                        CandidateSegmentQualificationSpecification.hasCandidates(candidateIds)
+//                )
+//        );
+//        /* Map<CandidateId, CSQ> */
+//        Map<UUID, CandidateSegmentQualification> csqMap =
+//                candidateSegmentQualifications
+//                        .stream()
+//                        .collect(
+//                                Collectors.toMap(
+//                                        csqRow -> csqRow.getCandidate().getId(),
+//                                        Function.identity()
+//                                )
+//                        );
+//
+//        /* Collect the results */
+//        List<CandidateSegmentQualification> femaleCandidateResults = new ArrayList<>();
+//        List<CandidateSegmentQualification> maleCandidateResults = new ArrayList<>();
+//
+//        /* Create shared parser */
+//        ExpressionParser parser = new SpelExpressionParser();
+//        /* Parse the formula and reuse it. Parsing is expensive! */
+//        Expression expression = parser.parseExpression(segment.getFormula());
+//        /* Loop through all candidates and use their criterion averages to fill the formula */
+//        candidateCriterionAverages.forEach((candidateId, criterionAverages) -> {
+//            /* Load the criterion averages into context */
+//            StandardEvaluationContext context = new StandardEvaluationContext(criterionAverages);
+//            /* Substitute the criterion score average in the formula */
+//            criterionAverages.forEach(context::setVariable);
+//            /* Evaluate the expression */
+//            Double result = expression.getValue(context, Double.class);
+//
+//            CandidateSegmentQualification csq = csqMap.get(candidateId);
+//            csq.setScore(result);
+//
+//            List<CriteriaBreakdown> criteriaBreakdowns = new ArrayList<>();
+//            criteriaIdsInFormula.forEach(criterionId -> {
+//                /* Get scores for the current candidate and current criterion */
+//                List<Score> scoresForCriterion = scoreMap
+//                        .getOrDefault(candidateId, Map.of())
+//                        .getOrDefault(criterionId, List.of());
+//
+//                /* Get pregenerated breakdown for the current criterion */
+//                CriteriaBreakdown breakdownTemplate = criteriaBreakdownTemplates.get(criterionId);
+//
+//                /* Get the calculate score from the existing map. */
+//                Double averageScore = candidateCriterionAverages
+//                        .getOrDefault(candidateId, Collections.emptyMap())
+//                        .getOrDefault(formulaEncoder.encodeUUID(criterionId), 0.0);
+//
+//                List<ScoreBreakdownDTO> scoresBreakdown = scoresForCriterion
+//                        .stream()
+//                        .map(score -> {
+//                            return scoreMapper.toBreakdownDTO(score);
+//                        }).toList();
+//
+//                CriteriaBreakdown criteriaBreakdown = new CriteriaBreakdown(
+//                        breakdownTemplate.getPhase(),
+//                        breakdownTemplate.getSegment(),
+//                        breakdownTemplate.getCriterion(),
+//                        BigDecimal.valueOf(averageScore),
+//                        scoresBreakdown
+//                );
+//                criteriaBreakdowns.add(criteriaBreakdown);
+//            });
+//            csq.setCriteriaBreakdown(criteriaBreakdowns);
+//
+//            /* Group the CSQs by gender */
+//            if (candidateGenders.get(candidateId).equals(CandidateGender.FEMALE)) {
+//                femaleCandidateResults.add(csq);
+//            } else if (candidateGenders.get(candidateId).equals(CandidateGender.MALE)) {
+//                maleCandidateResults.add(csq);
+//            }
+//        });
+//
+//        /* Sort scores in descending order */
+//        femaleCandidateResults.sort((a, b) -> {
+//            return Double.compare(b.getScore(), a.getScore());
+//        });
+//        maleCandidateResults.sort((a, b) -> {
+//            return Double.compare(b.getScore(), a.getScore());
+//        });
+//
+//        /* Determine CSQ rank, isQualified, and isTied */
+//        for (int i = 0; i < femaleCandidateResults.size(); i++) {
+//            int currentRank = i + 1;
+//            CandidateSegmentQualification currentCSQ = femaleCandidateResults.get(i);
+//            Double currentScore = currentCSQ.getScore();
+//
+//            /* Set the rank */
+//            currentCSQ.setRank(currentRank);
+//            /* Mark as qualified if within the candidate limit */
+//            currentCSQ.setQualified(currentRank <= segment.getCandidateLimit());
+//
+//            /* Count the number of tied candidates so we can just offset if there is a tie */
+//            int tieCount = 0;
+//            /* Check following candidates for ties */
+//            for (int j = i + 1; j < femaleCandidateResults.size(); j++) {
+//                CandidateSegmentQualification nextCSQ = femaleCandidateResults.get(j);
+//
+//                /* If the next candidate has a different score, i.e: no tie, break out */
+//                if (Math.abs(nextCSQ.getScore() - currentScore) > 1e-9) break;
+//
+//                /* Tied candidates will have the same: rank, isQualified, and tie values */
+//                nextCSQ.setRank(currentRank);
+//                nextCSQ.setQualified(currentRank <= segment.getCandidateLimit());
+//                nextCSQ.setTied(true);
+//                currentCSQ.setTied(true);
+//
+//                tieCount++;
+//            }
+//
+//            /* Skip over tied candidates since we have already set their fields */
+//            i += tieCount;
+//        }
+//
+//        for (int i = 0; i < maleCandidateResults.size(); i++) {
+//            int currentRank = i + 1;
+//            CandidateSegmentQualification currentCSQ = maleCandidateResults.get(i);
+//            Double currentScore = currentCSQ.getScore();
+//
+//            /* Set the rank */
+//            currentCSQ.setRank(currentRank);
+//            /* Mark as qualified if within the candidate limit */
+//            currentCSQ.setQualified(currentRank <= segment.getCandidateLimit());
+//
+//            /* Count the number of tied candidates so we can just offset if there is a tie */
+//            int tieCount = 0;
+//            /* Check following candidates for ties */
+//            for (int j = i + 1; j < maleCandidateResults.size(); j++) {
+//                CandidateSegmentQualification nextCSQ = maleCandidateResults.get(j);
+//
+//                /* If the next candidate has a different score, i.e: no tie, break out */
+//                if (Math.abs(nextCSQ.getScore() - currentScore) > 1e-9) break;
+//
+//                /* Tied candidates will have the same: rank, isQualified, and tie values */
+//                nextCSQ.setRank(currentRank);
+//                nextCSQ.setQualified(currentRank <= segment.getCandidateLimit());
+//                nextCSQ.setTied(true);
+//                currentCSQ.setTied(true);
+//
+//                tieCount++;
+//            }
+//
+//            /* Skip over tied candidates since we have already set their fields */
+//            i += tieCount;
+//        }
+//
+//        csqRepository.saveAll(femaleCandidateResults);
+//        csqRepository.saveAll(maleCandidateResults);
     }
 
     @RequirePageantStatus({

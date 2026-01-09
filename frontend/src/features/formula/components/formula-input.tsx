@@ -10,13 +10,16 @@ export default function FormulaInput({
 }: {
   name: string
   control: Control<any>
-  initialFormula?: Formula
+  initialFormula?: Formula | null
 }) {
   const { field } = useController({ name, control })
 
   /* Called when workspace changes */
   const onFormulaChange = (formula: Formula) => {
     /* Push changes to RHF */
+    if (formula.text.trim().length === 0) {
+      return field.onChange(null)
+    }
     field.onChange({ text: formula.text, workspace: formula.workspace })
   }
 

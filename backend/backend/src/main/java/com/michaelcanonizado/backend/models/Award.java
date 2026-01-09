@@ -30,6 +30,23 @@ public class Award {
     private int candidateLimit;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(
+                    name = "text",
+                    column = @Column(
+                            name = "text",
+                            nullable = false
+                    )
+            ),
+            @AttributeOverride(
+                    name = "workspace",
+                    column = @Column(
+                            name = "workspace",
+                            columnDefinition = "jsonb",
+                            nullable = false
+                    )
+            )
+    })
     private Formula formula;
 
     @JsonBackReference

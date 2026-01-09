@@ -41,6 +41,6 @@ public class SeederOrchestrator implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-//        seeders.forEach(DatabaseSeeder::seed);
+        seeders.forEach(DatabaseSeeder::seed);
     }
 }

@@ -9,6 +9,7 @@ import {
   candidateHierarchySchema,
   candidateSummarySchema,
 } from '@/features/candidates/schemas'
+import { formulaSchema } from '@/features/formula/schemas'
 
 export const candidateSegmentQualificationHierarchySchema = z.object({
   id: z.string(),
@@ -45,7 +46,7 @@ export const segmentSummarySchema = z.object({
   name: z.string(),
   sequence: z.number(),
   candidateLimit: z.union([z.null(), z.number()]),
-  formula: z.union([z.null(), z.string()]),
+  formula: z.union([z.null(), formulaSchema]),
   status: phaseSegmentStatusValue,
   phase: z.lazy(() => {
     /* Circular import patch! segments/schema imports from phases/schema.
@@ -61,7 +62,7 @@ export const segmentDetailedSchema = z.object({
   name: z.string(),
   sequence: z.number(),
   candidateLimit: z.union([z.null(), z.number()]),
-  formula: z.union([z.null(), z.string()]),
+  formula: z.union([z.null(), formulaSchema]),
   status: phaseSegmentStatusValue,
   phase: z.lazy(() => {
     return phaseSummarySchema
@@ -76,7 +77,7 @@ export const segmentHierarchySchema = z.object({
   name: z.string(),
   sequence: z.number(),
   candidateLimit: z.union([z.null(), z.number()]),
-  formula: z.union([z.null(), z.string()]),
+  formula: z.union([z.null(), formulaSchema]),
   status: phaseSegmentStatusValue,
   criteria: z.array(criterionHierarchySchema),
   candidateQualifications: z.array(
@@ -96,10 +97,7 @@ export const segmentEditFormSchema = z.object({
     z.coerce.number({
       message: 'Invalid value! Only positive numbers are allowed',
     }),
-    // .min(1, {
-    //   message: 'Enter how many candidates will be qualified for this segment',
-    // }),
   ]),
-  formula: z.union([z.null(), z.string()]),
+  formula: z.union([z.null(), formulaSchema]),
 })
 export type SegmentEditForm = z.infer<typeof segmentEditFormSchema>

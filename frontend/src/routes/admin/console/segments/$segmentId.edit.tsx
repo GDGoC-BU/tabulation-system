@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import Console from '@/components/console'
-import FormulaInput from '@/features/formula/deprecated-components/formula-input'
+import FormulaInput from '@/features/formula/components/formula-input'
 import { TextSub } from '@/components/text'
 import { segmentEditFormSchema } from '@/features/segments/schemas'
 import useEditSegmentMutate from '@/features/segments/hooks/use-edit-segment-mutate'
@@ -30,14 +30,21 @@ export const Route = createFileRoute('/admin/console/segments/$segmentId/edit')(
 )
 
 function RouteComponent() {
-  const { segmentId } = Route.useParams()
-  const { mutateAsync: editSegment, error } = useEditSegmentMutate()
-  const { data: segment } = useQuery(segmentQueryOptions(segmentId))
-
-  const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { mutateAsync: editSegment, error } = useEditSegmentMutate()
 
-  const { data: selectedPageant, isLoading } = useSelectedPageant()
+  /* Check if pageant is selected */
+  const { data: selectedPageant, isLoading: isSelectedPageantLoading } =
+    useSelectedPageant()
+  /* Get segment id */
+  const { segmentId } = Route.useParams()
+  /* Fetch award details if pageant is selected */
+  const { data: segment, isLoading: isSegmentLoading } = useQuery(
+    segmentQueryOptions(segmentId, {
+      enabled: !!selectedPageant,
+    }),
+  )
 
   const form = useForm({
     resolver: zodResolver(segmentEditFormSchema),
@@ -45,10 +52,14 @@ function RouteComponent() {
       id: '',
       name: '',
       candidateLimit: null,
-      formula: null,
+      formula: {
+        text: '',
+        workspace: {},
+      },
     },
   })
 
+  /* When segment data arrives, set tthe form values */
   useEffect(() => {
     if (!segment) return
     form.reset({
@@ -65,7 +76,7 @@ function RouteComponent() {
     })
   }
 
-  if (isLoading) {
+  if (isSelectedPageantLoading || isSegmentLoading) {
     return (
       <div className="p-4">
         <Loading />
@@ -74,9 +85,18 @@ function RouteComponent() {
   }
 
   async function onSubmit(values: SegmentEditForm) {
+    console.log('Values: ', values)
+    /* Since segment allows no candidate-limit and formula,
+    manually set it to null */
+
+    /* NOTE: These 2 inpuys should have a value or be null together! Not one of each. Refactor later*/
     if (values.candidateLimit === 0) {
       values.candidateLimit = null
     }
+    if (values.formula?.text.trim().length === 0) {
+      values.formula = null
+    }
+
     const isSuccess = await editSegment(values)
     if (isSuccess) {
       form.reset()
@@ -130,22 +150,31 @@ function RouteComponent() {
         <Console.Header.Title>Editing {segment?.name}</Console.Header.Title>
       </Console.Header>
       <Console.Content>
-        <div className="">
+        <div className="h-full">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="gap-4 flex h-full flex-col"
+            >
               <div className="grid grid-cols-2 gap-4">
                 {NameFormField}
                 {CandidateLimitFormField}
               </div>
-              <div className="">
+              <div className="grow">
                 <FormField
                   control={form.control}
-                  name="formula"
+                  /* Error message is determined from formula.text, bind <FormulaMessage/> to it */
+                  name="formula.text"
                   render={() => (
-                    <FormItem>
+                    <FormItem className="flex flex-col h-full">
                       <FormLabel>Formula</FormLabel>
                       <FormMessage className="" />
-                      <FormulaInput name="formula" control={form.control} />
+                      {/* Actual formula object is still being targeted here */}
+                      <FormulaInput
+                        initialFormula={segment?.formula}
+                        name="formula"
+                        control={form.control}
+                      />
                     </FormItem>
                   )}
                 />

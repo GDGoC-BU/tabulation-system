@@ -54,7 +54,7 @@ function AdminConsoleSegments() {
         /* Patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
         formula: rawFormula ? (
           <FormulaRenderer
-            formula={rawFormula}
+            formula={rawFormula.text}
             criterionLookup={criterionLookup}
           />
         ) : (
