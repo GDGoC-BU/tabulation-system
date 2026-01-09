@@ -2,7 +2,7 @@ package com.michaelcanonizado.backend.formula;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.customs.FormulaTreeException;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaInvalidWorkspaceException;
 import com.michaelcanonizado.backend.formula.blocks.*;
 import org.springframework.stereotype.Component;
 
@@ -28,8 +28,8 @@ public class FormulaTreeBuilder {
             criterionIdCollector.add(criterionUUID);
             return new CriterionNode(criterionUUID);
         } catch (Exception e) {
-            throw new FormulaTreeException(
-                    "Error building Formula Tree. Cannot convert \"" + criterionId + "\" to a UUID",
+            throw new FormulaInvalidWorkspaceException(
+                    "Error building Formula Tree. Cannot convert criterion_dropdown value: \"" + criterionId + "\" to a UUID",
                     ErrorCode.FORMULA_TREE_BUILDING_ERROR
             );
         }
@@ -54,8 +54,8 @@ public class FormulaTreeBuilder {
             case "MULTIPLY" -> BinaryOperator.MULTIPLY;
             case "DIVIDE" -> BinaryOperator.DIVIDE;
             default -> {
-                throw new FormulaTreeException(
-                        "Unknown binary_operation operator: " + operatorString,
+                throw new FormulaInvalidWorkspaceException(
+                        "Unknown blockly binary_operation operator: " + operatorString,
                         ErrorCode.FORMULA_TREE_BUILDING_ERROR
                 );
             }
@@ -76,8 +76,8 @@ public class FormulaTreeBuilder {
             case "number_literal" -> parseNumberLiteral(block);
             case "criterion_dropdown" -> parseCriterionDropdown(block, criterionIdCollector);
             case "binary_operation" -> parseBinaryOperation(block, criterionIdCollector);
-            default -> throw new FormulaTreeException(
-                    "Can't determine BlockNode for blocky block: " + blockType,
+            default -> throw new FormulaInvalidWorkspaceException(
+                    "FormulaTreeBuilder can't determine BlockNode for blocky block: " + blockType,
                     ErrorCode.FORMULA_TREE_BUILDING_ERROR
             );
         };
@@ -99,7 +99,7 @@ public class FormulaTreeBuilder {
             }
 
             if (blocklyFormulaRoot == null || blocklyFormulaRoot.isNull()) {
-                throw new FormulaTreeException(
+                throw new FormulaInvalidWorkspaceException(
                         "Serialized workspace doesnt contain \"formula_root\" block!",
                         ErrorCode.FORMULA_TREE_BUILDING_ERROR
                 );
@@ -116,9 +116,11 @@ public class FormulaTreeBuilder {
                     criterionIdCollector
             );
         }
-        /* Catches JsonNode and the custom class exceptions in the /formula package */
-        catch (Exception e) {
-            throw new FormulaTreeException(
+        /* NOTE: Any exceptions with formula evaluation and type checking happens when you call
+            formula.evaluate() or formula.getType() on the formula (Outside this class). */
+        /* Catches JsonNode exceptions */
+        catch (NullPointerException | IllegalArgumentException e) {
+            throw new FormulaInvalidWorkspaceException(
                     "Error parsing serialized blockly workspace to formula tree: \nError: " + e.getMessage(),
                     ErrorCode.FORMULA_TREE_BUILDING_ERROR
             );

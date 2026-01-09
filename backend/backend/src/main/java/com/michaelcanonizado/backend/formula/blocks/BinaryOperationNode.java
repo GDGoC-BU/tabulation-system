@@ -1,5 +1,8 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
+import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaEvaluationException;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaTypeException;
 import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
 import com.michaelcanonizado.backend.formula.contexts.TypeContext;
 import com.michaelcanonizado.backend.formula.values.NumberValue;
@@ -32,6 +35,12 @@ public class BinaryOperationNode implements BlockNode {
             case SUBTRACT -> leftBigDecimal.subtract(rightBigDecimal);
             case MULTIPLY -> leftBigDecimal.multiply(rightBigDecimal);
             case DIVIDE -> leftBigDecimal.divide(rightBigDecimal, context.getMathContext());
+            default -> {
+                throw new FormulaEvaluationException(
+                        "Formula evaluation error! BinaryOperationNode can't determine action for operator: " + operator.toString(),
+                        ErrorCode.FORMULA_EVALUATION_ERROR
+                );
+            }
         };
 
         return new NumberValue(result);
@@ -49,8 +58,9 @@ public class BinaryOperationNode implements BlockNode {
                 leftType != ValueType.NUMBER ||
                 rightType != ValueType.NUMBER
         ) {
-            throw new IllegalStateException(
-                    "BinaryOperationNode require inputs as NUMBER"
+            throw new FormulaTypeException(
+                    "Invalid formula! BinaryOperationNode left and right only accept: [ Number ]",
+                    ErrorCode.FORMULA_TYPE_ERROR
             );
         }
 

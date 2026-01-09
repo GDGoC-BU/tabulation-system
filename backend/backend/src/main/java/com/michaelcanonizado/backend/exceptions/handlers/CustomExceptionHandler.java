@@ -10,12 +10,46 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class CustomExceptionHandler {
-    @ExceptionHandler(FormulaTreeException.class)
-    public ResponseEntity<ErrorResponse> handleFormulaTreeException (
-            FormulaTreeException exception,
+    @ExceptionHandler(FormulaInvalidWorkspaceException.class)
+    public ResponseEntity<ErrorResponse> handleFormulaInvalidWorkspaceException (
+            FormulaInvalidWorkspaceException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
+    @ExceptionHandler(FormulaEvaluationException.class)
+    public ResponseEntity<ErrorResponse> handleFormulaEvaluationException (
+            FormulaEvaluationException exception,
             HttpServletRequest request
     ) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
+    @ExceptionHandler(FormulaTypeException.class)
+    public ResponseEntity<ErrorResponse> handleFormulaTypeException (
+            FormulaTypeException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
 
         ErrorResponse response = new ErrorResponse(
                 status.value(),

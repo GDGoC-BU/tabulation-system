@@ -1,5 +1,8 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
+import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaEvaluationException;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaTypeException;
 import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
 import com.michaelcanonizado.backend.formula.contexts.TypeContext;
 import com.michaelcanonizado.backend.formula.values.NumberListValue;
@@ -29,7 +32,10 @@ public class ListNode implements BlockNode {
             if (value instanceof NumberValue(BigDecimal value1)) {
                 values.add(value1);
             } else {
-                throw new IllegalStateException("List must only contain NUMBERS");
+                throw new FormulaEvaluationException(
+                        "Formula evaluation error! Invalid value: " + value +". ListNode only accepts NumberValue",
+                        ErrorCode.FORMULA_EVALUATION_ERROR
+                );
             }
         }
 
@@ -42,7 +48,10 @@ public class ListNode implements BlockNode {
             ValueType elementType = element.getType(context);
 
             if (elementType != ValueType.NUMBER) {
-                throw new IllegalStateException("List must only contain NUMBERS" );
+                throw new FormulaTypeException(
+                        "Invalid formula! ListNode only accepts: [ Number ]",
+                        ErrorCode.FORMULA_TYPE_ERROR
+                );
             }
         }
 

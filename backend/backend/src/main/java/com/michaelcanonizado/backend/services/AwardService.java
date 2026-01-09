@@ -184,7 +184,8 @@ public class AwardService {
         JsonNode serializedBlocklyWorkspace = award.getFormula().getWorkspace();
         FormulaTree formulaTree = formulaTreeBuilder.build(serializedBlocklyWorkspace);
 
-        /* This will fail if the formula tree is invalid (Formula should already be validated on creation) */
+        /* This will throw an exception if the formula tree is invalid
+        * (Formula should already be validated on creation) */
         TypeContext typeContext = formulaContextFactory.createTypeContext();
         formulaTree.getFormulaNode().getType(typeContext);
 

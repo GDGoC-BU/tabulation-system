@@ -1,5 +1,8 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
+import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaEvaluationException;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaInvalidWorkspaceException;
 import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
 import com.michaelcanonizado.backend.formula.contexts.TypeContext;
 import com.michaelcanonizado.backend.formula.values.NumberValue;
@@ -19,7 +22,10 @@ public class CriterionNode implements BlockNode {
         BigDecimal score = context.getCriteriaValues().get(id);
 
         if (score == null) {
-//            score is not in the criterionScore map
+            throw new FormulaEvaluationException(
+                    "Formula evaluation error! CriterionNode with value: \"" + id + "\" cannot be resolved! No score in evaluation context.",
+                    ErrorCode.FORMULA_EVALUATION_ERROR
+            );
         }
 
         return new NumberValue(score);

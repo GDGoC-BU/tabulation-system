@@ -1,5 +1,8 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
+import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaEvaluationException;
+import com.michaelcanonizado.backend.exceptions.customs.FormulaTypeException;
 import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
 import com.michaelcanonizado.backend.formula.contexts.TypeContext;
 import com.michaelcanonizado.backend.formula.functions.FormulaFunction;
@@ -38,9 +41,11 @@ public class FunctionNode implements BlockNode {
         FormulaFunction function = context.getFunctionRegistry().get(functionName);
 
         if (function == null) {
-            /* Custom unknown function error */
+            throw new FormulaEvaluationException(
+                    "Formula evaluation error! No registered function for FunctionNode: " + functionName,
+                    ErrorCode.FORMULA_EVALUATION_ERROR
+            );
         }
-        assert function != null;
 
         /* Pass the arguments to the function and evaluate */
         return function.evaluate(arguments, context);
@@ -48,9 +53,17 @@ public class FunctionNode implements BlockNode {
 
     @Override
     public ValueType getType(TypeContext context) {
-        return context
+        FormulaFunction function = context
                 .getFunctionRegistry()
-                .get(functionName)
-                .getReturnType(arguments, context);
+                .get(functionName);
+
+        if (function == null) {
+            throw new FormulaTypeException(
+                    "Invalid formula! No registered function for FunctionNode: " + functionName,
+                    ErrorCode.FORMULA_TYPE_ERROR
+            );
+        }
+
+        return function.getReturnType(arguments, context);
     }
 }
