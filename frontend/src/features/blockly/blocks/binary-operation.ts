@@ -2,7 +2,7 @@ import * as Blockly from 'blockly'
 
 Blockly.defineBlocksWithJsonArray([
   {
-    type: 'arithmetic',
+    type: 'binary_operation',
     message0: '%1 %2 %3',
     args0: [
       {
@@ -15,10 +15,9 @@ Blockly.defineBlocksWithJsonArray([
         name: 'OPERATOR',
         options: [
           ['+', 'ADD'],
-          ['-', 'MINUS'],
+          ['-', 'SUBTRACT'],
           ['×', 'MULTIPLY'],
           ['÷', 'DIVIDE'],
-          ['^', 'EXPONENT'],
         ],
       },
       {

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -17,6 +18,6 @@ public class CriteriaBreakdown {
     private PhaseBreakdownDTO phase;
     private SegmentBreakdownDTO segment;
     private CriterionBreakdownDTO criterion;
-    private Double averageScore;
+    private BigDecimal averageScore;
     private List<ScoreBreakdownDTO> scores;
 }

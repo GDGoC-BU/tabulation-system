@@ -1,12 +1,14 @@
 import { create } from 'zustand'
-import type { CriterionLookup } from '@/features/criteria/lib/generate-criterion-lookup'
 
 type BlocklyStore = {
-  criterionLookup: CriterionLookup | null
-  setCriterionLookup: (lookup: CriterionLookup) => void
+  criterionDropdownOptions: Array<[string, string] | 'separator'> | null
+  setCriterionDropdownOptions: (
+    options: Array<[string, string] | 'separator'>,
+  ) => void
 }
 
 export const useBlocklyStore = create<BlocklyStore>((set) => ({
-  criterionLookup: null,
-  setCriterionLookup: (lookup) => set({ criterionLookup: lookup }),
+  criterionDropdownOptions: null,
+  setCriterionDropdownOptions: (options) =>
+    set({ criterionDropdownOptions: options }),
 }))

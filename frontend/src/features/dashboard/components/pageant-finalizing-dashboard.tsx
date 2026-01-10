@@ -5,7 +5,7 @@ import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pagea
 import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
 import { useAwardsQuery } from '@/features/awards/hooks/use-awards-query'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
-import FormulaRenderer from '@/features/formula/components/formula-renderer'
+import FormulaRenderer from '@/features/formula/deprecated-components/formula-renderer'
 import { useAwardsCalculation } from '@/features/awards/hooks/use-awards-calculation-mutation'
 import { cn } from '@/lib/utils'
 import { groupLeaderboardByGender } from '@/lib/group-leaderboard-by-gender'

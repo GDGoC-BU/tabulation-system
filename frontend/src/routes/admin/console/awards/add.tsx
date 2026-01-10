@@ -35,7 +35,10 @@ function AdminConsoleAwardsAdd() {
     defaultValues: {
       name: '',
       candidateLimit: '',
-      formula: '',
+      formula: {
+        text: '',
+        workspace: {},
+      },
     },
   })
 
@@ -95,26 +98,32 @@ function AdminConsoleAwardsAdd() {
         </Console.Header.Title>
       </Console.Header>
       <Console.Content>
-        <div className="">
+        <div className="h-full">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="gap-4 flex h-full flex-col"
+            >
               <div className="grid grid-cols-2 gap-4">
                 {NameFormField}
                 {CandidateLimitFormField}
               </div>
-              <div className="">
+              <div className="grow">
                 <FormField
                   control={form.control}
-                  name="formula"
+                  /* Error message is determined from formula.text, bind <FormulaMessage/> to it */
+                  name="formula.text"
                   render={() => (
-                    <FormItem>
+                    <FormItem className="flex flex-col h-full">
                       <FormLabel>Formula</FormLabel>
                       <FormMessage className="" />
+                      {/* Actual formula object is still being targeted here */}
                       <FormulaInput name="formula" control={form.control} />
                     </FormItem>
                   )}
                 />
               </div>
+              {/* Server side error */}
               {/* {isError && <TextSub className="text-destructive">{error}</TextSub>} */}
               <div className="flex flex-row gap-4">
                 <Button type="button" variant="outline">

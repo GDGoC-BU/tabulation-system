@@ -8,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,15 +48,15 @@ public class AwardLeaderboard {
     @JoinColumn(name = "award_id", nullable = false)
     private Award award;
 
-    @Column(nullable = false)
-    private Double score;
+    @Column(nullable = false, precision = 20, scale = 10)
+    private BigDecimal score;
 
     @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<CriteriaBreakdown> criteriaBreakdown = new ArrayList<>();
 
-    public AwardLeaderboard(Double score, Candidate candidate, Award award) {
+    public AwardLeaderboard(BigDecimal score, Candidate candidate, Award award) {
         this.candidate = candidate;
         this.award = award;
         this.score = score;

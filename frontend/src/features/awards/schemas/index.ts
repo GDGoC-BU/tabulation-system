@@ -1,6 +1,7 @@
 import z from 'zod'
 import { candidateSummarySchema } from '@/features/candidates/schemas'
 import { criteriaBreakdownSchema } from '@/schemas'
+import { formulaSchema } from '@/features/formula/schemas'
 
 export const awardLeaderboardSummarySchema = z.object({
   id: z.string(),
@@ -19,7 +20,7 @@ export const awardSummarySchema = z.object({
   id: z.string(),
   name: z.string(),
   candidateLimit: z.int(),
-  formula: z.string(),
+  formula: formulaSchema,
 })
 export type AwardSummary = z.infer<typeof awardSummarySchema>
 
@@ -27,7 +28,7 @@ export const awardDetailedSchema = z.object({
   id: z.string(),
   name: z.string(),
   candidateLimit: z.int(),
-  formula: z.string(),
+  formula: formulaSchema,
   leaderboard: awardLeaderboardsSchema,
 })
 export type AwardDetailed = z.infer<typeof awardDetailedSchema>
@@ -46,9 +47,7 @@ export const awardAddFormSchema = z.object({
     .min(1, {
       message: 'Enter how many candidates will get this award',
     }),
-  formula: z.string().min(1, {
-    error: 'Formula is required',
-  }),
+  formula: formulaSchema,
 })
 export type AwardAddForm = z.infer<typeof awardAddFormSchema>
 
@@ -66,8 +65,6 @@ export const awardEditFormSchema = z.object({
     .min(1, {
       message: 'Enter how many candidates will get this award',
     }),
-  formula: z.string().min(1, {
-    error: 'Formula is required',
-  }),
+  formula: formulaSchema,
 })
 export type AwardEditForm = z.infer<typeof awardEditFormSchema>

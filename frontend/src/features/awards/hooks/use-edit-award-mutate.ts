@@ -19,7 +19,7 @@ export default function useEditAwardMutate() {
       }
     },
     onError: (error) => {
-      console.error('Editing award failed', error)
+      console.error('Editing award failed: ', error)
     },
   })
 }

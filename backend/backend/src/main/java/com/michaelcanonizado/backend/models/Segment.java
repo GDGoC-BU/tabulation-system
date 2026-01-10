@@ -38,8 +38,25 @@ public class Segment {
     @Column(nullable = true)
     private Integer candidateLimit;
 
-    @Column(nullable = true, columnDefinition = "TEXT")
-    private String formula;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(
+                    name = "text",
+                    column = @Column(
+                            name = "text",
+                            nullable = true
+                    )
+            ),
+            @AttributeOverride(
+                    name = "workspace",
+                    column = @Column(
+                            name = "workspace",
+                            columnDefinition = "jsonb",
+                            nullable = true
+                    )
+            )
+    })
+    private Formula formula;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -76,7 +93,7 @@ public class Segment {
     )
     private List<CandidateSegmentQualification> candidateQualifications = new ArrayList<>();
 
-    public Segment(String name, int sequence, Integer candidateLimit, String formula, Phase phase) {
+    public Segment(String name, int sequence, Integer candidateLimit, Formula formula, Phase phase) {
         this.name = name;
         this.sequence = sequence;
         this.candidateLimit = candidateLimit;

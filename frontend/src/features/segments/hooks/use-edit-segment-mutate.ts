@@ -19,7 +19,7 @@ export default function useEditSegmentMutate() {
       }
     },
     onError: (error) => {
-      console.error(`Editing segment failed`, error)
+      console.error(`Editing segment failed: `, error)
     },
   })
 }

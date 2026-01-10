@@ -29,8 +29,25 @@ public class Award {
     @Column(nullable = false)
     private int candidateLimit;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String formula;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(
+                    name = "text",
+                    column = @Column(
+                            name = "text",
+                            nullable = false
+                    )
+            ),
+            @AttributeOverride(
+                    name = "workspace",
+                    column = @Column(
+                            name = "workspace",
+                            columnDefinition = "jsonb",
+                            nullable = false
+                    )
+            )
+    })
+    private Formula formula;
 
     @JsonBackReference
     @ManyToOne(
@@ -48,7 +65,7 @@ public class Award {
     )
     private List<AwardLeaderboard> leaderboard = new ArrayList<>();
 
-    public Award(String name, int candidateLimit, String formula, Pageant pageant) {
+    public Award(String name, int candidateLimit, Formula formula, Pageant pageant) {
         this.name = name;
         this.candidateLimit = candidateLimit;
         this.formula = formula;

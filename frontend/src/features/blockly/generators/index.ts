@@ -1,4 +1,4 @@
 import './number-literal'
 import './formula'
-import './arithmetic'
+import './binary-operation'
 import './criterion-dropdown'
