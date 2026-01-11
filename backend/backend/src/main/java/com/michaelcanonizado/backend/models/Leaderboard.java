@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+/* To satisfy mapstruct generator. NoArgsConstructor is required by JPA, but
+entities should be set to protected to avoid invalid creation of classes. */
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 @Setter
 public class Leaderboard {

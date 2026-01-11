@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
+import com.michaelcanonizado.backend.dtos.leaderboard.LeaderboardSummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
 
@@ -13,6 +14,7 @@ public record SegmentDetailedDTO(
         int sequence,
         PhaseSegmentStatus status,
         PhaseSummaryDTO phase,
-        List<CriterionSummaryDTO> criteria
+        List<CriterionSummaryDTO> criteria,
+        LeaderboardSummaryDTO leaderboard
 ) {
 }

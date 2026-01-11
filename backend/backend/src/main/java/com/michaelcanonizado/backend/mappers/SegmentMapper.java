@@ -11,7 +11,8 @@ import org.mapstruct.MappingTarget;
         componentModel = "spring",
         uses = {
                 PhaseService.class,
-                CriterionMapper.class
+                CriterionMapper.class,
+                LeaderboardMapper.class
         }
 )
 public interface SegmentMapper {
