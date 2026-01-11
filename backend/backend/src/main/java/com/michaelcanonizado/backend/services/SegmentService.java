@@ -1,10 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
-import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
-import com.michaelcanonizado.backend.dtos.pageant.PageantHierarchyDTO;
-import com.michaelcanonizado.backend.dtos.phase.PhaseBreakdownDTO;
-import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.segment.*;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
@@ -14,30 +10,19 @@ import com.michaelcanonizado.backend.messages.OngoingSegmentMessage;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.contexts.PageantContext;
-import com.michaelcanonizado.backend.specifications.CandidateSegmentQualificationSpecification;
-import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import com.michaelcanonizado.backend.specifications.SegmentSpecification;
 import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
 import com.michaelcanonizado.backend.utilities.FormulaEncoder;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class SegmentService {
@@ -46,9 +31,6 @@ public class SegmentService {
 
     @Autowired
     private CandidateRepository candidateRepository;
-
-    @Autowired
-    private CandidateSegmentQualificationRepository csqRepository;
 
     @Autowired
     private ScoreRepository scoreRepository;
@@ -97,6 +79,9 @@ public class SegmentService {
     })
     @Transactional
     public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
+        /* NOTE: Creating a segment doesn't create leaderboard!
+        Another step should be taken to add qualifications to a segment. */
+
         /* Load DTO to entity */
         Segment segment = segmentMapper.toEntity(segmentCreateDTO);
 
@@ -104,12 +89,6 @@ public class SegmentService {
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
 
         Segment savedSegment = segmentRepository.save(segment);
-
-        /* Get current candidates and qualify them to the new segment */
-        List<Candidate> candidates = candidateRepository.findAll();
-        candidates.forEach(candidate -> {
-            csqRepository.save(new CandidateSegmentQualification(savedSegment, candidate));
-        });
 
         /* Save candidate to database */
         return segmentMapper.toDetailedDTO(savedSegment);
@@ -126,13 +105,6 @@ public class SegmentService {
 
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         UUID selectedPageantId = pageantContext.getId();
-
-        boolean shouldCalculateCandidateQualifications =
-                segment.getFormula() != null && segment.getCandidateLimit() != null;
-
-        if (shouldCalculateCandidateQualifications) {
-            calculateCandidateQualificationsHelper(segment, selectedPageantId);
-        }
 
         /* TO-IMPLEMENT: Ensure that only 1 has the state ONGOING */
         segment.setStatus(PhaseSegmentStatus.ONGOING);
@@ -158,7 +130,7 @@ public class SegmentService {
                     }
                 }
         );
-        return segmentMapper.toDetailedDTO(savedSegment);
+        return segmentMapper.toDetailedDTO(segment);
     }
 
     @RequirePageantStatus({
@@ -239,9 +211,9 @@ public class SegmentService {
            candidate limit and formula, and the next segment has none. THe qualified candidates
            from the previous segment should be the only qualified for the segment, not all
            candidates! It should have a funnel effect. */
-        if (segment.getFormula() == null || segment.getCandidateLimit() == null) {
-            return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
-        }
+//        if (segment.getFormula() == null || segment.getCandidateLimit() == null) {
+//            return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
+//        }
 
         UUID selectedPageantId = pageantContext.getId();
         calculateCandidateQualificationsHelper(segment, selectedPageantId);
@@ -558,16 +530,20 @@ public class SegmentService {
     @Transactional
     public List<SegmentSummaryDTO> getSegments() {
         UUID selectedPageantId = pageantContext.getId();
-        return segmentRepository.findAll(
-                Specification.allOf(
-                        SegmentSpecification.hasPageant(selectedPageantId)
+        return segmentRepository
+                .findAll(
+                    Specification.allOf(
+                            SegmentSpecification.hasPageant(selectedPageantId)
+                    )
                 )
-        ).stream().sorted(
-                Comparator.comparing((Segment segment) -> segment.getPhase().getSequence())
-                        .thenComparing(Segment::getSequence)
-        ).map(segment -> {
-            return segmentMapper.toSummaryDTO(segment);
-        }).toList();
+                .stream()
+                .sorted(
+                    Comparator
+                            .comparing((Segment segment) -> segment.getPhase().getSequence())
+                            .thenComparing(Segment::getSequence)
+                )
+                .map(segment -> segmentMapper.toSummaryDTO(segment))
+                .toList();
     }
 
     @RequirePageantStatus({

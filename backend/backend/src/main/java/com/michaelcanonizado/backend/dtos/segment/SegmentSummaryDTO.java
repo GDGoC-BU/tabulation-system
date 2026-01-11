@@ -10,11 +10,12 @@ public record SegmentSummaryDTO(
         UUID id,
         String name,
         int sequence,
-        Integer candidateLimit,
-        Formula formula,
         PhaseSegmentStatus status,
         /* FIX THIS. PhaseDetailedDTO shows its segments and the segment shows their phase? unnecessary.
            But for now keep it, the frontend depends on this relationship. */
-        PhaseSummaryDTO phase
+        PhaseSummaryDTO phase,
+        boolean hasQualification,
+        int leaderboardSelectionCount,
+        Formula formula
 ) {
 }

@@ -11,7 +11,6 @@ import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedExcep
 import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
-import com.michaelcanonizado.backend.specifications.CandidateSegmentQualificationSpecification;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
@@ -36,9 +35,6 @@ public class PageantService {
 
     @Autowired
     private SegmentRepository segmentRepository;
-
-    @Autowired
-    private CandidateSegmentQualificationRepository csqRepository;
 
     @Autowired
     private AwardRepository awardRepository;
@@ -373,16 +369,7 @@ public class PageantService {
         segmentRepository.saveAll(segments);
         phaseRepository.saveAll(phases);
 
-        /* Reset Candidate-Segment Qualifications */
-        List<CandidateSegmentQualification> candidateSegmentQualifications = csqRepository.findAll(
-                Specification.allOf(CandidateSegmentQualificationSpecification.hasPageant(id))
-        );
-        candidateSegmentQualifications.forEach((csq) -> {
-            csq.setQualified(true);
-            csq.setScore(0.0);
-            csq.setCriteriaBreakdown(null);
-        });
-        csqRepository.saveAll(candidateSegmentQualifications);
+        /* RESET LEADERBOARDS */
 
         /* Reset Pageant status */
         pageant.setStatus(PageantStatus.PREPARATION);

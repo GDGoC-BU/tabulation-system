@@ -15,12 +15,16 @@ public record SegmentCreateDTO(
         @Min(value = 1, message = ">= 1")
         int sequence,
 
-        @Min(value = 1, message = ">= 1")
-        Integer candidateLimit,
-
-        Formula formula,
+        @NotNull(message = "required")
+        UUID phaseId,
 
         @NotNull(message = "required")
-        UUID phaseId
+        boolean hasQualifications,
+
+        @Min(value = 0, message = ">= 0")
+        int leaderboardSelectionCount,
+
+        @NotNull(message = "required")
+        Formula formula
 ) {
 }

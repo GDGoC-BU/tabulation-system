@@ -1,7 +1,7 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
-import com.michaelcanonizado.backend.dtos.candidateSegmentQualification.CandidateSegmentQualificationSummaryDTO;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionSummaryDTO;
+import com.michaelcanonizado.backend.dtos.leaderboardEntry.LeaderboardEntrySummaryDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseSummaryDTO;
 import com.michaelcanonizado.backend.models.Formula;
 import com.michaelcanonizado.backend.models.PhaseSegmentStatus;
@@ -13,11 +13,12 @@ public record SegmentDetailedDTO(
         UUID id,
         String name,
         int sequence,
-        Integer candidateLimit,
-        Formula formula,
         PhaseSegmentStatus status,
         PhaseSummaryDTO phase,
         List<CriterionSummaryDTO> criteria,
-        List<CandidateSegmentQualificationSummaryDTO> candidateQualifications
+        boolean hasQualifications,
+        int leaderboardSelectionCount,
+        Formula formula,
+        List<LeaderboardEntrySummaryDTO> leaderboard
 ) {
 }

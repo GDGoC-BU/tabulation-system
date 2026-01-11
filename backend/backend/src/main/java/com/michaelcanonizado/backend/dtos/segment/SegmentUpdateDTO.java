@@ -9,9 +9,13 @@ public record SegmentUpdateDTO(
         @NotBlank(message = "required")
         String name,
 
-        @Min(value = 1, message = ">= 1")
-        Integer candidateLimit,
+        @NotNull(message = "required")
+        boolean hasQualifications,
 
+        @Min(value = 0, message = ">= 0")
+        int leaderboardSelectionCount,
+
+        @NotNull(message = "required")
         Formula formula
 ) {
 }

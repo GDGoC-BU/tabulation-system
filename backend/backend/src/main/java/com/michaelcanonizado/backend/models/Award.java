@@ -35,6 +35,7 @@ public class Award {
                     name = "text",
                     column = @Column(
                             name = "text",
+                            columnDefinition = "TEXT",
                             nullable = false
                     )
             ),

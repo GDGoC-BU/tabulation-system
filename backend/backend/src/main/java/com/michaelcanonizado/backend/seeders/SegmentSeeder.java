@@ -1,5 +1,7 @@
 package com.michaelcanonizado.backend.seeders;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.michaelcanonizado.backend.models.Formula;
 import com.michaelcanonizado.backend.models.Phase;
 import com.michaelcanonizado.backend.models.Segment;
 import com.michaelcanonizado.backend.repositories.PhaseRepository;
@@ -38,7 +40,16 @@ public class SegmentSeeder implements DatabaseSeeder {
 
             /* Go through the ist of segments of the static phase and store it in the database */
             phaseTemp.getSegments().forEach(segmentTemp -> {
-                segments.add(new Segment(segmentTemp.getName(), segmentTemp.getSequence(), null, null, phase));
+                segments.add(
+                        new Segment(
+                                segmentTemp.getName(),
+                                segmentTemp.getSequence(),
+                                phase,
+                                false,
+                                new Formula("", new ObjectMapper().createObjectNode()),
+                                0
+                        )
+                );
             });
         });
         segmentRepository.saveAll(segments);

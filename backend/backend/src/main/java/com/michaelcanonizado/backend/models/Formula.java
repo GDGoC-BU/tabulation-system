@@ -3,8 +3,8 @@ package com.michaelcanonizado.backend.models;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,11 +19,17 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Formula {
-    @Column(nullable = false)
+    @Column(
+            nullable = false,
+            columnDefinition = "TEXT"
+    )
     private String text;
 
     @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(
+            nullable = false,
+            columnDefinition = "jsonb"
+    )
     private JsonNode workspace;
 }
