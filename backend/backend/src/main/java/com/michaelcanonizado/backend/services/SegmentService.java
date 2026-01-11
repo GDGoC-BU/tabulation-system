@@ -550,7 +550,7 @@ public class SegmentService {
             PageantStatus.PREPARATION
     })
     @Transactional
-    public SegmentSummaryDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
+    public SegmentDetailedDTO updateSegment(UUID id, SegmentUpdateDTO segmentUpdateDTO) {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Can't update! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
@@ -559,7 +559,7 @@ public class SegmentService {
         segmentMapper.updateEntityFromDTO(segment, segmentUpdateDTO);
 
         Segment savedSegment = segmentRepository.save(segment);
-        return segmentMapper.toSummaryDTO(savedSegment);
+        return segmentMapper.toDetailedDTO(savedSegment);
     }
 
     @RequirePageantStatus({

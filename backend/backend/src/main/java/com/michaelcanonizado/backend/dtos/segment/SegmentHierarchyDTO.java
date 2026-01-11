@@ -13,8 +13,6 @@ public record SegmentHierarchyDTO(
         int sequence,
         PhaseSegmentStatus status,
         List<CriterionHierarchyDTO> criteria,
-        boolean hasQualifications,
-        int leaderboardSelectionCount,
-        Formula formula
+        boolean hasQualifications
 ) {
 }
