@@ -44,10 +44,7 @@ public class SegmentSeeder implements DatabaseSeeder {
                         new Segment(
                                 segmentTemp.getName(),
                                 segmentTemp.getSequence(),
-                                phase,
-                                false,
-                                new Formula("", new ObjectMapper().createObjectNode()),
-                                0
+                                phase
                         )
                 );
             });

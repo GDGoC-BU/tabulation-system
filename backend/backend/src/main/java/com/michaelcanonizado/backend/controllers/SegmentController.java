@@ -39,12 +39,6 @@ public class SegmentController {
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 
-    @PostMapping("/segments/{id}/calculate-qualified-candidates")
-    public ResponseEntity<SegmentDetailedDTO> calculateCandidateQualifications(@PathVariable UUID id) {
-        SegmentDetailedDTO segment = service.calculateCandidateQualifications(id);
-        return new ResponseEntity<>(segment, HttpStatus.OK);
-    }
-
     @GetMapping("/segments/{id}")
     public ResponseEntity<SegmentDetailedDTO> getSegment(@PathVariable UUID id) {
         SegmentDetailedDTO segment = service.getSegment(id);
@@ -67,8 +61,8 @@ public class SegmentController {
     }
 
     @PutMapping("/segments/{id}")
-    public ResponseEntity<SegmentSummaryDTO> updateSegment(@PathVariable UUID id, @RequestBody @Valid SegmentUpdateDTO segmentUpdateDTO) {
-        SegmentSummaryDTO segment = service.updateSegment(id, segmentUpdateDTO);
+    public ResponseEntity<SegmentDetailedDTO> updateSegment(@PathVariable UUID id, @RequestBody @Valid SegmentUpdateDTO segmentUpdateDTO) {
+        SegmentDetailedDTO segment = service.updateSegment(id, segmentUpdateDTO);
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 

@@ -1,0 +1,301 @@
+package com.michaelcanonizado.backend.services;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.judge.JudgeBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.phase.PhaseBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.segment.SegmentBreakdownDTO;
+import com.michaelcanonizado.backend.formula.FormulaTree;
+import com.michaelcanonizado.backend.formula.FormulaTreeBuilder;
+import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
+import com.michaelcanonizado.backend.formula.contexts.FormulaContextFactory;
+import com.michaelcanonizado.backend.formula.contexts.TypeContext;
+import com.michaelcanonizado.backend.formula.values.NumberValue;
+import com.michaelcanonizado.backend.mappers.CriterionMapper;
+import com.michaelcanonizado.backend.mappers.PhaseMapper;
+import com.michaelcanonizado.backend.mappers.SegmentMapper;
+import com.michaelcanonizado.backend.models.*;
+import com.michaelcanonizado.backend.repositories.CandidateRepository;
+import com.michaelcanonizado.backend.repositories.CriterionRepository;
+import com.michaelcanonizado.backend.repositories.ScoreRepository;
+import com.michaelcanonizado.backend.specifications.ScoreSpecification;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@Service
+public class LeaderboardService {
+    @Autowired
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private CriterionRepository criterionRepository;
+
+    @Autowired
+    private ScoreRepository scoreRepository;
+
+    @Autowired
+    private PhaseMapper phaseMapper;
+
+    @Autowired
+    private SegmentMapper segmentMapper;
+
+    @Autowired
+    private CriterionMapper criterionMapper;
+
+    @Autowired
+    private FormulaTreeBuilder formulaTreeBuilder;
+
+    @Autowired
+    private FormulaContextFactory formulaContextFactory;
+
+    /* Centralized logic to work with the leaderboard. The lifecycle should be controlled
+    * by the aggregate root (Method calling LeaderboardService methods should have @Transaction).
+    * This service shall only read necessary data from the repository, and not write to it. */
+
+    public Formula createBlankFormula() {
+        return new Formula(
+                "",
+                new ObjectMapper().createObjectNode()
+        );
+    }
+
+    public void createLeaderboard(
+            Leaderboard leaderboardOwner,
+            UUID pageantId
+    ) {
+        List<Candidate> candidates = candidateRepository.findAllByPageant_Id(pageantId);
+        List<LeaderboardEntry> leaderboardEntries = leaderboardOwner.getEntries();
+
+        candidates.forEach(candidate -> {
+            LeaderboardEntry entry = new LeaderboardEntry(
+                    candidate,
+                    0,
+                    BigDecimal.ZERO
+            );
+            leaderboardEntries.add(entry);
+        });
+
+        leaderboardOwner.getEntries().clear();
+        leaderboardOwner.setEntries(leaderboardEntries);
+    }
+
+    public void clearLeaderboard(Leaderboard leaderboardOwner) {
+        leaderboardOwner.setSelectionCount(0);
+        leaderboardOwner.setFormula(createBlankFormula());
+        leaderboardOwner.getEntries().clear();
+    }
+
+    public void calculateLeaderboard(Leaderboard leaderboardOwner, UUID pageantId) {
+        /* ======================================================================== */
+        /* ========================= Formula Tree Building ======================== */
+        /* ======================================================================== */
+
+        /* Convert serialized blockly workspace to AST */
+        JsonNode serializedBlocklyWorkspace = leaderboardOwner.getFormula().getWorkspace();
+        FormulaTree formulaTree = formulaTreeBuilder.build(serializedBlocklyWorkspace);
+
+        /* This will throw an exception if the formula tree generated is invalid
+         * (Formula should already be validated on creation) */
+        TypeContext typeContext = formulaContextFactory.createTypeContext();
+        formulaTree.getFormulaNode().getType(typeContext);
+        /* MathContext the formula will use. Set the formula precision here */
+        MathContext mathContext = new MathContext(10, RoundingMode.HALF_UP);
+
+        /* ======================================================================== */
+        /* ======================= Data Fetching & Aggregation ==================== */
+        /* ======================================================================== */
+
+        List<UUID> criterionIdsInFormula = new ArrayList<>(formulaTree.getCriterionIdsInFormula());
+
+        /* Fetch criteria in the formula */
+        List<Criterion> criteria = criterionRepository.findAllById(criterionIdsInFormula);
+
+        /* Fetch all candidates in the pageant */
+        List<Candidate> candidates = candidateRepository.findAllByPageant_Id(pageantId);
+        /* Fetch relevant scores */
+        List<Score> scores = scoreRepository.findAll(
+                Specification.allOf(
+                        ScoreSpecification.hasPageant(pageantId),
+                        ScoreSpecification.hasCandidates(
+                                candidates.stream().map(Candidate::getId).toList()
+                        ),
+                        ScoreSpecification.hasCriteria(criterionIdsInFormula)
+                )
+        );
+
+        /* Create a template of CriterionBreakdowns per criterion as accessing
+        the sub entities are expensive (fetched lazy). These entities can be
+        cached instead in the future. */
+        Map<UUID, CriteriaBreakdown> criterionBreakdownTemplates = new HashMap<>();
+        criteria.forEach(criterion -> {
+            PhaseBreakdownDTO phaseBreakdown = phaseMapper.toBreakdownDTO(criterion.getSegment().getPhase());
+            SegmentBreakdownDTO segmentBreakdown = segmentMapper.toBreakdownDTO(criterion.getSegment());
+            CriterionBreakdownDTO criterionBreakdown = criterionMapper.toBreakdownDTO(criterion);
+
+            criterionBreakdownTemplates.put(
+                    criterion.getId(),
+                    new CriteriaBreakdown(
+                            phaseBreakdown,
+                            segmentBreakdown,
+                            criterionBreakdown,
+                            null,
+                            null
+                    )
+            );
+        });
+
+        /* Group scores by criterion and candidate */
+        /* Map<CandidateId, Map<CriterionId, List<Scores>>> */
+        Map<UUID, Map<UUID, List<Score>>> scoreMap = new HashMap<>();
+        for (Score score : scores) {
+            UUID candidateId = score.getCandidate().getId();
+            UUID criterionId = score.getCriterion().getId();
+
+            scoreMap
+                    .computeIfAbsent(candidateId, k -> new HashMap<>())
+                    .computeIfAbsent(criterionId, k -> new ArrayList<>())
+                    .add(score);
+        }
+
+        /* ======================================================================== */
+        /* =========================== Context Building =========================== */
+        /* ======================================================================== */
+
+        /* Map of criteriaAverages per candidate. Each sub map will be used in the evaluation
+         * context, when evaluating the formula for each candidate. */
+        /* Map<CandidateId, Map<CriterionId, Average Score>> */
+        Map<UUID, Map<UUID, BigDecimal>> candidateCriteriaAverages = new HashMap<>();
+        /* Map of criteriaBreakdowns for each candidate */
+        /* Map<CandidateID, List<CriterionBreakdown>> */
+        Map<UUID, List<CriteriaBreakdown>> candidateCriteriaBreakdowns =  new HashMap<>();
+
+        /* Populate candidateCriterionAverages and candidateCriteriaBreakdowns.
+         * This is done together to keep the result of the evaluated formula in-sync
+         * with the criterion breakdown. Loop through each candidate and get the needed data */
+        candidates.forEach(candidate -> {
+            UUID candidateId = candidate.getId();
+
+            /* Collect the candidate's breakdowns  */
+            List<CriteriaBreakdown> breakdowns = new ArrayList<>();
+
+            /* Loop through each criterion in the formula */
+            criteria.forEach(criterion -> {
+                UUID criterionId = criterion.getId();
+
+                /* Get the scores of the candidate on the current criterion */
+                List<Score> candidateScores = scoreMap.get(candidateId).get(criterionId);
+
+                List<ScoreBreakdownDTO> scoreBreakdowns = new ArrayList<>();
+                BigDecimal sum = BigDecimal.ZERO;
+
+                /* Go through each score */
+                for (Score score : candidateScores) {
+                    /* Create the score breakdown */
+                    Judge judge = score.getJudge();
+                    scoreBreakdowns.add(
+                            new ScoreBreakdownDTO(
+                                    new JudgeBreakdownDTO(
+                                            judge.getId(),
+                                            judge.getUsername(),
+                                            judge.getFirstName(),
+                                            judge.getLastName(),
+                                            judge.getHonorific(),
+                                            judge.getNumber()
+                                    ),
+                                    score.getValue()
+                            )
+                    );
+
+                    /* Compute sum of score values */
+                    sum = sum.add(new BigDecimal(score.getValue()));
+                }
+
+                /* Get the average score of candidate on the current criterion */
+                BigDecimal average = sum.divide(
+                        BigDecimal.valueOf(candidateScores.size()),
+                        mathContext
+                );
+
+
+                /* Create and add the CriterionBreakdown */
+                CriteriaBreakdown template = criterionBreakdownTemplates.get(criterionId);
+                breakdowns.add(
+                        new CriteriaBreakdown(
+                                template.getPhase(),
+                                template.getSegment(),
+                                template.getCriterion(),
+                                average,
+                                scoreBreakdowns
+                        )
+                );
+
+                /* Add to candidateCriteriaAverages */
+                candidateCriteriaAverages
+                        .computeIfAbsent(candidateId, k -> new HashMap<>())
+                        .put(criterionId, average);
+            });
+
+            /* Add to candidateCriteriaBreakdowns */
+            candidateCriteriaBreakdowns.put(candidateId, breakdowns);
+        });
+
+        /* ======================================================================== */
+        /* ============================== EVALUATION ============================== */
+        /* ======================================================================== */
+
+        /* Create a map to quickly access the leaderboard entry of a candidate */
+        /* Map<CandidateId, LeaderboardEntry> */
+        Map<UUID, LeaderboardEntry> leaderboardEntriesMap = leaderboardOwner
+                .getEntries()
+                .stream()
+                .collect(
+                        Collectors.toMap(
+                                leaderboardRow -> leaderboardRow.getCandidate().getId(),
+                                Function.identity()
+                        )
+                );
+
+        List<LeaderboardEntry> updatedLeaderboardEntries = new ArrayList<>();
+
+        /* Go through each candidate and evaluate the formula on them */
+        candidates.forEach(candidate -> {
+            /* Get their criterion scores */
+            Map<UUID, BigDecimal> criteriaValues = candidateCriteriaAverages.get(candidate.getId());
+
+            /* Populate their evaluation context */
+            EvaluationContext evaluationContext = formulaContextFactory.createEvaluationContext(
+                    mathContext,
+                    criteriaValues
+            );
+
+            /* Evaluate the formula */
+            BigDecimal result = ((NumberValue) formulaTree.getFormulaNode().evaluate(evaluationContext)).value();
+
+            /* Set candidate's award leaderboard score value */
+            LeaderboardEntry leaderboardEntry = leaderboardEntriesMap.get(candidate.getId());
+            leaderboardEntry.setScore(result);
+
+            /* Add candidate's breakdown */
+            leaderboardEntry.setCriteriaBreakdown(
+                    candidateCriteriaBreakdowns.get(candidate.getId())
+            );
+
+            updatedLeaderboardEntries.add(leaderboardEntry);
+        });
+
+        leaderboardOwner.getEntries().clear();
+        leaderboardOwner.setEntries(updatedLeaderboardEntries);
+        leaderboardOwner.setLastCalculatedAt(LocalDateTime.now());
+    }
+}

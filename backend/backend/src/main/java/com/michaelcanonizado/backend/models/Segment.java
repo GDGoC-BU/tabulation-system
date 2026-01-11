@@ -7,12 +7,19 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
-public class Segment extends Leaderboard {
+public class Segment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
+    private UUID id;
+
     @Column(nullable = false, unique = false)
     private String name;
 
@@ -41,20 +48,22 @@ public class Segment extends Leaderboard {
     private List<Criterion> criteria = new ArrayList<>();
 
     @Column(nullable = false)
-    private boolean hasQualifications;
+    private boolean isQualificationRequired;
+
+    @OneToOne(
+            optional = true,
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(name = "leaderboard_id")
+    private Leaderboard leaderboard;
 
     public Segment(
             String name,
             int sequence,
-            Phase phase,
-            boolean hasQualifications,
-            Formula formula,
-            int leaderboardSelectionCount
+            Phase phase
     ) {
-        super(formula, leaderboardSelectionCount);
         this.name = name;
         this.sequence = sequence;
         this.phase = phase;
-        this.hasQualifications = hasQualifications;
     }
 }

@@ -1,14 +1,20 @@
 package com.michaelcanonizado.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Check;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -46,7 +52,7 @@ public class LeaderboardEntry {
     private BigDecimal score;
 
     @Column(nullable = false)
-    Boolean overridden = false;
+    boolean isOverridden = false;
 
     @Column(nullable = true)
     String overrideReason;
@@ -56,6 +62,11 @@ public class LeaderboardEntry {
 
     @Column(nullable = false)
     private boolean isSelected = false;
+
+    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<CriteriaBreakdown> criteriaBreakdown = new ArrayList<>();
 
     public LeaderboardEntry(Candidate candidate, Integer rank, BigDecimal score) {
         this.candidate = candidate;

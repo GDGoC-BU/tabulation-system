@@ -12,16 +12,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DiscriminatorColumn(name = "owner")
 @Getter
 @Setter
-public abstract class Leaderboard {
-    @Column(name = "owner", insertable = false, updatable = false)
-    @Setter(AccessLevel.NONE)
-    private String owner;
-
+public class Leaderboard {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)
@@ -33,7 +27,7 @@ public abstract class Leaderboard {
     private Formula formula;
 
     @Column(nullable = false)
-    private int leaderboardSelectionCount;
+    private int selectionCount;
 
     @OneToMany(
             mappedBy = "leaderboard",
@@ -41,13 +35,13 @@ public abstract class Leaderboard {
             fetch = FetchType.LAZY,
             orphanRemoval = true
     )
-    protected List<LeaderboardEntry> leaderboard = new ArrayList<>();
+    protected List<LeaderboardEntry> entries = new ArrayList<>();
 
     @Column(nullable = true)
-    private LocalDateTime leaderboardLastCalculatedAt = null;
+    private LocalDateTime lastCalculatedAt = null;
 
-    public Leaderboard(Formula formula, int leaderboardSelectionCount) {
+    public Leaderboard(Formula formula, int selectionCount) {
         this.formula = formula;
-        this.leaderboardSelectionCount = leaderboardSelectionCount;
+        this.selectionCount = selectionCount;
     }
 }
