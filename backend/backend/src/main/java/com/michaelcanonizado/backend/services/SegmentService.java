@@ -56,6 +56,9 @@ public class SegmentService {
     public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
         Segment segment = segmentMapper.toEntity(segmentCreateDTO);
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
+        if (segment.getLeaderboard() != null) {
+            segment.getLeaderboard().setPageantId(pageantContext.getId());
+        }
         Segment savedSegment = segmentRepository.save(segment);
         return segmentMapper.toDetailedDTO(savedSegment);
     }
@@ -236,6 +239,9 @@ public class SegmentService {
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         segmentMapper.updateEntityFromDTO(segment, segmentUpdateDTO);
+        if (segment.getLeaderboard() != null) {
+            segment.getLeaderboard().setPageantId(pageantContext.getId());
+        }
         return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
     }
 

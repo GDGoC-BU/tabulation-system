@@ -1,12 +1,15 @@
 package com.michaelcanonizado.backend.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeBreakdownDTO;
+import com.michaelcanonizado.backend.dtos.leaderboard.LeaderboardDetailedDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentBreakdownDTO;
+import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
+import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.formula.FormulaTree;
 import com.michaelcanonizado.backend.formula.FormulaTreeBuilder;
 import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
@@ -14,12 +17,11 @@ import com.michaelcanonizado.backend.formula.contexts.FormulaContextFactory;
 import com.michaelcanonizado.backend.formula.contexts.TypeContext;
 import com.michaelcanonizado.backend.formula.values.NumberValue;
 import com.michaelcanonizado.backend.mappers.CriterionMapper;
+import com.michaelcanonizado.backend.mappers.LeaderboardMapper;
 import com.michaelcanonizado.backend.mappers.PhaseMapper;
 import com.michaelcanonizado.backend.mappers.SegmentMapper;
 import com.michaelcanonizado.backend.models.*;
-import com.michaelcanonizado.backend.repositories.CandidateRepository;
-import com.michaelcanonizado.backend.repositories.CriterionRepository;
-import com.michaelcanonizado.backend.repositories.ScoreRepository;
+import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +38,12 @@ import java.util.stream.Collectors;
 @Service
 public class LeaderboardService {
     @Autowired
+    private LeaderboardRepository leaderboardRepository;
+
+    @Autowired
+    private LeaderboardEntryRepository leaderboardEntryRepository;
+
+    @Autowired
     private CandidateRepository candidateRepository;
 
     @Autowired
@@ -43,6 +51,9 @@ public class LeaderboardService {
 
     @Autowired
     private ScoreRepository scoreRepository;
+
+    @Autowired
+    private LeaderboardMapper leaderboardMapper;
 
     @Autowired
     private PhaseMapper phaseMapper;
@@ -54,46 +65,23 @@ public class LeaderboardService {
     private CriterionMapper criterionMapper;
 
     @Autowired
+    private PageantContext pageantContext;
+
+    @Autowired
     private FormulaTreeBuilder formulaTreeBuilder;
 
     @Autowired
     private FormulaContextFactory formulaContextFactory;
 
-    /* Centralized logic to work with the leaderboard. The lifecycle should be controlled
-    * by the aggregate root (Method calling LeaderboardService methods should have @Transaction).
-    * This service shall only read necessary data from the repository, and not write to it. */
-
-    public Formula createBlankFormula() {
-        return new Formula(
-                "",
-                new ObjectMapper().createObjectNode()
-        );
-    }
-
-    public void createLeaderboard(
-            Leaderboard leaderboardOwner,
-            UUID pageantId
-    ) {
-        List<Candidate> candidates = candidateRepository.findAllByPageant_Id(pageantId);
-        List<LeaderboardEntry> leaderboardEntries = leaderboardOwner.getEntries();
-
-        candidates.forEach(candidate -> {
-            LeaderboardEntry entry = new LeaderboardEntry(
-                    candidate,
-                    0,
-                    BigDecimal.ZERO
+    public LeaderboardDetailedDTO getLeaderboard(UUID id) {
+        Leaderboard leaderboard = leaderboardRepository.findById(id).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "Leaderboard not found!",
+                    ErrorCode.ENTITY_NOT_FOUND
             );
-            leaderboardEntries.add(entry);
         });
-
-        leaderboardOwner.getEntries().clear();
-        leaderboardOwner.setEntries(leaderboardEntries);
-    }
-
-    public void clearLeaderboard(Leaderboard leaderboardOwner) {
-        leaderboardOwner.setSelectionCount(0);
-        leaderboardOwner.setFormula(createBlankFormula());
-        leaderboardOwner.getEntries().clear();
+        pageantContext.assertAccess(leaderboard.getPageantId());
+        return leaderboardMapper.toDetailedDTO(leaderboard);
     }
 
     public void calculateLeaderboard(Leaderboard leaderboardOwner, UUID pageantId) {
