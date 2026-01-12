@@ -9,6 +9,6 @@ public record SegmentUpdateDTO(
         String name,
 
         @Valid
-        LeaderboardUpdateDTO leaderboard
+        LeaderboardUpdateDTO qualificationsLeaderboard
 ) {
 }

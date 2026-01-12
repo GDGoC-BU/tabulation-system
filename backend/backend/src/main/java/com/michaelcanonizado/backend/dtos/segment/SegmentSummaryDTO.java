@@ -14,6 +14,6 @@ public record SegmentSummaryDTO(
         /* FIX THIS. PhaseDetailedDTO shows its segments and the segment shows their phase? unnecessary.
            But for now keep it, the frontend depends on this relationship. */
         PhaseSummaryDTO phase,
-        LeaderboardSummaryDTO leaderboard
+        LeaderboardSummaryDTO qualificationsLeaderboard
 ) {
 }

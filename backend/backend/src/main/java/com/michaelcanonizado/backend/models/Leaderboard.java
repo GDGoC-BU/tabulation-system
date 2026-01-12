@@ -30,7 +30,6 @@ public class Leaderboard {
     private UUID pageantId;
 
     @Embedded
-    @Column(nullable = false)
     private Formula formula;
 
     @Column(nullable = false)

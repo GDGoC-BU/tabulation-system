@@ -13,6 +13,6 @@ public record SegmentHierarchyDTO(
         int sequence,
         PhaseSegmentStatus status,
         List<CriterionHierarchyDTO> criteria,
-        LeaderboardSummaryDTO leaderboard
+        LeaderboardSummaryDTO qualificationsLeaderboard
 ) {
 }

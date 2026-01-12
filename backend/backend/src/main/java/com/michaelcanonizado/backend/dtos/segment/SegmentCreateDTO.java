@@ -22,6 +22,6 @@ public record SegmentCreateDTO(
         UUID phaseId,
 
         @Valid
-        LeaderboardCreateDTO leaderboard
+        LeaderboardCreateDTO qualificationsLeaderboard
 ) {
 }

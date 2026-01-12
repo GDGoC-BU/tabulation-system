@@ -52,10 +52,12 @@ public class Segment {
 
     @OneToOne(
             optional = true,
-            fetch = FetchType.LAZY
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
-    @JoinColumn(name = "leaderboard_id")
-    private Leaderboard leaderboard;
+    @JoinColumn(name = "qualifications_leaderboard_id")
+    private Leaderboard qualificationsLeaderboard;
 
     public Segment(
             String name,

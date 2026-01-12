@@ -15,6 +15,6 @@ public record SegmentDetailedDTO(
         PhaseSegmentStatus status,
         PhaseSummaryDTO phase,
         List<CriterionSummaryDTO> criteria,
-        LeaderboardSummaryDTO leaderboard
+        LeaderboardSummaryDTO qualificationsLeaderboard
 ) {
 }
