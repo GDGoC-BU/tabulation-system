@@ -1,6 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
+import com.michaelcanonizado.backend.dtos.leaderboard.LeaderboardDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.*;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
@@ -22,6 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SegmentService {
@@ -29,7 +31,19 @@ public class SegmentService {
     private SegmentRepository segmentRepository;
 
     @Autowired
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private PhaseRepository phaseRepository;
+
+    @Autowired
+    private LeaderboardService leaderboardService;
+
+    @Autowired
     private SegmentMapper segmentMapper;
+
+    @Autowired
+    private LeaderboardMapper leaderboardMapper;
 
     @Autowired
     private PageantMapper pageantMapper;
@@ -56,11 +70,13 @@ public class SegmentService {
     public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
         Segment segment = segmentMapper.toEntity(segmentCreateDTO);
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
-        if (segment.getQualificationsLeaderboard() != null) {
-            segment.getQualificationsLeaderboard().setPageantId(pageantContext.getId());
+        if (segment.getQualificationLeaderboard() != null) {
+            segment.getQualificationLeaderboard().setPageantId(pageantContext.getId());
         }
+
+        /* Verify leaderboard formula */
+
         Segment savedSegment = segmentRepository.save(segment);
-        System.out.println("Segment: " + segment + " | " + segment.getName());
         return segmentMapper.toDetailedDTO(savedSegment);
     }
 
@@ -72,9 +88,25 @@ public class SegmentService {
         Segment segment = segmentRepository.findById(id).orElseThrow(() -> {
             return new EntityNotFoundException("Cannot start! Segment not found.", ErrorCode.ENTITY_NOT_FOUND);
         });
-
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
-        UUID selectedPageantId = pageantContext.getId();
+
+        /* If this is a qualifying segment, reflect the selected candidates in
+        * qualification leaderboard in ranking leaderboard. */
+        if (segment.isQualificationRequired()) {
+            Set<UUID> selectedCandidateIds = segment
+                    .getQualificationLeaderboard()
+                    .getSelectedCandidates()
+                    .stream()
+                    .map(Candidate::getId)
+                    .collect(Collectors.toSet());
+
+            segment
+                    .getRankingLeaderboard()
+                    .getEntries()
+                    .forEach(entry -> {
+                        entry.setSelected(selectedCandidateIds.contains(entry.getCandidate().getId()));
+                    });
+        }
 
         /* TO-IMPLEMENT: Ensure that only 1 has the state ONGOING */
         segment.setStatus(PhaseSegmentStatus.ONGOING);
@@ -88,6 +120,7 @@ public class SegmentService {
         Pageant pageant = phase.getPageant();
         updateCacheThatHaveSegment(pageant, phase);
 
+        UUID selectedPageantId = pageantContext.getId();
         /* Notify the client about the new ongoing segment after database commit */
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
@@ -135,29 +168,106 @@ public class SegmentService {
         return segmentMapper.toDetailedDTO(savedSegment);
     }
 
-    private void updateCacheThatHaveSegment(Pageant pageant, Phase phase) {
-        /* Pageant Hierarchy */
-        cacheService.put(
-                CacheNameConstants.TABULATION,
-                cacheKeyBuilder.build("pageants", pageant.getId(), "hierarchy"),
-                pageantMapper.toHierarchyDTO(pageant)
-        );
 
-        /* Phase */
-        cacheService.put(
-                CacheNameConstants.TABULATION,
-                cacheKeyBuilder.build("pageants", pageant.getId(), "phases", phase.getId()),
-                phaseMapper.toDetailedDTO(phase)
-        );
-
-        /* Ongoing Phase */
-        if (phase.getStatus() == PhaseSegmentStatus.ONGOING) {
-            cacheService.put(
-                    CacheNameConstants.TABULATION,
-                    cacheKeyBuilder.build("pageants", pageant.getId(), "phases", "ongoing"),
-                    phaseMapper.toDetailedDTO(phase)
+    @Transactional
+    public LeaderboardDetailedDTO calculateQualificationLeaderboard(UUID segmentId) {
+        Segment segment = segmentRepository.findById(segmentId).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "Cannot calculate qualification leaderboard! Segment not found.",
+                    ErrorCode.ENTITY_NOT_FOUND
             );
+        });
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
+
+        if (!segment.isQualificationRequired()) {
+            // Throw custom error
+            throw new RuntimeException("");
         }
+
+        /* Get previous segment within the same phase */
+        Segment previousSegmentInTheSamePhase = segment
+                .getPhase()
+                .getSegments()
+                .stream()
+                .filter(s -> s.getSequence() < segment.getSequence())
+                .max(Comparator.comparingInt(Segment::getSequence))
+                .orElse(null);
+
+        List<Candidate> candidatesToEvaluate;
+
+        /* Funneling effect. Candidates who were in the previous segment should be the only
+        * ones to be evaluated to be qualified for the current segment.
+        *
+        * Segment.qualificationLeaderboard will contain fewer entries as the pageant moves on. */
+        if (previousSegmentInTheSamePhase == null) {
+            /* Rare edge case where the starting segment of a phase already has qualifications.
+            *
+            * Case 1:
+            * P1: [S1,S2,S3], P2: [S1(q),S2(q)]
+            * - P2.S1 should refer to P1.S3
+            *
+            * Case 2:
+            * P1: [S1(q),S2(q)], P2: [S1,S2,S3]
+            * - This is an invalid pageant. What even is the criteria for P1.S1?
+            *   Since it's the very first segment in the WHOLE pageant.
+            * - Formula should also be verified such that it doesn't contain criteria
+            *   that comes after the segment it's applied on. */
+            UUID selectedPageantId = pageantContext.getId();
+            List<Phase> phases = phaseRepository.findAllByPageant_Id(selectedPageantId);
+
+            /* Find the previous phase */
+            Phase currentPhase = segment.getPhase();
+            Phase previousPhase = phases
+                    .stream()
+                    .filter(phase -> phase.getSequence() < currentPhase.getSequence())
+                    .max(Comparator.comparingInt(Phase::getSequence))
+                    .orElse(null);
+
+            /* Case 2 Error */
+            if (previousPhase == null) {
+                // First phase, first segment
+                throw new RuntimeException("");
+            }
+
+            /* Get the last segment in that phase */
+            Segment lastSegmentInPreviousPhase = previousPhase
+                    .getSegments()
+                    .stream()
+                    .max(Comparator.comparingInt(Segment::getSequence))
+                    .orElse(null);
+
+            /* Previous phase has no segments */
+            if (lastSegmentInPreviousPhase == null) {
+                // Phase before has no segments
+                throw new RuntimeException("");
+            }
+
+            candidatesToEvaluate = lastSegmentInPreviousPhase
+                    .getRankingLeaderboard()
+                    .getSelectedCandidates();
+
+        } else {
+            candidatesToEvaluate = previousSegmentInTheSamePhase
+                    .getRankingLeaderboard()
+                    .getSelectedCandidates();
+        }
+
+        Leaderboard updatedLeaderboard = leaderboardService.calculateLeaderboard(
+                segment.getQualificationLeaderboard(),
+                candidatesToEvaluate
+        );
+        return leaderboardMapper.toDetailedDTO(updatedLeaderboard);
+    }
+
+    public LeaderboardDetailedDTO getQualificationLeaderboard(UUID segmentId) {
+        Segment segment = segmentRepository.findById(segmentId).orElseThrow(() -> {
+            return new EntityNotFoundException(
+                    "Cannot get qualification leaderboard! Segment not found.",
+                    ErrorCode.ENTITY_NOT_FOUND
+            );
+        });
+        pageantContext.assertAccess(segment.getPhase().getPageant().getId());
+        return leaderboardMapper.toDetailedDTO(segment.getQualificationLeaderboard());
     }
 
     @RequirePageantStatus({
@@ -240,8 +350,8 @@ public class SegmentService {
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         segmentMapper.updateEntityFromDTO(segment, segmentUpdateDTO);
-        if (segment.getQualificationsLeaderboard() != null) {
-            segment.getQualificationsLeaderboard().setPageantId(pageantContext.getId());
+        if (segment.getQualificationLeaderboard() != null) {
+            segment.getQualificationLeaderboard().setPageantId(pageantContext.getId());
         }
         return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
     }
@@ -255,5 +365,30 @@ public class SegmentService {
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         segmentRepository.deleteById(id);
+    }
+
+    private void updateCacheThatHaveSegment(Pageant pageant, Phase phase) {
+        /* Pageant Hierarchy */
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", pageant.getId(), "hierarchy"),
+                pageantMapper.toHierarchyDTO(pageant)
+        );
+
+        /* Phase */
+        cacheService.put(
+                CacheNameConstants.TABULATION,
+                cacheKeyBuilder.build("pageants", pageant.getId(), "phases", phase.getId()),
+                phaseMapper.toDetailedDTO(phase)
+        );
+
+        /* Ongoing Phase */
+        if (phase.getStatus() == PhaseSegmentStatus.ONGOING) {
+            cacheService.put(
+                    CacheNameConstants.TABULATION,
+                    cacheKeyBuilder.build("pageants", pageant.getId(), "phases", "ongoing"),
+                    phaseMapper.toDetailedDTO(phase)
+            );
+        }
     }
 }

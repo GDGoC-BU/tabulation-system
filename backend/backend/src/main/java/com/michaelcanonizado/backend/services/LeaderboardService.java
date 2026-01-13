@@ -26,6 +26,7 @@ import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -84,13 +85,19 @@ public class LeaderboardService {
         return leaderboardMapper.toDetailedDTO(leaderboard);
     }
 
-    public void calculateLeaderboard(Leaderboard leaderboardOwner, UUID pageantId) {
+    @Transactional
+    public Leaderboard calculateLeaderboard(
+            Leaderboard leaderboard,
+            List<Candidate> candidates
+    ) {
+        UUID selectedPageantId = pageantContext.getId();
+
         /* ======================================================================== */
         /* ========================= Formula Tree Building ======================== */
         /* ======================================================================== */
 
-        /* Convert serialized blockly workspace to AST */
-        JsonNode serializedBlocklyWorkspace = leaderboardOwner.getFormula().getWorkspace();
+        /* Convert serialized blockly workspace to formula tree */
+        JsonNode serializedBlocklyWorkspace = leaderboard.getFormula().getWorkspace();
         FormulaTree formulaTree = formulaTreeBuilder.build(serializedBlocklyWorkspace);
 
         /* This will throw an exception if the formula tree generated is invalid
@@ -109,12 +116,10 @@ public class LeaderboardService {
         /* Fetch criteria in the formula */
         List<Criterion> criteria = criterionRepository.findAllById(criterionIdsInFormula);
 
-        /* Fetch all candidates in the pageant */
-        List<Candidate> candidates = candidateRepository.findAllByPageant_Id(pageantId);
         /* Fetch relevant scores */
         List<Score> scores = scoreRepository.findAll(
                 Specification.allOf(
-                        ScoreSpecification.hasPageant(pageantId),
+                        ScoreSpecification.hasPageant(selectedPageantId),
                         ScoreSpecification.hasCandidates(
                                 candidates.stream().map(Candidate::getId).toList()
                         ),
@@ -244,7 +249,7 @@ public class LeaderboardService {
 
         /* Create a map to quickly access the leaderboard entry of a candidate */
         /* Map<CandidateId, LeaderboardEntry> */
-        Map<UUID, LeaderboardEntry> leaderboardEntriesMap = leaderboardOwner
+        Map<UUID, LeaderboardEntry> leaderboardEntriesMap = leaderboard
                 .getEntries()
                 .stream()
                 .collect(
@@ -282,8 +287,9 @@ public class LeaderboardService {
             updatedLeaderboardEntries.add(leaderboardEntry);
         });
 
-        leaderboardOwner.getEntries().clear();
-        leaderboardOwner.setEntries(updatedLeaderboardEntries);
-        leaderboardOwner.setLastCalculatedAt(LocalDateTime.now());
+        leaderboard.getEntries().clear();
+        leaderboard.setEntries(updatedLeaderboardEntries);
+        leaderboard.setLastCalculatedAt(LocalDateTime.now());
+        return leaderboardRepository.save(leaderboard);
     }
 }

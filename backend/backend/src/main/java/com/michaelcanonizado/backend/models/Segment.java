@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -50,14 +48,24 @@ public class Segment {
     @Column(nullable = false)
     private boolean isQualificationRequired;
 
+    /*  */
     @OneToOne(
             optional = true,
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @JoinColumn(name = "qualifications_leaderboard_id")
-    private Leaderboard qualificationsLeaderboard;
+    @JoinColumn(name = "qualification_leaderboard_id")
+    private Leaderboard qualificationLeaderboard;
+
+    @OneToOne(
+            optional = false,
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "ranking_leaderboard_id")
+    private Leaderboard rankingLeaderboard;
 
     public Segment(
             String name,
@@ -68,4 +76,14 @@ public class Segment {
         this.sequence = sequence;
         this.phase = phase;
     }
+
+    public Segment getPreviousSegment() {
+        return phase
+                .getSegments()
+                .stream()
+                .filter(s -> s.getSequence() < this.sequence)
+                .max(Comparator.comparingInt(Segment::getSequence))
+                .orElse(null);
+    }
+
 }

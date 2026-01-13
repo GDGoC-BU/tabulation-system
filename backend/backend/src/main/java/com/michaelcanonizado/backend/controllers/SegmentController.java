@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.controllers;
 
+import com.michaelcanonizado.backend.dtos.leaderboard.LeaderboardDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
@@ -37,6 +38,18 @@ public class SegmentController {
     public ResponseEntity<SegmentDetailedDTO> closeSegment(@PathVariable UUID id) {
         SegmentDetailedDTO segment = service.closeSegment(id);
         return new ResponseEntity<>(segment, HttpStatus.OK);
+    }
+
+    @PostMapping("/segments/{id}/qualificationLeaderboard/calculate")
+    public ResponseEntity<LeaderboardDetailedDTO> calculateQualificationLeaderboard(@PathVariable UUID id) {
+        LeaderboardDetailedDTO leaderboard = service.calculateQualificationLeaderboard(id);
+        return new ResponseEntity<>(leaderboard, HttpStatus.OK);
+    }
+
+    @GetMapping("/segments/{id}/qualificationsLeaderboard")
+    public ResponseEntity<LeaderboardDetailedDTO> getQualificationLeaderboard(@PathVariable UUID id) {
+        LeaderboardDetailedDTO leaderboard = service.getQualificationLeaderboard(id);
+        return new ResponseEntity<>(leaderboard, HttpStatus.OK);
     }
 
     @GetMapping("/segments/{id}")

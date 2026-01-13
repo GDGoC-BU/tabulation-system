@@ -41,7 +41,7 @@ public class Leaderboard {
             fetch = FetchType.LAZY,
             orphanRemoval = true
     )
-    protected List<LeaderboardEntry> entries = new ArrayList<>();
+    private List<LeaderboardEntry> entries = new ArrayList<>();
 
     @Column(nullable = true)
     private LocalDateTime lastCalculatedAt = null;
@@ -49,5 +49,17 @@ public class Leaderboard {
     public Leaderboard(Formula formula, int selectionCount) {
         this.formula = formula;
         this.selectionCount = selectionCount;
+    }
+
+    public List<Candidate> getSelectedCandidates() {
+        return entries
+                .stream()
+                .filter(LeaderboardEntry::isSelected)
+                .map(LeaderboardEntry::getCandidate)
+                .toList();
+    }
+
+    public boolean isCalculated() {
+        return lastCalculatedAt != null;
     }
 }
