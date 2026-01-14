@@ -1,21 +1,21 @@
 package com.michaelcanonizado.backend.seeders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.michaelcanonizado.backend.models.Formula;
-import com.michaelcanonizado.backend.models.Phase;
-import com.michaelcanonizado.backend.models.Segment;
-import com.michaelcanonizado.backend.repositories.PhaseRepository;
-import com.michaelcanonizado.backend.repositories.SegmentRepository;
+import com.michaelcanonizado.backend.models.*;
+import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.utilities.PhaseSegmentCriteriaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.UUID;
 
 @Component
 public class SegmentSeeder implements DatabaseSeeder {
+    @Autowired
+    private PageantRepository pageantRepository;
+
     @Autowired
     private SegmentRepository segmentRepository;
 
@@ -24,6 +24,7 @@ public class SegmentSeeder implements DatabaseSeeder {
 
     @Override
     public void seed() {
+        UUID selectedPageantId = pageantRepository.findAll().getFirst().getId();
         List<Phase> phases = phaseRepository.findAll();
         List<Segment> segments = new ArrayList<>();
 
@@ -40,13 +41,20 @@ public class SegmentSeeder implements DatabaseSeeder {
 
             /* Go through the ist of segments of the static phase and store it in the database */
             phaseTemp.getSegments().forEach(segmentTemp -> {
-                segments.add(
-                        new Segment(
-                                segmentTemp.getName(),
-                                segmentTemp.getSequence(),
-                                phase
-                        )
+                Segment segment = new Segment(
+                        segmentTemp.getName(),
+                        segmentTemp.getSequence(),
+                        phase
                 );
+
+                /* Add the leaderboard */
+                Leaderboard rankingLeaderboard = new Leaderboard(
+                        selectedPageantId,
+                        new Formula("", new ObjectMapper().createObjectNode()),
+                        4
+                );
+                segment.setRankingLeaderboard(rankingLeaderboard);
+                segments.add(segment);
             });
         });
         segmentRepository.saveAll(segments);

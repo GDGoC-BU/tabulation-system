@@ -46,7 +46,8 @@ public class Leaderboard {
     @Column(nullable = true)
     private LocalDateTime lastCalculatedAt = null;
 
-    public Leaderboard(Formula formula, int selectionCount) {
+    public Leaderboard(UUID pageantId,Formula formula, int selectionCount) {
+        this.pageantId = pageantId;
         this.formula = formula;
         this.selectionCount = selectionCount;
     }
@@ -57,6 +58,17 @@ public class Leaderboard {
                 .filter(LeaderboardEntry::isSelected)
                 .map(LeaderboardEntry::getCandidate)
                 .toList();
+    }
+
+    public void addEntry(LeaderboardEntry entry) {
+        entries.add(entry);
+        entry.setLeaderboard(this);
+    }
+
+    public void removeEntry(LeaderboardEntry entry) {
+        if (!entries.contains(entry)) return;
+        entries.remove(entry);
+        entry.setLeaderboard(null);
     }
 
     public boolean isCalculated() {

@@ -28,15 +28,13 @@ public class LeaderboardEntry {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @JsonBackReference
     @ManyToOne(
-            optional = false,
-            fetch = FetchType.LAZY
+            fetch = FetchType.LAZY,
+            optional = false
     )
-    @JoinColumn(name = "leaderboard_id")
+    @JoinColumn(name = "leaderboard_id", nullable = false)
     private Leaderboard leaderboard;
 
-    @JsonBackReference
     @ManyToOne(
             optional = false,
             fetch = FetchType.LAZY
@@ -49,12 +47,12 @@ public class LeaderboardEntry {
     private Integer rank;
 
     @Column(nullable = false, precision = 20, scale = 10)
-    private BigDecimal score;
+    private BigDecimal score = BigDecimal.ZERO;
 
     @Column(nullable = false)
     boolean isOverridden = false;
 
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     String overrideReason;
 
     @Column(nullable = false)
@@ -68,9 +66,19 @@ public class LeaderboardEntry {
     @Column(columnDefinition = "jsonb")
     private List<CriteriaBreakdown> criteriaBreakdown = new ArrayList<>();
 
-    public LeaderboardEntry(Candidate candidate, Integer rank, BigDecimal score) {
+    public LeaderboardEntry(Candidate candidate) {
         this.candidate = candidate;
-        this.rank = rank;
-        this.score = score;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LeaderboardEntry other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

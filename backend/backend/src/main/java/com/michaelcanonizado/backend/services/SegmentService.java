@@ -1,5 +1,7 @@
 package com.michaelcanonizado.backend.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
 import com.michaelcanonizado.backend.dtos.leaderboard.LeaderboardDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.*;
@@ -76,6 +78,15 @@ public class SegmentService {
 
         /* Verify leaderboard formula */
 
+        /* Initialize its ranking leaderboard */
+        UUID selectedPageantId = pageantContext.getId();
+        Leaderboard rankingLeaderboard = new Leaderboard(
+                selectedPageantId,
+                new Formula("", new ObjectMapper().createObjectNode()),
+                4
+        );
+        rankingLeaderboard.setPageantId(selectedPageantId);
+        segment.setRankingLeaderboard(rankingLeaderboard);
         Segment savedSegment = segmentRepository.save(segment);
         return segmentMapper.toDetailedDTO(savedSegment);
     }

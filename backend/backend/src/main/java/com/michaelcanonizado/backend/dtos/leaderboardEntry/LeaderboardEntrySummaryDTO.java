@@ -12,7 +12,7 @@ public record LeaderboardEntrySummaryDTO(
         CandidateSummaryDTO candidate,
         int rank,
         BigDecimal score,
-        Boolean overridden,
+        Boolean isOverridden,
         String overrideReason,
         boolean isTied,
         boolean isSelected,

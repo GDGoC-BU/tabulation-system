@@ -6,6 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface LeaderboardEntryMapper {
-    LeaderboardEntry toEntity(LeaderboardEntrySummaryDTO leaderboardEntrySummaryDTO);
     LeaderboardEntrySummaryDTO toSummaryDTO(LeaderboardEntry leaderboardEntry);
 }

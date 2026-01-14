@@ -48,7 +48,6 @@ public class Segment {
     @Column(nullable = false)
     private boolean isQualificationRequired;
 
-    /*  */
     @OneToOne(
             optional = true,
             fetch = FetchType.LAZY,
