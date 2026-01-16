@@ -46,7 +46,7 @@ public class SegmentController {
         return new ResponseEntity<>(leaderboard, HttpStatus.OK);
     }
 
-    @GetMapping("/segments/{id}/qualificationsLeaderboard")
+    @GetMapping("/segments/{id}/qualificationLeaderboard")
     public ResponseEntity<LeaderboardDetailedDTO> getQualificationLeaderboard(@PathVariable UUID id) {
         LeaderboardDetailedDTO leaderboard = service.getQualificationLeaderboard(id);
         return new ResponseEntity<>(leaderboard, HttpStatus.OK);

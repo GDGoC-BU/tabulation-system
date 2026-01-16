@@ -11,7 +11,7 @@ public record LeaderboardDetailedDTO(
         UUID id,
         FormulaSummaryDTO formula,
         int selectionCount,
-        List<LeaderboardEntrySummaryDTO> entries,
-        LocalDateTime lastCalculatedAt
+        LocalDateTime lastCalculatedAt,
+        List<LeaderboardEntrySummaryDTO> entries
 ) {
 }

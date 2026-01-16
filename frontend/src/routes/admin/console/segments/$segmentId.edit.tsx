@@ -48,26 +48,26 @@ function RouteComponent() {
 
   const form = useForm({
     resolver: zodResolver(segmentEditFormSchema),
-    defaultValues: {
-      id: '',
-      name: '',
-      candidateLimit: null,
-      formula: {
-        text: '',
-        workspace: {},
-      },
-    },
+    // defaultValues: {
+    //   id: '',
+    //   name: '',
+    //   candidateLimit: null,
+    //   formula: {
+    //     text: '',
+    //     workspace: {},
+    //   },
+    // },
   })
 
   /* When segment data arrives, set tthe form values */
   useEffect(() => {
     if (!segment) return
-    form.reset({
-      id: segment.id,
-      name: segment.name,
-      candidateLimit: segment.candidateLimit,
-      formula: segment.formula,
-    })
+    // form.reset({
+    //   id: segment.id,
+    //   name: segment.name,
+    //   candidateLimit: segment.candidateLimit,
+    //   formula: segment.formula,
+    // })
   }, [segment])
 
   if (!selectedPageant) {
@@ -90,12 +90,12 @@ function RouteComponent() {
     manually set it to null */
 
     /* NOTE: These 2 inpuys should have a value or be null together! Not one of each. Refactor later*/
-    if (values.candidateLimit === 0) {
-      values.candidateLimit = null
-    }
-    if (values.formula?.text.trim().length === 0) {
-      values.formula = null
-    }
+    // if (values.candidateLimit === 0) {
+    //   values.candidateLimit = null
+    // }
+    // if (values.formula?.text.trim().length === 0) {
+    //   values.formula = null
+    // }
 
     const isSuccess = await editSegment(values)
     if (isSuccess) {
@@ -128,21 +128,21 @@ function RouteComponent() {
     />
   )
 
-  const CandidateLimitFormField = (
-    <FormField
-      control={form.control}
-      name="candidateLimit"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Candidate Limit</FormLabel>
-          <FormControl>
-            <Input type="number" min={1} {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  )
+  // const CandidateLimitFormField = (
+  //   <FormField
+  //     control={form.control}
+  //     name="candidateLimit"
+  //     render={({ field }) => (
+  //       <FormItem>
+  //         <FormLabel>Candidate Limit</FormLabel>
+  //         <FormControl>
+  //           <Input type="number" min={1} {...field} />
+  //         </FormControl>
+  //         <FormMessage />
+  //       </FormItem>
+  //     )}
+  //   />
+  // )
 
   return (
     <Console>
@@ -158,23 +158,23 @@ function RouteComponent() {
             >
               <div className="grid grid-cols-2 gap-4">
                 {NameFormField}
-                {CandidateLimitFormField}
+                {/* {CandidateLimitFormField} */}
               </div>
               <div className="grow">
                 <FormField
-                  control={form.control}
+                  // control={form.control}
                   /* Error message is determined from formula.text, bind <FormulaMessage/> to it */
-                  name="formula.text"
+                  // name="formula.text"
                   render={() => (
                     <FormItem className="flex flex-col h-full">
                       <FormLabel>Formula</FormLabel>
                       <FormMessage className="" />
                       {/* Actual formula object is still being targeted here */}
-                      <FormulaInput
+                      {/* <FormulaInput
                         initialFormula={segment?.formula}
                         name="formula"
                         control={form.control}
-                      />
+                      /> */}
                     </FormItem>
                   )}
                 />
