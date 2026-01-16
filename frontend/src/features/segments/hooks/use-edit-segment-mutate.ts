@@ -9,8 +9,7 @@ export default function useEditSegmentMutate() {
       try {
         const body = {
           name: data.name,
-          candidateLimit: data.candidateLimit,
-          formula: data.formula,
+          qualificationLeaderboard: data.qualificationLeaderboard,
         }
         await api.put(`/segments/${data.id}`, body)
         return true

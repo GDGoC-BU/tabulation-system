@@ -19,7 +19,7 @@ export type LeaderboardEntry = z.infer<typeof leaderboardEntrySummarySchema>
 export const leaderboardSummarySchema = z.object({
   formula: formulaSchema,
   selectionCount: z.int(),
-  lastCalculatedAt: zStringToDate,
+  lastCalculatedAt: z.union([z.null(), zStringToDate]),
 })
 export type LeaderboardSummary = z.infer<typeof leaderboardSummarySchema>
 
@@ -27,7 +27,7 @@ export const leaderboardDetailedSchema = z.object({
   id: z.string(),
   formula: formulaSchema,
   selectionCount: z.int(),
-  lastCalculatedAt: zStringToDate,
+  lastCalculatedAt: z.union([z.null(), zStringToDate]),
   entries: z.array(leaderboardEntrySummarySchema),
 })
 export type LeaderboardDetailed = z.infer<typeof leaderboardDetailedSchema>
@@ -42,8 +42,12 @@ export type LeaderboardAddForm = z.infer<typeof leaderboardAddFormSchema>
 
 export const leaderboardEditFormSchema = z.object({
   formula: formulaSchema,
-  selectionCount: z
-    .int()
-    .gt(1, { message: 'selectionCount must be greater than 1' }),
+  selectionCount: z.coerce
+    .number({
+      message: 'Invalid value! Only positive numbers are allowed',
+    })
+    .min(0, {
+      message: 'Enter how many candidates will get this award',
+    }),
 })
 export type LeaderboardEditForm = z.infer<typeof leaderboardEditFormSchema>

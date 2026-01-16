@@ -62,11 +62,11 @@ export const segmentTableColumns: Array<
       const formula: SegmentSummaryWithRenderedFormula['qualificationLeaderboardFormula'] =
         row.getValue('qualificationLeaderboardFormula')
 
-      const label = formula ? formula : 'None'
+      const label = formula ? formula : <TextBody>None</TextBody>
 
       return (
         <div className="mx-2 w-fit rounded-md px-4 py-2 text-center">
-          <TextBody>{label}</TextBody>
+          {label}
         </div>
       )
     },
