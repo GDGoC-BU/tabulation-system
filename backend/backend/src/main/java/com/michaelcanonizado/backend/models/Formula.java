@@ -1,10 +1,12 @@
 package com.michaelcanonizado.backend.models;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.michaelcanonizado.backend.converters.BlockNodeJsonConverter;
+import com.michaelcanonizado.backend.formula.blocks.BlockNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,4 +34,9 @@ public class Formula {
             columnDefinition = "jsonb"
     )
     private JsonNode workspace;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    @Convert(converter = BlockNodeJsonConverter.class)
+    private BlockNode tree;
 }

@@ -1,21 +1,30 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.FormulaEvaluationException;
-import com.michaelcanonizado.backend.exceptions.customs.FormulaInvalidWorkspaceException;
 import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
 import com.michaelcanonizado.backend.formula.contexts.TypeContext;
 import com.michaelcanonizado.backend.formula.values.NumberValue;
 import com.michaelcanonizado.backend.formula.values.Value;
 import com.michaelcanonizado.backend.formula.values.ValueType;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@AllArgsConstructor
-public class CriterionNode implements BlockNode {
+@Getter
+public final class CriterionNode implements BlockNode {
     private final UUID id;
+
+    @JsonCreator
+    public CriterionNode(
+            @JsonProperty("id") UUID id
+    ) {
+        this.id = id;
+    }
 
     @Override
     public Value evaluate(EvaluationContext context) {

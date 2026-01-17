@@ -8,6 +8,7 @@ import com.michaelcanonizado.backend.dtos.segment.*;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.exceptions.customs.PhaseSegmentStatusException;
+import com.michaelcanonizado.backend.formula.blocks.*;
 import com.michaelcanonizado.backend.mappers.*;
 import com.michaelcanonizado.backend.messages.OngoingSegmentMessage;
 import com.michaelcanonizado.backend.models.*;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,7 +84,7 @@ public class SegmentService {
         UUID selectedPageantId = pageantContext.getId();
         Leaderboard rankingLeaderboard = new Leaderboard(
                 selectedPageantId,
-                new Formula("", new ObjectMapper().createObjectNode()),
+                new Formula("", new ObjectMapper().createObjectNode(), new NumberLiteralNode(BigDecimal.ZERO)),
                 4
         );
         rankingLeaderboard.setPageantId(selectedPageantId);
@@ -376,6 +378,42 @@ public class SegmentService {
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         segmentRepository.deleteById(id);
+    }
+
+    protected void initializeSegment(UUID pageantId) {
+        List<Segment> segments = segmentRepository.findAll(
+                Specification.allOf(
+                        SegmentSpecification.hasPageant(pageantId)
+                )
+        );
+        List<Candidate> candidates = candidateRepository.findAllByPageant_Id(pageantId);
+
+        segments.forEach(segment -> {
+            /* Create ranking leaderboard rows for all candidates */
+            Leaderboard rankingLeaderboard = segment.getRankingLeaderboard();
+            candidates.forEach(candidate -> {
+                LeaderboardEntry entry = new LeaderboardEntry(candidate);
+                entry.setSelected(true);
+                rankingLeaderboard.addEntry(entry);
+            });
+
+            /* Create formula */
+            List<Criterion> criteria = segment.getCriteria();
+            if (criteria.isEmpty()) {
+                // Throw, segment has no criteria
+            }
+
+            BlockNode root = new CriterionNode(criteria.getFirst().getId());
+            for (int i = 1; i < criteria.size(); i++) {
+                root = new BinaryOperationNode(
+                        root,
+                        BinaryOperator.ADD,
+                        new CriterionNode(criteria.get(i).getId())
+                );
+            }
+
+
+        });
     }
 
     private void updateCacheThatHaveSegment(Pageant pageant, Phase phase) {

@@ -46,7 +46,7 @@ public class Leaderboard {
     @Column(nullable = true)
     private LocalDateTime lastCalculatedAt = null;
 
-    public Leaderboard(UUID pageantId,Formula formula, int selectionCount) {
+    public Leaderboard(UUID pageantId, Formula formula, int selectionCount) {
         this.pageantId = pageantId;
         this.formula = formula;
         this.selectionCount = selectionCount;

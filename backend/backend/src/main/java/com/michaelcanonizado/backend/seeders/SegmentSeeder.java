@@ -1,12 +1,14 @@
 package com.michaelcanonizado.backend.seeders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.michaelcanonizado.backend.formula.blocks.*;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.utilities.PhaseSegmentCriteriaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -50,7 +52,11 @@ public class SegmentSeeder implements DatabaseSeeder {
                 /* Add the leaderboard */
                 Leaderboard rankingLeaderboard = new Leaderboard(
                         selectedPageantId,
-                        new Formula("", new ObjectMapper().createObjectNode()),
+                        new Formula(
+                                "",
+                                new ObjectMapper().createObjectNode(),
+                                new NumberLiteralNode(BigDecimal.ZERO)
+                        ),
                         4
                 );
                 segment.setRankingLeaderboard(rankingLeaderboard);

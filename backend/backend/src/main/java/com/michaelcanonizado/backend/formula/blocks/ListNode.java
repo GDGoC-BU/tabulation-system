@@ -1,5 +1,8 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.FormulaEvaluationException;
 import com.michaelcanonizado.backend.exceptions.customs.FormulaTypeException;
@@ -9,15 +12,22 @@ import com.michaelcanonizado.backend.formula.values.NumberListValue;
 import com.michaelcanonizado.backend.formula.values.NumberValue;
 import com.michaelcanonizado.backend.formula.values.Value;
 import com.michaelcanonizado.backend.formula.values.ValueType;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
-public class ListNode implements BlockNode {
+@Getter
+public final class ListNode implements BlockNode {
     private final List<BlockNode> elements;
+
+    @JsonCreator
+    public ListNode(
+            @JsonProperty("elements") List<BlockNode> elements
+    ) {
+        this.elements = elements;
+    }
 
     @Override
     public Value evaluate(EvaluationContext context) {
