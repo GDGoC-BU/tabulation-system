@@ -75,9 +75,6 @@ public class SegmentService {
     public SegmentDetailedDTO addSegment(SegmentCreateDTO segmentCreateDTO) {
         Segment segment = segmentMapper.toEntity(segmentCreateDTO);
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
-        if (segment.getQualificationLeaderboard() != null) {
-            segment.getQualificationLeaderboard().setPageantId(pageantContext.getId());
-        }
 
         /* Verify qualification leaderboard formula if there is */
 
@@ -355,9 +352,6 @@ public class SegmentService {
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         segmentMapper.updateEntityFromDTO(segment, segmentUpdateDTO);
-        if (segment.getQualificationLeaderboard() != null) {
-            segment.getQualificationLeaderboard().setPageantId(pageantContext.getId());
-        }
         return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
     }
 
@@ -405,7 +399,6 @@ public class SegmentService {
 
             /* Create a leaderboard */
             Leaderboard rankingLeaderboard = new Leaderboard(
-                    pageantId,
                     new Formula(formulaText, emptyWorkspace, root),
                     4
             );

@@ -74,17 +74,6 @@ public class LeaderboardService {
     @Autowired
     private FormulaContextFactory formulaContextFactory;
 
-    public LeaderboardDetailedDTO getLeaderboard(UUID id) {
-        Leaderboard leaderboard = leaderboardRepository.findById(id).orElseThrow(() -> {
-            return new EntityNotFoundException(
-                    "Leaderboard not found!",
-                    ErrorCode.ENTITY_NOT_FOUND
-            );
-        });
-        pageantContext.assertAccess(leaderboard.getPageantId());
-        return leaderboardMapper.toDetailedDTO(leaderboard);
-    }
-
     @Transactional
     public Leaderboard calculateLeaderboard(
             Leaderboard leaderboard,

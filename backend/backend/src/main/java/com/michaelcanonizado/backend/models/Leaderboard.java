@@ -24,11 +24,6 @@ public class Leaderboard {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    /* Soft reference to pageant. We don't need an actual reference to
-    pageant as this will only be used for pageant assertion.  */
-    @Column(nullable = false, name = "pageant_id")
-    private UUID pageantId;
-
     @Embedded
     private Formula formula;
 
@@ -46,8 +41,7 @@ public class Leaderboard {
     @Column(nullable = true)
     private LocalDateTime lastCalculatedAt = null;
 
-    public Leaderboard(UUID pageantId, Formula formula, int selectionCount) {
-        this.pageantId = pageantId;
+    public Leaderboard(Formula formula, int selectionCount) {
         this.formula = formula;
         this.selectionCount = selectionCount;
     }
