@@ -36,7 +36,10 @@ public class Formula {
     private JsonNode workspace;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
+    @Column(
+            nullable = false,
+            columnDefinition = "jsonb"
+    )
     @Convert(converter = BlockNodeJsonConverter.class)
     private BlockNode tree;
 }

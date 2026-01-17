@@ -54,6 +54,9 @@ public class PageantService {
     @Autowired
     private CacheKeyBuilder cacheKeyBuilder;
 
+    @Autowired
+    private SegmentService segmentService;
+
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         Pageant savedPageant = pageantRepository.save(mapper.toEntity(pageantCreateDTO));
         PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
@@ -93,6 +96,10 @@ public class PageantService {
 
         pageant.setStatus(PageantStatus.ONGOING);
         pageant.setStartedAt(LocalDateTime.now());
+
+        /* Call initializers */
+        segmentService.initializeSegment(id);
+
         Pageant savedPageant = pageantRepository.save(pageant);
         PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
 

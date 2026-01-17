@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.michaelcanonizado.backend.annotations.RequirePageantStatus;
@@ -78,17 +79,8 @@ public class SegmentService {
             segment.getQualificationLeaderboard().setPageantId(pageantContext.getId());
         }
 
-        /* Verify leaderboard formula */
+        /* Verify qualification leaderboard formula if there is */
 
-        /* Initialize its ranking leaderboard */
-        UUID selectedPageantId = pageantContext.getId();
-        Leaderboard rankingLeaderboard = new Leaderboard(
-                selectedPageantId,
-                new Formula("", new ObjectMapper().createObjectNode(), new NumberLiteralNode(BigDecimal.ZERO)),
-                4
-        );
-        rankingLeaderboard.setPageantId(selectedPageantId);
-        segment.setRankingLeaderboard(rankingLeaderboard);
         Segment savedSegment = segmentRepository.save(segment);
         return segmentMapper.toDetailedDTO(savedSegment);
     }
@@ -380,7 +372,8 @@ public class SegmentService {
         segmentRepository.deleteById(id);
     }
 
-    protected void initializeSegment(UUID pageantId) {
+    @Transactional
+    public void initializeSegment(UUID pageantId) {
         List<Segment> segments = segmentRepository.findAll(
                 Specification.allOf(
                         SegmentSpecification.hasPageant(pageantId)
@@ -388,21 +381,16 @@ public class SegmentService {
         );
         List<Candidate> candidates = candidateRepository.findAllByPageant_Id(pageantId);
 
+        JsonNode emptyWorkspace = new ObjectMapper().createObjectNode();
+        /* Initialize ranking leaderboards for all segments */
         segments.forEach(segment -> {
-            /* Create ranking leaderboard rows for all candidates */
-            Leaderboard rankingLeaderboard = segment.getRankingLeaderboard();
-            candidates.forEach(candidate -> {
-                LeaderboardEntry entry = new LeaderboardEntry(candidate);
-                entry.setSelected(true);
-                rankingLeaderboard.addEntry(entry);
-            });
-
-            /* Create formula */
+            /* Create formula for the leaderboard */
             List<Criterion> criteria = segment.getCriteria();
             if (criteria.isEmpty()) {
                 // Throw, segment has no criteria
             }
 
+            /* Add up all criteria in the segment */
             BlockNode root = new CriterionNode(criteria.getFirst().getId());
             for (int i = 1; i < criteria.size(); i++) {
                 root = new BinaryOperationNode(
@@ -411,9 +399,27 @@ public class SegmentService {
                         new CriterionNode(criteria.get(i).getId())
                 );
             }
+            String formulaText = criteria.stream()
+                    .map(c -> String.valueOf(c.getId()))
+                    .collect(Collectors.joining(" + "));
 
+            /* Create a leaderboard */
+            Leaderboard rankingLeaderboard = new Leaderboard(
+                    pageantId,
+                    new Formula(formulaText, emptyWorkspace, root),
+                    4
+            );
 
+            /* Create entries for all candidates */
+            candidates.forEach(candidate -> {
+                LeaderboardEntry entry = new LeaderboardEntry(candidate);
+                entry.setSelected(true);
+                rankingLeaderboard.addEntry(entry);
+            });
+            segment.setRankingLeaderboard(rankingLeaderboard);
         });
+
+        segmentRepository.saveAll(segments);
     }
 
     private void updateCacheThatHaveSegment(Pageant pageant, Phase phase) {

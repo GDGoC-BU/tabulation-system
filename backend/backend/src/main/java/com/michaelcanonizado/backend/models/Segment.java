@@ -58,7 +58,7 @@ public class Segment {
     private Leaderboard qualificationLeaderboard;
 
     @OneToOne(
-            optional = false,
+            optional = true,
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
