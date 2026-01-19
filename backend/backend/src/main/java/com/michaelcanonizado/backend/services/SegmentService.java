@@ -94,9 +94,9 @@ public class SegmentService {
 
         /* If this is a qualifying segment, reflect the selected candidates in
         * qualification leaderboard in ranking leaderboard. */
-        if (segment.isQualificationRequired()) {
-            Set<UUID> selectedCandidateIds = segment
-                    .getQualificationLeaderboard()
+        Leaderboard qualificationLeaderboard = segment.getQualificationLeaderboard();
+        if (qualificationLeaderboard != null) {
+            Set<UUID> selectedCandidateIds = qualificationLeaderboard
                     .getSelectedCandidates()
                     .stream()
                     .map(Candidate::getId)
@@ -181,7 +181,8 @@ public class SegmentService {
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
 
-        if (!segment.isQualificationRequired()) {
+        Leaderboard qualificationLeaderboard = segment.getQualificationLeaderboard();
+        if (qualificationLeaderboard == null) {
             // Throw custom error
             throw new RuntimeException("");
         }
@@ -255,7 +256,7 @@ public class SegmentService {
         }
 
         Leaderboard updatedLeaderboard = leaderboardService.calculateLeaderboard(
-                segment.getQualificationLeaderboard(),
+                qualificationLeaderboard,
                 candidatesToEvaluate
         );
         return leaderboardMapper.toDetailedDTO(updatedLeaderboard);

@@ -45,9 +45,6 @@ public class Segment {
     )
     private List<Criterion> criteria = new ArrayList<>();
 
-    @Column(nullable = false)
-    private boolean isQualificationRequired;
-
     @OneToOne(
             optional = true,
             fetch = FetchType.LAZY,
