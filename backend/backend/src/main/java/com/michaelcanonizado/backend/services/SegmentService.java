@@ -77,6 +77,13 @@ public class SegmentService {
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
 
         /* Verify qualification leaderboard formula if there is */
+        Leaderboard qualificationLeaderboard = segment.getQualificationLeaderboard();
+        if (qualificationLeaderboard != null) {
+            Formula formula = leaderboardService.validateLeaderboardFormula(
+                    qualificationLeaderboard.getFormula()
+            );
+            qualificationLeaderboard.setFormula(formula);
+        }
 
         Segment savedSegment = segmentRepository.save(segment);
         return segmentMapper.toDetailedDTO(savedSegment);
@@ -353,6 +360,15 @@ public class SegmentService {
         });
         pageantContext.assertAccess(segment.getPhase().getPageant().getId());
         segmentMapper.updateEntityFromDTO(segment, segmentUpdateDTO);
+
+        Leaderboard qualificationLeaderboard = segment.getQualificationLeaderboard();
+        if (qualificationLeaderboard != null) {
+            Formula formula = leaderboardService.validateLeaderboardFormula(
+                    qualificationLeaderboard.getFormula()
+            );
+            qualificationLeaderboard.setFormula(formula);
+        };
+        
         return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
     }
 

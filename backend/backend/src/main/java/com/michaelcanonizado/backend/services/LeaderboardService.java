@@ -74,6 +74,21 @@ public class LeaderboardService {
     @Autowired
     private FormulaContextFactory formulaContextFactory;
 
+    public Formula validateLeaderboardFormula(Formula formula) {
+        /* Construct the tree. Will throw error if there are mismatch blocks. */
+        JsonNode serializedBlocklyWorkspace = formula.getWorkspace();
+        FormulaTree formulaTree = formulaTreeBuilder.build(serializedBlocklyWorkspace);
+
+        /* Validate the tree node types. Will throw error if block input and output types don't match. */
+        TypeContext typeContext = formulaContextFactory.createTypeContext();
+        formulaTree.getFormulaNode().getType(typeContext);
+
+        /* Re-visit how this can be properly handled and reused by other methods. This method also mutates the
+        * already pass by reference formula and the called no longer needs to re set the formula field. */
+        formula.setTree(formulaTree.getFormulaNode());
+        return formula;
+    }
+
     @Transactional
     public Leaderboard calculateLeaderboard(
             Leaderboard leaderboard,
