@@ -4,12 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.michaelcanonizado.backend.contexts.PageantContext;
 import com.michaelcanonizado.backend.dtos.criterion.CriterionBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.judge.JudgeBreakdownDTO;
-import com.michaelcanonizado.backend.dtos.leaderboard.LeaderboardDetailedDTO;
 import com.michaelcanonizado.backend.dtos.phase.PhaseBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.score.ScoreBreakdownDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentBreakdownDTO;
-import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
-import com.michaelcanonizado.backend.exceptions.customs.EntityNotFoundException;
 import com.michaelcanonizado.backend.formula.FormulaTree;
 import com.michaelcanonizado.backend.formula.FormulaTreeBuilder;
 import com.michaelcanonizado.backend.formula.contexts.EvaluationContext;
@@ -81,11 +78,11 @@ public class LeaderboardService {
 
         /* Validate the tree node types. Will throw error if block input and output types don't match. */
         TypeContext typeContext = formulaContextFactory.createTypeContext();
-        formulaTree.getFormulaNode().getType(typeContext);
+        formulaTree.getRootNode().getType(typeContext);
 
         /* Re-visit how this can be properly handled and reused by other methods. This method also mutates the
         * already pass by reference formula and the called no longer needs to re set the formula field. */
-        formula.setTree(formulaTree.getFormulaNode());
+        formula.setTree(formulaTree.getRootNode());
         return formula;
     }
 
@@ -107,7 +104,7 @@ public class LeaderboardService {
         /* This will throw an exception if the formula tree generated is invalid
          * (Formula should already be validated on creation) */
         TypeContext typeContext = formulaContextFactory.createTypeContext();
-        formulaTree.getFormulaNode().getType(typeContext);
+        formulaTree.getRootNode().getType(typeContext);
         /* MathContext the formula will use. Set the formula precision here */
         MathContext mathContext = new MathContext(10, RoundingMode.HALF_UP);
 
@@ -277,7 +274,7 @@ public class LeaderboardService {
             );
 
             /* Evaluate the formula */
-            BigDecimal result = ((NumberValue) formulaTree.getFormulaNode().evaluate(evaluationContext)).value();
+            BigDecimal result = ((NumberValue) formulaTree.getRootNode().evaluate(evaluationContext)).value();
 
             /* Set candidate's award leaderboard score value */
             LeaderboardEntry leaderboardEntry = leaderboardEntriesMap.get(candidate.getId());
