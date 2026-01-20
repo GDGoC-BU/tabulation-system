@@ -1,21 +1,36 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Star } from 'lucide-react'
 import type { SegmentHierarchy } from '@/features/segments/schemas'
 import type { PhaseHierarchy } from '@/features/phases/schemas'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
-import { TextBody, TextSub } from '@/components/text'
+import {
+  TextBody,
+  TextSub,
+  textBodyClassName,
+  textHeadingClassName,
+} from '@/components/text'
 import { phaseSegmentStatusValue } from '@/schemas'
 import ConfirmDialog from '@/components/confirm-dialog'
 import api from '@/lib/axios'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import segmentQualificationLeaderboardQueryOptions from '@/features/segments/query-options/segment-qualification-leaderboard-query-options'
 
 type NextAction = {
   endpoint: string
   label: string
+  segment?: SegmentHierarchy
 } | null
 
-function determinNextAction(phases: Array<PhaseHierarchy>): NextAction {
+function determineNextAction(phases: Array<PhaseHierarchy>): NextAction {
   const PENDING = phaseSegmentStatusValue.enum.PENDING
   const ONGOING = phaseSegmentStatusValue.enum.ONGOING
   const CLOSED = phaseSegmentStatusValue.enum.CLOSED
@@ -61,6 +76,7 @@ function determinNextAction(phases: Array<PhaseHierarchy>): NextAction {
       return {
         endpoint: `/segments/${segment.id}/start`,
         label: `Start ${segment.name}`,
+        segment: segment,
       }
     }
 
@@ -119,7 +135,94 @@ function PhaseCard({
   )
 }
 
-export default function PageantOngoinDashboard() {
+function SegmentQualificationVerification({
+  segment,
+  pageantId,
+}: {
+  segment: SegmentHierarchy
+  pageantId: string
+}) {
+  const queryClient = useQueryClient()
+  const { mutateAsync } = useMutation({
+    mutationFn: async (url: string | null) => {
+      if (!url) return
+      await api.post(url)
+    },
+  })
+
+  const { data: qualificationLeaderboard } = useQuery(
+    segmentQualificationLeaderboardQueryOptions(segment.id, {
+      enabled:
+        /* If there is a qualification Leaderboard */
+        segment.qualificationLeaderboard != null &&
+        /* If it has already been calculated */
+        segment.qualificationLeaderboard.lastCalculatedAt != null,
+    }),
+  )
+
+  if (segment.qualificationLeaderboard === null) {
+    return <TextBody>Segment has no qualifications</TextBody>
+  }
+
+  useEffect(() => {
+    if (!qualificationLeaderboard) return
+
+    console.log('Qualification Leaderboard Calculated!')
+    console.log(qualificationLeaderboard)
+  }, [qualificationLeaderboard])
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>View {segment.name} qualifiers</Button>
+      </DialogTrigger>
+      <DialogContent className="w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] !max-w-none flex flex-col">
+        <div className="space-y-2">
+          <DialogTitle className={textHeadingClassName}>
+            {segment.name}
+          </DialogTitle>
+          <DialogDescription className={textBodyClassName}>
+            View the qulification standings for the segment.
+          </DialogDescription>
+        </div>
+        <div className="grow grid place-items-center">
+          {segment.qualificationLeaderboard.lastCalculatedAt != null ? (
+            <TextBody>{`Leaderboard was calculated at ${segment.qualificationLeaderboard.lastCalculatedAt}`}</TextBody>
+          ) : (
+            <Button
+              onClick={async () => {
+                await mutateAsync(
+                  `segments/${segment.id}/qualificationLeaderboard/calculate`,
+                )
+                queryClient.invalidateQueries({
+                  queryKey: ['pageants', pageantId, 'hierarchy'],
+                })
+              }}
+            >
+              Calculate qualifiers
+            </Button>
+          )}
+        </div>
+        {segment.qualificationLeaderboard.lastCalculatedAt != null && (
+          <div className="">
+            <Button
+              onClick={async () => {
+                await mutateAsync(`segments/${segment.id}/start`)
+                queryClient.invalidateQueries({
+                  queryKey: ['pageants', pageantId, 'hierarchy'],
+                })
+              }}
+            >
+              Confirm and Start {segment.name}
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export default function PageantOngoingDashboard() {
   const queryClient = useQueryClient()
 
   const { data: selectedPageant, isLoading: isSelectedPageantLoading } =
@@ -140,7 +243,7 @@ export default function PageantOngoinDashboard() {
 
   const nextAction = useMemo(() => {
     if (!pageantHierarchy) return null
-    return determinNextAction(pageantHierarchy.phases)
+    return determineNextAction(pageantHierarchy.phases)
   }, [pageantHierarchy])
 
   if (
@@ -156,34 +259,42 @@ export default function PageantOngoinDashboard() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col gap-4">
       <div className="flex flex-col gap-4 w-full items-center">
         {pageantHierarchy.phases
           .sort((a, b) => a.sequence - b.sequence)
           .map((phase) => {
             return (
-              <PhaseCard phase={phase}>
+              <PhaseCard phase={phase} key={phase.id}>
                 {phase.segments
                   .sort((a, b) => a.sequence - b.sequence)
                   .map((segment) => {
-                    return <SegmentCard segment={segment} />
+                    return <SegmentCard segment={segment} key={segment.id} />
                   })}
               </PhaseCard>
             )
           })}
       </div>
-      <div className="mt-4">
-        <ConfirmDialog
-          triggerLabel={nextAction ? nextAction.label : 'Finalize Pageant'}
-          title={nextAction ? nextAction.label : 'Finalize Pageant'}
-          description="This action cannot be undone. Are you sure you want to move to the next stage?"
-          onConfirm={async () => {
-            await mutateAsync(nextAction ? nextAction.endpoint : null)
-            queryClient.invalidateQueries({
-              queryKey: ['pageants', pageantHierarchy.id, 'hierarchy'],
-            })
-          }}
-        />
+      <div>
+        {nextAction?.segment &&
+        nextAction.segment.qualificationLeaderboard !== null ? (
+          <SegmentQualificationVerification
+            segment={nextAction.segment}
+            pageantId={pageantHierarchy.id}
+          />
+        ) : (
+          <ConfirmDialog
+            triggerLabel={nextAction ? nextAction.label : 'Finalize Pageant'}
+            title={nextAction ? nextAction.label : 'Finalize Pageant'}
+            description="This action cannot be undone. Are you sure you want to move to the next stage?"
+            onConfirm={async () => {
+              await mutateAsync(nextAction ? nextAction.endpoint : null)
+              queryClient.invalidateQueries({
+                queryKey: ['pageants', pageantHierarchy.id, 'hierarchy'],
+              })
+            }}
+          />
+        )}
       </div>
     </div>
   )

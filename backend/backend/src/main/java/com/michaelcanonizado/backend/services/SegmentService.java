@@ -178,6 +178,9 @@ public class SegmentService {
     }
 
 
+    @RequirePageantStatus({
+            PageantStatus.ONGOING
+    })
     @Transactional
     public LeaderboardDetailedDTO calculateQualificationLeaderboard(UUID segmentId) {
         Segment segment = segmentRepository.findById(segmentId).orElseThrow(() -> {
@@ -266,9 +269,20 @@ public class SegmentService {
                 qualificationLeaderboard,
                 candidatesToEvaluate
         );
+
+        Phase phase = segment.getPhase();
+        Pageant pageant = phase.getPageant();
+        updateCacheThatHaveSegment(pageant, phase);
+
         return leaderboardMapper.toDetailedDTO(updatedLeaderboard);
     }
 
+    @RequirePageantStatus({
+            PageantStatus.ONGOING,
+            PageantStatus.FINALIZING,
+            PageantStatus.CLOSED,
+    })
+    @Transactional
     public LeaderboardDetailedDTO getQualificationLeaderboard(UUID segmentId) {
         Segment segment = segmentRepository.findById(segmentId).orElseThrow(() -> {
             return new EntityNotFoundException(
@@ -368,7 +382,7 @@ public class SegmentService {
             );
             qualificationLeaderboard.setFormula(formula);
         };
-        
+
         return segmentMapper.toDetailedDTO(segmentRepository.save(segment));
     }
 
