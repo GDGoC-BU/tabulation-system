@@ -96,11 +96,9 @@ public class LeaderboardService {
         /* ======================================================================== */
         /* ========================= Formula Tree Building ======================== */
         /* ======================================================================== */
-
         /* Convert serialized blockly workspace to formula tree */
         JsonNode serializedBlocklyWorkspace = leaderboard.getFormula().getWorkspace();
         FormulaTree formulaTree = formulaTreeBuilder.build(serializedBlocklyWorkspace);
-
         /* This will throw an exception if the formula tree generated is invalid
          * (Formula should already be validated on creation) */
         TypeContext typeContext = formulaContextFactory.createTypeContext();
@@ -127,7 +125,6 @@ public class LeaderboardService {
                         ScoreSpecification.hasCriteria(criterionIdsInFormula)
                 )
         );
-
         /* Create a template of CriterionBreakdowns per criterion as accessing
         the sub entities are expensive (fetched lazy). These entities can be
         cached instead in the future. */
@@ -148,7 +145,6 @@ public class LeaderboardService {
                     )
             );
         });
-
         /* Group scores by criterion and candidate */
         /* Map<CandidateId, Map<CriterionId, List<Scores>>> */
         Map<UUID, Map<UUID, List<Score>>> scoreMap = new HashMap<>();
@@ -173,7 +169,6 @@ public class LeaderboardService {
         /* Map of criteriaBreakdowns for each candidate */
         /* Map<CandidateID, List<CriterionBreakdown>> */
         Map<UUID, List<CriteriaBreakdown>> candidateCriteriaBreakdowns =  new HashMap<>();
-
         /* Populate candidateCriterionAverages and candidateCriteriaBreakdowns.
          * This is done together to keep the result of the evaluated formula in-sync
          * with the criterion breakdown. Loop through each candidate and get the needed data */
@@ -216,10 +211,12 @@ public class LeaderboardService {
                 }
 
                 /* Get the average score of candidate on the current criterion */
-                BigDecimal average = sum.divide(
-                        BigDecimal.valueOf(candidateScores.size()),
-                        mathContext
-                );
+                BigDecimal average = candidateScores.isEmpty()
+                        ? BigDecimal.ZERO
+                        : sum.divide(
+                                BigDecimal.valueOf(candidateScores.size()),
+                                mathContext
+                        );
 
 
                 /* Create and add the CriterionBreakdown */
@@ -248,20 +245,7 @@ public class LeaderboardService {
         /* ============================== EVALUATION ============================== */
         /* ======================================================================== */
 
-        /* Create a map to quickly access the leaderboard entry of a candidate */
-        /* Map<CandidateId, LeaderboardEntry> */
-        Map<UUID, LeaderboardEntry> leaderboardEntriesMap = leaderboard
-                .getEntries()
-                .stream()
-                .collect(
-                        Collectors.toMap(
-                                leaderboardRow -> leaderboardRow.getCandidate().getId(),
-                                Function.identity()
-                        )
-                );
-
-        List<LeaderboardEntry> updatedLeaderboardEntries = new ArrayList<>();
-
+        leaderboard.getEntries().clear();
         /* Go through each candidate and evaluate the formula on them */
         candidates.forEach(candidate -> {
             /* Get their criterion scores */
@@ -276,8 +260,8 @@ public class LeaderboardService {
             /* Evaluate the formula */
             BigDecimal result = ((NumberValue) formulaTree.getRootNode().evaluate(evaluationContext)).value();
 
-            /* Set candidate's award leaderboard score value */
-            LeaderboardEntry leaderboardEntry = leaderboardEntriesMap.get(candidate.getId());
+            /* Create candidate's entry */
+            LeaderboardEntry leaderboardEntry = new LeaderboardEntry(candidate);
             leaderboardEntry.setScore(result);
 
             /* Add candidate's breakdown */
@@ -285,11 +269,9 @@ public class LeaderboardService {
                     candidateCriteriaBreakdowns.get(candidate.getId())
             );
 
-            updatedLeaderboardEntries.add(leaderboardEntry);
+            leaderboard.addEntry(leaderboardEntry);
         });
 
-        leaderboard.getEntries().clear();
-        leaderboard.setEntries(updatedLeaderboardEntries);
         leaderboard.setLastCalculatedAt(LocalDateTime.now());
         return leaderboardRepository.save(leaderboard);
     }
