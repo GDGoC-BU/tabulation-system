@@ -27,7 +27,6 @@ public class Formula {
     )
     private String text;
 
-    @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(
             nullable = false,
