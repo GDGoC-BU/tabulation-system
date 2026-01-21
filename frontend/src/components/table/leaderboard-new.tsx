@@ -4,7 +4,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import type { ColumnDef } from '@tanstack/react-table'
-import type { CandidateSegmentQualificationSummary } from '@/features/segments/schemas'
+import type { LeaderboardEntrySummary } from '@/features/leaderboard/schemas'
+import type { Formula } from '@/features/formula/schemas'
 import {
   Table,
   TableBody,
@@ -16,23 +17,23 @@ import {
 import { cn } from '@/lib/utils'
 
 type DataTableProps = {
-  columns: Array<ColumnDef<CandidateSegmentQualificationSummary>>
-  data: Array<CandidateSegmentQualificationSummary>
-  limit: number | null
-  formula: string | null
+  columns: Array<ColumnDef<LeaderboardEntrySummary>>
+  data: Array<LeaderboardEntrySummary>
+  selectionCount: number
+  formula: Formula
 }
 
-export default function CandidateQualifications({
+export default function LeaderboardNew({
   columns,
   data,
-  limit,
+  selectionCount,
   formula,
 }: DataTableProps) {
   const table = useReactTable({
     data,
     columns,
     meta: {
-      // formula: formula,
+      formula: formula,
     },
     getCoreRowModel: getCoreRowModel(),
   })
@@ -60,15 +61,13 @@ export default function CandidateQualifications({
         </TableHeader>
         <TableBody className="">
           {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => {
-              const isQualified = !limit || row.original.isQualified
-
-              const ringClassName = isQualified
-                ? 'ring-emerald-500'
-                : 'ring-red-500'
-              const borderClassName = isQualified
-                ? 'border-emerald-500'
-                : 'border-red-500'
+            table.getRowModel().rows.map((row, rowIndex) => {
+              const ringClassName =
+                rowIndex < selectionCount ? 'ring-emerald-500' : 'ring-red-500'
+              const borderClassName =
+                rowIndex < selectionCount
+                  ? 'border-emerald-500'
+                  : 'border-red-500'
 
               return (
                 <TableRow
@@ -82,7 +81,6 @@ export default function CandidateQualifications({
                         className={cn(
                           cellIndex < row.getVisibleCells().length - 1 &&
                             'border-r',
-                          cell.column.columnDef.meta?.className,
                           borderClassName,
                         )}
                         key={cell.id}

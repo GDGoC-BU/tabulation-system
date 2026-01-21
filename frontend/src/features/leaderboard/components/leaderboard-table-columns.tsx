@@ -62,13 +62,13 @@ export const leadboardTableColumns: Array<ColumnDef<LeaderboardEntrySummary>> =
         const leaderboard: LeaderboardEntrySummary = row.original
         const formula = table.options.meta?.formula
 
-        if (!formula || formula.length === 0) {
+        if (!formula || formula.text.length === 0) {
           return <TextBody>No formula passed</TextBody>
         }
 
         return (
           <BreakdownRenderer
-            formula={formula}
+            formula={formula.text}
             breakdown={leaderboard.criteriaBreakdown}
           />
         )

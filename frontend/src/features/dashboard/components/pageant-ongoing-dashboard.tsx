@@ -191,9 +191,11 @@ function SegmentQualificationResultsViewer({
             <TextHeading>Female Candidates</TextHeading>
           </div>
           <div className="">
-            <Table.Data
+            <Table.LeaderboardNew
               columns={leadboardTableColumns}
               data={femaleCandidates}
+              selectionCount={qualificationLeaderboard.selectionCount}
+              formula={qualificationLeaderboard.formula}
             />
           </div>
         </div>
@@ -202,7 +204,12 @@ function SegmentQualificationResultsViewer({
             <TextHeading>Male Candidates</TextHeading>
           </div>
           <div className="">
-            <Table.Data columns={leadboardTableColumns} data={maleCandidates} />
+            <Table.LeaderboardNew
+              columns={leadboardTableColumns}
+              data={maleCandidates}
+              selectionCount={qualificationLeaderboard.selectionCount}
+              formula={qualificationLeaderboard.formula}
+            />
           </div>
         </div>
       </div>
