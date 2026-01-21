@@ -28,6 +28,8 @@ export default function segmentQualificationLeaderboardQueryOptions<
         const parsedResponse = leaderboardDetailedSchema.safeParse(
           response.data,
         )
+        console.log('Backend called. IsSuccess: ', parsedResponse.success)
+        console.log('Error: ', parsedResponse.error)
         if (!parsedResponse.success) {
           throw new Error(
             `/segments/${id}/qualificationLeaderboard response doesn't match schema!`,

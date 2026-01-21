@@ -3,10 +3,12 @@ import { useEffect, useMemo } from 'react'
 import { Star } from 'lucide-react'
 import type { SegmentHierarchy } from '@/features/segments/schemas'
 import type { PhaseHierarchy } from '@/features/phases/schemas'
+import type { PageantHierarchy } from '@/features/pageants/schemas'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
 import {
   TextBody,
+  TextHeading,
   TextSub,
   textBodyClassName,
   textHeadingClassName,
@@ -23,6 +25,11 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import segmentQualificationLeaderboardQueryOptions from '@/features/segments/query-options/segment-qualification-leaderboard-query-options'
+import { groupLeaderboardEntriesByGender } from '@/features/leaderboard/lib/group-leaderboard-entries-by-gender'
+import Table from '@/components/table'
+import { leadboardTableColumns } from '@/features/leaderboard/components/leaderboard-table-columns'
+import FormulaRenderer from '@/features/formula/deprecated-components/formula-renderer'
+import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 
 type NextAction = {
   endpoint: string
@@ -135,7 +142,75 @@ function PhaseCard({
   )
 }
 
-function SegmentQualificationVerification({
+function SegmentQualificationResultsViewer({
+  segment,
+  pageantId,
+}: {
+  segment: SegmentHierarchy
+  pageantId: string
+}) {
+  const { data: qualificationLeaderboard } = useQuery(
+    segmentQualificationLeaderboardQueryOptions(segment.id, {
+      enabled:
+        segment.qualificationLeaderboard !== null &&
+        segment.qualificationLeaderboard.lastCalculatedAt !== null,
+    }),
+  )
+
+  const { maleCandidates, femaleCandidates } = useMemo(() => {
+    if (!qualificationLeaderboard) {
+      return { maleCandidates: [], femaleCandidates: [] }
+    }
+    console.log(qualificationLeaderboard)
+    const candidates = groupLeaderboardEntriesByGender(
+      qualificationLeaderboard.entries,
+    )
+    return {
+      maleCandidates: candidates.maleCandidates.sort(
+        (a, b) => b.score - a.score,
+      ),
+      femaleCandidates: candidates.femaleCandidates.sort(
+        (a, b) => b.score - a.score,
+      ),
+    }
+  }, [qualificationLeaderboard])
+
+  if (!qualificationLeaderboard) {
+    return (
+      <div className="w-full grid place-items-center">
+        <TextBody>{segment.name} qualifiers has not been calculated </TextBody>
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full overflow-y-scroll mt-2">
+      <div className="overflow-y-hidden flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
+          <div className="">
+            <TextHeading>Female Candidates</TextHeading>
+          </div>
+          <div className="">
+            <Table.Data
+              columns={leadboardTableColumns}
+              data={femaleCandidates}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          <div className="">
+            <TextHeading>Male Candidates</TextHeading>
+          </div>
+          <div className="">
+            <Table.Data columns={leadboardTableColumns} data={maleCandidates} />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SegmentQualificationCalculator({
   segment,
   pageantId,
 }: {
@@ -150,66 +225,90 @@ function SegmentQualificationVerification({
     },
   })
 
-  const { data: qualificationLeaderboard } = useQuery(
-    segmentQualificationLeaderboardQueryOptions(segment.id, {
-      enabled:
-        /* If there is a qualification Leaderboard */
-        segment.qualificationLeaderboard != null &&
-        /* If it has already been calculated */
-        segment.qualificationLeaderboard.lastCalculatedAt != null,
-    }),
+  return (
+    <div className="grow grid place-items-center">
+      <Button
+        onClick={async () => {
+          await mutateAsync(
+            `segments/${segment.id}/qualificationLeaderboard/calculate`,
+          )
+          queryClient.invalidateQueries({
+            queryKey: ['pageants', pageantId, 'hierarchy'],
+          })
+          queryClient.invalidateQueries({
+            queryKey: ['segments', segment.id, 'qualificationLeaderboard'],
+          })
+        }}
+      >
+        Calculate qualifiers
+      </Button>
+    </div>
   )
+}
+
+function SegmentQualificationVerification({
+  segment,
+  pageant,
+}: {
+  segment: SegmentHierarchy
+  pageant: PageantHierarchy
+}) {
+  const queryClient = useQueryClient()
+  const { mutateAsync } = useMutation({
+    mutationFn: async (url: string | null) => {
+      if (!url) return
+      await api.post(url)
+    },
+  })
+
+  const criterionLookup = useFormulaCriterionLookup(pageant.phases)
 
   if (segment.qualificationLeaderboard === null) {
     return <TextBody>Segment has no qualifications</TextBody>
   }
-
-  useEffect(() => {
-    if (!qualificationLeaderboard) return
-
-    console.log('Qualification Leaderboard Calculated!')
-    console.log(qualificationLeaderboard)
-  }, [qualificationLeaderboard])
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button>View {segment.name} qualifiers</Button>
       </DialogTrigger>
-      <DialogContent className="w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] !max-w-none flex flex-col">
+      <DialogContent className="w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] !max-w-none flex flex-col gap-6">
         <div className="space-y-2">
           <DialogTitle className={textHeadingClassName}>
-            {segment.name}
+            {segment.name} Qualification Results
           </DialogTitle>
           <DialogDescription className={textBodyClassName}>
-            View the qulification standings for the segment.
+            View the qualified candidates for the segment.
           </DialogDescription>
+          <TextBody>
+            Candidate limit: {segment.qualificationLeaderboard.selectionCount}
+          </TextBody>
+          <div className="flex flex-row gap-2">
+            <TextBody>Formula: </TextBody>
+            <FormulaRenderer
+              formula={segment.qualificationLeaderboard.formula.text}
+              criterionLookup={criterionLookup}
+            />
+          </div>
         </div>
-        <div className="grow grid place-items-center">
-          {segment.qualificationLeaderboard.lastCalculatedAt != null ? (
-            <TextBody>{`Leaderboard was calculated at ${segment.qualificationLeaderboard.lastCalculatedAt}`}</TextBody>
-          ) : (
-            <Button
-              onClick={async () => {
-                await mutateAsync(
-                  `segments/${segment.id}/qualificationLeaderboard/calculate`,
-                )
-                queryClient.invalidateQueries({
-                  queryKey: ['pageants', pageantId, 'hierarchy'],
-                })
-              }}
-            >
-              Calculate qualifiers
-            </Button>
-          )}
-        </div>
-        {segment.qualificationLeaderboard.lastCalculatedAt != null && (
+        {segment.qualificationLeaderboard.lastCalculatedAt !== null ? (
+          <SegmentQualificationResultsViewer
+            segment={segment}
+            pageantId={pageant.id}
+          />
+        ) : (
+          <SegmentQualificationCalculator
+            segment={segment}
+            pageantId={pageant.id}
+          />
+        )}
+        {segment.qualificationLeaderboard.lastCalculatedAt !== null && (
           <div className="">
             <Button
               onClick={async () => {
                 await mutateAsync(`segments/${segment.id}/start`)
                 queryClient.invalidateQueries({
-                  queryKey: ['pageants', pageantId, 'hierarchy'],
+                  queryKey: ['pageants', pageant.id, 'hierarchy'],
                 })
               }}
             >
@@ -280,7 +379,7 @@ export default function PageantOngoingDashboard() {
         nextAction.segment.qualificationLeaderboard !== null ? (
           <SegmentQualificationVerification
             segment={nextAction.segment}
-            pageantId={pageantHierarchy.id}
+            pageant={pageantHierarchy}
           />
         ) : (
           <ConfirmDialog

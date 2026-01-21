@@ -6,7 +6,7 @@ import { formulaSchema } from '@/features/formula/schemas'
 export const leaderboardEntrySummarySchema = z.object({
   id: z.string(),
   candidate: candidateSummarySchema,
-  rank: z.int(),
+  rank: z.union([z.null(), z.int()]),
   score: z.number(),
   isOverridden: z.boolean(),
   overrideReason: z.union([z.null(), z.string()]),
@@ -14,7 +14,9 @@ export const leaderboardEntrySummarySchema = z.object({
   isSelected: z.boolean(),
   criteriaBreakdown: z.union([z.null(), z.array(criteriaBreakdownSchema)]),
 })
-export type LeaderboardEntry = z.infer<typeof leaderboardEntrySummarySchema>
+export type LeaderboardEntrySummary = z.infer<
+  typeof leaderboardEntrySummarySchema
+>
 
 export const leaderboardSummarySchema = z.object({
   formula: formulaSchema,
