@@ -272,7 +272,44 @@ public class LeaderboardService {
             leaderboard.addEntry(leaderboardEntry);
         });
 
+        rankAndSelectLeaderboardEntries(leaderboard.getEntries(), leaderboard.getSelectionCount());
         leaderboard.setLastCalculatedAt(LocalDateTime.now());
         return leaderboardRepository.save(leaderboard);
+    }
+
+    private void rankAndSelectLeaderboardEntries(List<LeaderboardEntry> entries, int selectionCount) {
+        /* Separate the entries by gender and sort them in descending order.
+        * NOTE: the temporary lists below are immutable to add, reorder, sorting, etc.
+        * You can only modify the actual objects from then on. */
+        List<LeaderboardEntry> femaleCandidates = entries
+                .stream()
+                .filter(entry -> entry.getCandidate().getGender() == CandidateGender.FEMALE)
+                .sorted(Comparator.comparing(LeaderboardEntry::getScore).reversed())
+                .toList();
+        List<LeaderboardEntry> maleCandidates = entries
+                .stream()
+                .filter(entry -> entry.getCandidate().getGender() == CandidateGender.MALE)
+                .sorted(Comparator.comparing(LeaderboardEntry::getScore).reversed())
+                .toList();
+
+        /* Go through the candidates and set the rank and isSelected */
+        for (int i = 0; i < femaleCandidates.size(); i++) {
+            int rank = i + 1;
+            LeaderboardEntry entry = femaleCandidates.get(i);
+            entry.setRank(rank);
+            entry.setSelected(rank <= selectionCount);
+            System.out.println("F-C"+entry.getCandidate().getNumber() + " = " + entry.isSelected());
+        }
+        for (int i = 0; i < maleCandidates.size(); i++) {
+            int rank = i + 1;
+            LeaderboardEntry entry = maleCandidates.get(i);
+            entry.setRank(rank);
+            entry.setSelected(rank <= selectionCount);
+            System.out.println("M-C"+entry.getCandidate().getNumber() + " = " + entry.isSelected());
+        }
+
+        entries.clear();
+        entries.addAll(femaleCandidates);
+        entries.addAll(maleCandidates);
     }
 }
