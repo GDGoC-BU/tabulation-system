@@ -50,16 +50,16 @@ public class LeaderboardEntry {
     private BigDecimal score = BigDecimal.ZERO;
 
     @Column(nullable = false)
-    boolean isOverridden = false;
+    boolean overridden = false;
 
     @Column(nullable = true, columnDefinition = "TEXT")
     String overrideReason;
 
     @Column(nullable = false)
-    private boolean isTied = false;
+    private boolean tied = false;
 
     @Column(nullable = false)
-    private boolean isSelected = false;
+    private boolean selected = true;
 
     @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
