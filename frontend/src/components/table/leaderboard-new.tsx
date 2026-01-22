@@ -19,14 +19,12 @@ import { cn } from '@/lib/utils'
 type DataTableProps = {
   columns: Array<ColumnDef<LeaderboardEntrySummary>>
   data: Array<LeaderboardEntrySummary>
-  selectionCount: number
   formula: Formula
 }
 
 export default function LeaderboardNew({
   columns,
   data,
-  selectionCount,
   formula,
 }: DataTableProps) {
   const table = useReactTable({
@@ -61,13 +59,18 @@ export default function LeaderboardNew({
         </TableHeader>
         <TableBody className="">
           {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row, rowIndex) => {
-              const ringClassName =
-                rowIndex < selectionCount ? 'ring-emerald-500' : 'ring-red-500'
-              const borderClassName =
-                rowIndex < selectionCount
-                  ? 'border-emerald-500'
-                  : 'border-red-500'
+            table.getRowModel().rows.map((row) => {
+              const isSelected: LeaderboardEntrySummary['isSelected'] =
+                row.original.isSelected
+
+              /* Top and bottom border on rows */
+              const ringClassName = isSelected
+                ? 'ring-emerald-500'
+                : 'ring-red-500'
+              /* Column separator on rows */
+              const borderClassName = isSelected
+                ? 'border-emerald-500'
+                : 'border-red-500'
 
               return (
                 <TableRow
@@ -89,6 +92,7 @@ export default function LeaderboardNew({
                           cell.column.columnDef.cell,
                           cell.getContext(),
                         )}
+                        <div>{row.getValue('rank')}</div>
                       </TableCell>
                     )
                   })}

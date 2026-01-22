@@ -10,7 +10,7 @@ export const leadboardTableColumns: Array<ColumnDef<LeaderboardEntrySummary>> =
       id: 'rank',
       header: 'Rank',
       cell: ({ row }) => {
-        const rank: LeaderboardEntrySummary['rank'] = row.getValue('rank')
+        const rank: LeaderboardEntrySummary['rank'] = row.original.rank
         return <TextBody>{rank ? rank : '-'}</TextBody>
       },
     },

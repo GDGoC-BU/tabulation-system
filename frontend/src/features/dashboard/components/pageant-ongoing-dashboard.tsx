@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Star } from 'lucide-react'
 import type { SegmentHierarchy } from '@/features/segments/schemas'
 import type { PhaseHierarchy } from '@/features/phases/schemas'
@@ -142,14 +142,53 @@ function PhaseCard({
   )
 }
 
-function SegmentQualificationResultsViewer({
-  segment,
+function CalculateSegmentQualificationButton({
+  children,
+  segmentId,
   pageantId,
+  ...props
 }: {
-  segment: SegmentHierarchy
+  children: React.ReactNode
+  segmentId: string
   pageantId: string
 }) {
-  const { data: qualificationLeaderboard } = useQuery(
+  const queryClient = useQueryClient()
+  const { mutateAsync } = useMutation({
+    mutationFn: async (url: string | null) => {
+      if (!url) return
+      await api.post(url)
+    },
+  })
+
+  return (
+    <Button
+      {...props}
+      onClick={async () => {
+        await mutateAsync(
+          `segments/${segmentId}/qualificationLeaderboard/calculate`,
+        )
+        queryClient.invalidateQueries({
+          queryKey: ['pageants', pageantId, 'hierarchy'],
+        })
+        queryClient.invalidateQueries({
+          queryKey: ['segments', segmentId, 'qualificationLeaderboard'],
+        })
+      }}
+    >
+      {children}
+    </Button>
+  )
+}
+
+function SegmentQualificationResultsViewer({
+  segment,
+}: {
+  segment: SegmentHierarchy
+}) {
+  const {
+    data: qualificationLeaderboard,
+    isFetching: isQualificationLeaderboardFetching,
+  } = useQuery(
     segmentQualificationLeaderboardQueryOptions(segment.id, {
       enabled:
         segment.qualificationLeaderboard !== null &&
@@ -161,7 +200,6 @@ function SegmentQualificationResultsViewer({
     if (!qualificationLeaderboard) {
       return { maleCandidates: [], femaleCandidates: [] }
     }
-    console.log(qualificationLeaderboard)
     const candidates = groupLeaderboardEntriesByGender(
       qualificationLeaderboard.entries,
     )
@@ -174,6 +212,14 @@ function SegmentQualificationResultsViewer({
       ),
     }
   }, [qualificationLeaderboard])
+
+  if (isQualificationLeaderboardFetching) {
+    return (
+      <div className="w-full h-full grid place-items-center">
+        <TextBody>Calculating...</TextBody>
+      </div>
+    )
+  }
 
   if (!qualificationLeaderboard) {
     return (
@@ -194,7 +240,6 @@ function SegmentQualificationResultsViewer({
             <Table.LeaderboardNew
               columns={leadboardTableColumns}
               data={femaleCandidates}
-              selectionCount={qualificationLeaderboard.selectionCount}
               formula={qualificationLeaderboard.formula}
             />
           </div>
@@ -207,7 +252,6 @@ function SegmentQualificationResultsViewer({
             <Table.LeaderboardNew
               columns={leadboardTableColumns}
               data={maleCandidates}
-              selectionCount={qualificationLeaderboard.selectionCount}
               formula={qualificationLeaderboard.formula}
             />
           </div>
@@ -224,31 +268,14 @@ function SegmentQualificationCalculator({
   segment: SegmentHierarchy
   pageantId: string
 }) {
-  const queryClient = useQueryClient()
-  const { mutateAsync } = useMutation({
-    mutationFn: async (url: string | null) => {
-      if (!url) return
-      await api.post(url)
-    },
-  })
-
   return (
     <div className="grow grid place-items-center">
-      <Button
-        onClick={async () => {
-          await mutateAsync(
-            `segments/${segment.id}/qualificationLeaderboard/calculate`,
-          )
-          queryClient.invalidateQueries({
-            queryKey: ['pageants', pageantId, 'hierarchy'],
-          })
-          queryClient.invalidateQueries({
-            queryKey: ['segments', segment.id, 'qualificationLeaderboard'],
-          })
-        }}
+      <CalculateSegmentQualificationButton
+        segmentId={segment.id}
+        pageantId={pageantId}
       >
         Calculate qualifiers
-      </Button>
+      </CalculateSegmentQualificationButton>
     </div>
   )
 }
@@ -299,10 +326,7 @@ function SegmentQualificationVerification({
           </div>
         </div>
         {segment.qualificationLeaderboard.lastCalculatedAt !== null ? (
-          <SegmentQualificationResultsViewer
-            segment={segment}
-            pageantId={pageant.id}
-          />
+          <SegmentQualificationResultsViewer segment={segment} />
         ) : (
           <SegmentQualificationCalculator
             segment={segment}
@@ -310,7 +334,15 @@ function SegmentQualificationVerification({
           />
         )}
         {segment.qualificationLeaderboard.lastCalculatedAt !== null && (
-          <div className="">
+          <div className="flex flex-row gap-4">
+            <CalculateSegmentQualificationButton
+              // @ts-ignore Can make this type-safe later on. Or find another abstraction
+              variant="outline"
+              segmentId={segment.id}
+              pageantId={pageant.id}
+            >
+              Recalculate
+            </CalculateSegmentQualificationButton>
             <Button
               onClick={async () => {
                 await mutateAsync(`segments/${segment.id}/start`)
