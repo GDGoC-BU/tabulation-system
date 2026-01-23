@@ -27,9 +27,6 @@ public class CandidateService {
     private CandidateRepository candidateRepository;
 
     @Autowired
-    private CandidateSegmentQualificationRepository csqRepository;
-
-    @Autowired
     private SegmentRepository segmentRepository;
 
     @Autowired
@@ -75,16 +72,6 @@ public class CandidateService {
         candidate.setPageant(pageant);
 
         Candidate savedCandidate = candidateRepository.save(candidate);
-
-        /* Get available segments and qualify
-           the new candidate to each segment */
-        List<Segment> segments = segmentRepository.findAll();
-        List<CandidateSegmentQualification> newCSQs = new ArrayList<>();
-        segments.forEach(segment -> {
-            newCSQs.add(new CandidateSegmentQualification(segment, savedCandidate));
-        });
-        /* Batch save to minimize insert queries */
-        csqRepository.saveAll(newCSQs);
 
         /* Pre-generate the scores for the new candidate */
         List<Judge> judges = judgeRepository.findAll();

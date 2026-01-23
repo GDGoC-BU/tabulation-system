@@ -1,8 +1,7 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { AwardLeaderboards } from '@/features/awards/schemas'
 import { TextBody, TextHeading } from '@/components/text'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
-import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
 import { useAwardsQuery } from '@/features/awards/hooks/use-awards-query'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 import FormulaRenderer from '@/features/formula/deprecated-components/formula-renderer'
@@ -11,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { groupLeaderboardByGender } from '@/lib/group-leaderboard-by-gender'
 import ConfirmDialog from '@/components/confirm-dialog'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
+import api from '@/lib/axios'
 
 export function AwardLeaderboard({
   leaderboard,
@@ -65,8 +65,12 @@ export function AwardLeaderboard({
 
 export default function PageantFinalizingDashboard() {
   const queryClient = useQueryClient()
-
-  const { mutateAsync } = useStatusChangeMutate()
+  const { mutateAsync } = useMutation({
+    mutationFn: async (url: string | null) => {
+      if (!url) return
+      await api.post(url)
+    },
+  })
   const { data: selectedPageant, isLoading } = useSelectedPageant()
   const { data: awards } = useAwardsQuery()
   const awardResults = useAwardsCalculation(awards)

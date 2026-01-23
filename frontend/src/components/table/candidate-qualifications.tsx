@@ -32,7 +32,7 @@ export default function CandidateQualifications({
     data,
     columns,
     meta: {
-      formula: formula,
+      // formula: formula,
     },
     getCoreRowModel: getCoreRowModel(),
   })

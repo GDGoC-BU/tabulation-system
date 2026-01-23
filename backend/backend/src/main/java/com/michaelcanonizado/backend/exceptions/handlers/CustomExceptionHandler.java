@@ -10,6 +10,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class CustomExceptionHandler {
+    @ExceptionHandler(LeaderboardException.class)
+    public ResponseEntity<ErrorResponse> handleLeaderboardException (
+            LeaderboardException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        ErrorResponse response = new ErrorResponse(
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getErrorCode(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(response, status);
+    }
+
     @ExceptionHandler(FormulaInvalidWorkspaceException.class)
     public ResponseEntity<ErrorResponse> handleFormulaInvalidWorkspaceException (
             FormulaInvalidWorkspaceException exception,

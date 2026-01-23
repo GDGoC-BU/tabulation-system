@@ -55,20 +55,6 @@ public class Candidate extends Auditable {
     @JoinColumn(name = "pageant_id", nullable = false)
     private Pageant pageant;
 
-    /* Temporary list. Still need the real Segment object
-    with their details. Exclude list from getter and expose a
-    separate getter stream to extract the actual segment data:
-    getQualifiedSegments() */
-    @JsonManagedReference
-    @OneToMany(
-            mappedBy = "candidate",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @Getter(AccessLevel.NONE)
-    private List<CandidateSegmentQualification> qualifiedSegments = new ArrayList<>();
-
     @JsonManagedReference
     @OneToMany(
             mappedBy = "candidate",
@@ -86,18 +72,5 @@ public class Candidate extends Auditable {
         this.age = age;
         this.college = college;
         this.pageant = pageant;
-    }
-
-    public void addCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
-        qualifiedSegments.add(candidateSegmentQualification);
-        candidateSegmentQualification.setCandidate(this);
-    }
-    public void removeCandidateSegmentQualification(CandidateSegmentQualification candidateSegmentQualification) {
-        qualifiedSegments.remove(candidateSegmentQualification);
-        candidateSegmentQualification.setCandidate(null);
-    }
-    /* TEST THIS. I DON'T THINK THIS IS NECESSARY BECAUSE JPA ALREADY LOADS THE RELATIONSHIP */
-    public List<Segment> getQualifiedSegments() {
-        return qualifiedSegments.stream().map((CandidateSegmentQualification::getSegment)).toList();
     }
 }

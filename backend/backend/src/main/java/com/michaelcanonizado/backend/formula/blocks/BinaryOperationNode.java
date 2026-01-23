@@ -1,5 +1,8 @@
 package com.michaelcanonizado.backend.formula.blocks;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.michaelcanonizado.backend.exceptions.common.ErrorCode;
 import com.michaelcanonizado.backend.exceptions.customs.FormulaEvaluationException;
 import com.michaelcanonizado.backend.exceptions.customs.FormulaTypeException;
@@ -8,20 +11,33 @@ import com.michaelcanonizado.backend.formula.contexts.TypeContext;
 import com.michaelcanonizado.backend.formula.values.NumberValue;
 import com.michaelcanonizado.backend.formula.values.Value;
 import com.michaelcanonizado.backend.formula.values.ValueType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
-@AllArgsConstructor
 @Getter
-public class BinaryOperationNode implements BlockNode {
+public final class BinaryOperationNode implements BlockNode {
     private final BlockNode left;
     private final BinaryOperator operator;
     private final BlockNode right;
 
+    @JsonCreator
+    public BinaryOperationNode(
+            @JsonProperty("left") BlockNode left,
+            @JsonProperty("operator") BinaryOperator operator,
+            @JsonProperty("right") BlockNode right) {
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
+    }
+
     @Override
     public Value evaluate(EvaluationContext context) {
+        Objects.requireNonNull(left, "left");
+        Objects.requireNonNull(right, "right");
+        Objects.requireNonNull(operator, "operator");
+
         /* Recursively evaluate their inputs */
         NumberValue leftValue = (NumberValue) left.evaluate(context);
         NumberValue rightValue = (NumberValue) right.evaluate(context);
@@ -48,6 +64,10 @@ public class BinaryOperationNode implements BlockNode {
 
     @Override
     public ValueType getType(TypeContext context) {
+        Objects.requireNonNull(left, "left");
+        Objects.requireNonNull(right, "right");
+        Objects.requireNonNull(operator, "operator");
+
         /* Recursively verify the type of inputs */
         ValueType leftType = left.getType(context);
         ValueType rightType = right.getType(context);

@@ -10,6 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 public class FormulaTree {
-    private BlockNode formulaNode;
+    private BlockNode rootNode;
     private Set<UUID> criterionIdsInFormula;
 }

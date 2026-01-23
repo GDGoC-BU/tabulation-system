@@ -6,10 +6,8 @@ import FormulaRenderer from '@/features/formula/deprecated-components/formula-re
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
 import useFormulaCriterionLookup from '@/features/formula/hooks/use-formula-criterion-lookup'
 import Table from '@/components/table'
-import { segmentCandidateQualifications } from '@/features/segments/components/segment-candidate-qualifications-table-columns'
 import Loading from '@/components/loading'
 import pageantHierarchyQueryOptions from '@/features/pageants/query-options/pageant-hierarchy-query-options'
-import segmentCalculateCandidateQualificationsQueryOptions from '@/features/segments/query-options/segment-calculate-candidate-qualifications-query-options'
 
 export const Route = createFileRoute(
   '/admin/console/segments/$segmentId/qualified',
@@ -62,24 +60,24 @@ function RouteComponent() {
     )
   }
 
-  const { femaleCandidateQualifications, maleCandidateQualifications } =
-    groupCandidateQualificationsByGender(segment?.candidateQualifications)
+  // const { femaleCandidateQualifications, maleCandidateQualifications } =
+  //   groupCandidateQualificationsByGender(segment?.candidateQualifications)
 
   return (
     <div className="p-4 w-full">
       <div className="w-full flex flex-col gap-24">
         <div className="border rounded-lg p-4">
           <div className="mb-2">
-            <TextHeading>Qualified Candidates for {segment?.name}</TextHeading>
+            {/* <TextHeading>Qualified Candidates for {segment?.name}</TextHeading> */}
           </div>
           <div className="flex flex-col gap-2 border-b pb-8">
             <div className="">
-              <TextBody>
+              {/* <TextBody>
                 Candidate Limit: {segment?.candidateLimit ?? 'None'}
-              </TextBody>
+              </TextBody> */}
             </div>
             <div className="">
-              {segment?.formula === null ? (
+              {/* {segment?.formula === null ? (
                 <div>
                   <TextBody>Formula: None</TextBody>
                 </div>
@@ -91,7 +89,7 @@ function RouteComponent() {
                     criterionLookup={criterionLookup}
                   />
                 </div>
-              )}
+              )} */}
             </div>
           </div>
           <div className="w-full flex flex-col">
@@ -99,23 +97,23 @@ function RouteComponent() {
               <div className="w-full text-center mb-8">
                 <TextHeading className="font-bold">Female</TextHeading>
               </div>
-              <Table.CandidateQualifications
+              {/* <Table.CandidateQualifications
                 columns={segmentCandidateQualifications}
                 data={femaleCandidateQualifications}
                 limit={segment?.candidateLimit ?? 0}
                 formula={segment?.formula ?? ''}
-              />
+              /> */}
             </div>
             <div className="flex flex-col gap-2 mt-8">
               <div className="w-full text-center mb-8">
                 <TextHeading className="font-bold">Male</TextHeading>
               </div>
-              <Table.CandidateQualifications
+              {/* <Table.CandidateQualifications
                 columns={segmentCandidateQualifications}
                 data={maleCandidateQualifications}
                 limit={segment?.candidateLimit ?? null}
                 formula={segment?.formula ?? null}
-              />
+              /> */}
             </div>
           </div>
         </div>

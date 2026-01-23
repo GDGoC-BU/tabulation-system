@@ -14,7 +14,6 @@ public class SeederOrchestrator implements CommandLineRunner {
     public SeederOrchestrator(
             PageantSeeder pageantSeeder,
             CandidateSeeder candidateSeeder,
-            CandidateSegmentQualificationSeeder candidateSegmentQualificationSeeder,
             CollegeSeeder collegeSeeder,
             CriterionSeeder criterionSeeder,
             JudgeSeeder judgeSeeder,
@@ -34,7 +33,6 @@ public class SeederOrchestrator implements CommandLineRunner {
                 segmentSeeder,
                 criterionSeeder,
                 candidateSeeder,
-                candidateSegmentQualificationSeeder,
                 scoreSeeder
         );
     }

@@ -16,8 +16,8 @@ export const Route = createFileRoute('/admin/console/segments/')({
 })
 
 function AdminConsoleSegments() {
-  const { data: segments, isLoading } = useQuery(segmentsQueryOptions())
   const { data: selectedPageant } = useSelectedPageant()
+  const { data: segments, isLoading } = useQuery(segmentsQueryOptions())
   const { data: pageantHierarchy } = useQuery(
     pageantHierarchyQueryOptions(selectedPageant?.id, {
       enabled: !!selectedPageant,
@@ -48,18 +48,16 @@ function AdminConsoleSegments() {
   const processedSegments = useMemo(() => {
     if (!segments) return []
     return segments.map((segment) => {
-      const rawFormula = segment.formula
+      const rawFormula = segment.qualificationLeaderboard?.formula.text
       return {
         ...segment,
         /* Patchy fix. But this prevents multiple query fetches and you cant call hooks in table-columns */
-        formula: rawFormula ? (
+        qualificationLeaderboardFormula: rawFormula ? (
           <FormulaRenderer
-            formula={rawFormula.text}
+            formula={rawFormula}
             criterionLookup={criterionLookup}
           />
-        ) : (
-          <TextBody>None</TextBody>
-        ),
+        ) : null,
       }
     })
   }, [segments, criterionMap, criterionLookup])

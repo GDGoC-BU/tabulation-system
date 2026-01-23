@@ -1,12 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TextBody } from '@/components/text'
 import { useSelectedPageant } from '@/features/pageants/hooks/use-selected-pageant'
-import useStatusChangeMutate from '@/features/state-machine/hooks/use-status-change-mutate'
 import ConfirmDialog from '@/components/confirm-dialog'
+import api from '@/lib/axios'
 
 export default function PageantPreparationDashboard() {
   const queryClient = useQueryClient()
-  const { mutateAsync } = useStatusChangeMutate()
+  const { mutateAsync } = useMutation({
+    mutationFn: async (url: string | null) => {
+      if (!url) return
+      await api.post(url)
+    },
+  })
   const { data: selectedPageant, isLoading } = useSelectedPageant()
   if (isLoading || !selectedPageant) {
     return <TextBody>Loading Preperation Dashboard...</TextBody>

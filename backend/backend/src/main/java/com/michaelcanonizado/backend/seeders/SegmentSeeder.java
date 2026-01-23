@@ -1,16 +1,13 @@
 package com.michaelcanonizado.backend.seeders;
 
-import com.michaelcanonizado.backend.models.Phase;
-import com.michaelcanonizado.backend.models.Segment;
-import com.michaelcanonizado.backend.repositories.PhaseRepository;
-import com.michaelcanonizado.backend.repositories.SegmentRepository;
+import com.michaelcanonizado.backend.models.*;
+import com.michaelcanonizado.backend.repositories.*;
 import com.michaelcanonizado.backend.utilities.PhaseSegmentCriteriaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Component
 public class SegmentSeeder implements DatabaseSeeder {
@@ -38,7 +35,12 @@ public class SegmentSeeder implements DatabaseSeeder {
 
             /* Go through the ist of segments of the static phase and store it in the database */
             phaseTemp.getSegments().forEach(segmentTemp -> {
-                segments.add(new Segment(segmentTemp.getName(), segmentTemp.getSequence(), null, null, phase));
+                Segment segment = new Segment(
+                        segmentTemp.getName(),
+                        segmentTemp.getSequence(),
+                        phase
+                );
+                segments.add(segment);
             });
         });
         segmentRepository.saveAll(segments);

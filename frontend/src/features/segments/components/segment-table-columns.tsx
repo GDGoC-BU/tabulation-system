@@ -5,11 +5,8 @@ import type { SegmentSummary } from '../schemas'
 import type { JSX } from 'react'
 import { TextBody } from '@/components/text'
 
-export type SegmentSummaryWithRenderedFormula = Omit<
-  SegmentSummary,
-  'formula'
-> & {
-  formula: JSX.Element
+export type SegmentSummaryWithRenderedFormula = SegmentSummary & {
+  qualificationLeaderboardFormula: JSX.Element | null
 }
 
 export const segmentTableColumns: Array<
@@ -44,14 +41,12 @@ export const segmentTableColumns: Array<
       return <TextBody>{sequence}</TextBody>
     },
   },
-
   {
-    accessorKey: 'candidateLimit',
-    header: 'Candidate Limit',
+    accessorKey: 'qualificationLeaderboard.selectionCount',
+    header: 'Selection Count',
     cell: ({ row }) => {
-      const candidateLimit: SegmentSummaryWithRenderedFormula['candidateLimit'] =
-        row.getValue('candidateLimit')
-      const label = candidateLimit ? candidateLimit : 'None'
+      const qualificationLeaderboard = row.original.qualificationLeaderboard
+      const label = qualificationLeaderboard?.selectionCount ?? 'None'
 
       return (
         <div className="mx-2 w-fit rounded-md px-4 py-2 text-center">
@@ -61,13 +56,19 @@ export const segmentTableColumns: Array<
     },
   },
   {
-    accessorKey: 'formula',
+    accessorKey: 'qualificationLeaderboardFormula',
     header: 'Formula',
     cell: ({ row }) => {
-      const formula: SegmentSummaryWithRenderedFormula['formula'] =
-        row.getValue('formula')
+      const formula: SegmentSummaryWithRenderedFormula['qualificationLeaderboardFormula'] =
+        row.getValue('qualificationLeaderboardFormula')
 
-      return <div className="max-w-[1000px] whitespace-normal">{formula}</div>
+      const label = formula ? formula : <TextBody>None</TextBody>
+
+      return (
+        <div className="mx-2 w-fit rounded-md px-4 py-2 text-center">
+          {label}
+        </div>
+      )
     },
   },
   {

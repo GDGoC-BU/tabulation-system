@@ -1,52 +1,20 @@
 import z from 'zod'
-import { criteriaBreakdownSchema, phaseSegmentStatusValue } from '@/schemas'
+import { phaseSegmentStatusValue } from '@/schemas'
 import { phaseSummarySchema } from '@/features/phases/schemas'
 import {
   criterionHierarchySchema,
   criterionSummarySchema,
 } from '@/features/criteria/schemas'
 import {
-  candidateHierarchySchema,
-  candidateSummarySchema,
-} from '@/features/candidates/schemas'
-import { formulaSchema } from '@/features/formula/schemas'
-
-export const candidateSegmentQualificationHierarchySchema = z.object({
-  id: z.string(),
-  candidate: candidateHierarchySchema,
-  isQualified: z.boolean(),
-  score: z.union([z.null(), z.number()]),
-})
-export type CandidateSegmentQualificationHierarchy = z.infer<
-  typeof candidateSegmentQualificationHierarchySchema
->
-
-export const candidateSegmentQualificationSummarySchema = z.object({
-  id: z.string(),
-  candidate: candidateSummarySchema,
-  rank: z.union([z.null(), z.number()]),
-  isQualified: z.boolean(),
-  score: z.union([z.null(), z.number()]),
-  isTied: z.boolean(),
-  criteriaBreakdown: z.union([z.null(), z.array(criteriaBreakdownSchema)]),
-})
-export type CandidateSegmentQualificationSummary = z.infer<
-  typeof candidateSegmentQualificationSummarySchema
->
-
-export const candidateQualificationsSchema = z.array(
-  candidateSegmentQualificationSummarySchema,
-)
-export type CandidateQualifications = z.infer<
-  typeof candidateQualificationsSchema
->
+  leaderboardAddFormSchema,
+  leaderboardEditFormSchema,
+  leaderboardSummarySchema,
+} from '@/features/leaderboard/schemas'
 
 export const segmentSummarySchema = z.object({
   id: z.string(),
   name: z.string(),
   sequence: z.number(),
-  candidateLimit: z.union([z.null(), z.number()]),
-  formula: z.union([z.null(), formulaSchema]),
   status: phaseSegmentStatusValue,
   phase: z.lazy(() => {
     /* Circular import patch! segments/schema imports from phases/schema.
@@ -54,6 +22,7 @@ export const segmentSummarySchema = z.object({
     /* const { phaseSummarySchema } = require('@/features/phases/schemas') */
     return phaseSummarySchema
   }),
+  qualificationLeaderboard: z.union([z.null(), leaderboardSummarySchema]),
 })
 export type SegmentSummary = z.infer<typeof segmentSummarySchema>
 
@@ -61,14 +30,12 @@ export const segmentDetailedSchema = z.object({
   id: z.string(),
   name: z.string(),
   sequence: z.number(),
-  candidateLimit: z.union([z.null(), z.number()]),
-  formula: z.union([z.null(), formulaSchema]),
   status: phaseSegmentStatusValue,
   phase: z.lazy(() => {
     return phaseSummarySchema
   }),
   criteria: z.array(criterionSummarySchema),
-  candidateQualifications: candidateQualificationsSchema,
+  qualificationLeaderboard: z.union([z.null(), leaderboardSummarySchema]),
 })
 export type SegmentDetailed = z.infer<typeof segmentDetailedSchema>
 
@@ -76,28 +43,26 @@ export const segmentHierarchySchema = z.object({
   id: z.string(),
   name: z.string(),
   sequence: z.number(),
-  candidateLimit: z.union([z.null(), z.number()]),
-  formula: z.union([z.null(), formulaSchema]),
   status: phaseSegmentStatusValue,
   criteria: z.array(criterionHierarchySchema),
-  candidateQualifications: z.array(
-    candidateSegmentQualificationHierarchySchema,
-  ),
+  qualificationLeaderboard: z.union([z.null(), leaderboardSummarySchema]),
 })
 export type SegmentHierarchy = z.infer<typeof segmentHierarchySchema>
 
 export const segmentsSchema = z.array(segmentSummarySchema)
 export type Segments = z.infer<typeof segmentsSchema>
 
+export const segmentAddFormSchema = z.object({
+  name: z.string(),
+  sequence: z.int().gt(1, { message: 'sequence must be greater than 1' }),
+  phaseId: z.string(),
+  qualificationLeaderboard: z.union([z.null(), leaderboardAddFormSchema]),
+})
+export type SegmentAddForm = z.infer<typeof segmentAddFormSchema>
+
 export const segmentEditFormSchema = z.object({
   id: z.string(),
   name: z.string(),
-  candidateLimit: z.union([
-    z.null(),
-    z.coerce.number({
-      message: 'Invalid value! Only positive numbers are allowed',
-    }),
-  ]),
-  formula: z.union([z.null(), formulaSchema]),
+  qualificationLeaderboard: z.union([z.null(), leaderboardEditFormSchema]),
 })
 export type SegmentEditForm = z.infer<typeof segmentEditFormSchema>

@@ -1,5 +1,6 @@
 package com.michaelcanonizado.backend.controllers;
 
+import com.michaelcanonizado.backend.dtos.leaderboard.LeaderboardDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentCreateDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentDetailedDTO;
 import com.michaelcanonizado.backend.dtos.segment.SegmentSummaryDTO;
@@ -39,10 +40,16 @@ public class SegmentController {
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 
-    @PostMapping("/segments/{id}/calculate-qualified-candidates")
-    public ResponseEntity<SegmentDetailedDTO> calculateCandidateQualifications(@PathVariable UUID id) {
-        SegmentDetailedDTO segment = service.calculateCandidateQualifications(id);
-        return new ResponseEntity<>(segment, HttpStatus.OK);
+    @PostMapping("/segments/{id}/qualificationLeaderboard/calculate")
+    public ResponseEntity<LeaderboardDetailedDTO> calculateQualificationLeaderboard(@PathVariable UUID id) {
+        LeaderboardDetailedDTO leaderboard = service.calculateQualificationLeaderboard(id);
+        return new ResponseEntity<>(leaderboard, HttpStatus.OK);
+    }
+
+    @GetMapping("/segments/{id}/qualificationLeaderboard")
+    public ResponseEntity<LeaderboardDetailedDTO> getQualificationLeaderboard(@PathVariable UUID id) {
+        LeaderboardDetailedDTO leaderboard = service.getQualificationLeaderboard(id);
+        return new ResponseEntity<>(leaderboard, HttpStatus.OK);
     }
 
     @GetMapping("/segments/{id}")
@@ -67,8 +74,8 @@ public class SegmentController {
     }
 
     @PutMapping("/segments/{id}")
-    public ResponseEntity<SegmentSummaryDTO> updateSegment(@PathVariable UUID id, @RequestBody @Valid SegmentUpdateDTO segmentUpdateDTO) {
-        SegmentSummaryDTO segment = service.updateSegment(id, segmentUpdateDTO);
+    public ResponseEntity<SegmentDetailedDTO> updateSegment(@PathVariable UUID id, @RequestBody @Valid SegmentUpdateDTO segmentUpdateDTO) {
+        SegmentDetailedDTO segment = service.updateSegment(id, segmentUpdateDTO);
         return new ResponseEntity<>(segment, HttpStatus.OK);
     }
 

@@ -51,10 +51,12 @@ function RouteComponent() {
     defaultValues: {
       id: '',
       name: '',
-      candidateLimit: null,
-      formula: {
-        text: '',
-        workspace: {},
+      qualificationLeaderboard: {
+        formula: {
+          text: '',
+          workspace: null,
+        },
+        selectionCount: 0,
       },
     },
   })
@@ -65,8 +67,12 @@ function RouteComponent() {
     form.reset({
       id: segment.id,
       name: segment.name,
-      candidateLimit: segment.candidateLimit,
-      formula: segment.formula,
+      qualificationLeaderboard: {
+        selectionCount: segment.qualificationLeaderboard
+          ? segment.qualificationLeaderboard.selectionCount
+          : 0,
+        formula: segment.qualificationLeaderboard?.formula,
+      },
     })
   }, [segment])
 
@@ -85,18 +91,13 @@ function RouteComponent() {
   }
 
   async function onSubmit(values: SegmentEditForm) {
-    console.log('Values: ', values)
-    /* Since segment allows no candidate-limit and formula,
-    manually set it to null */
-
     /* NOTE: These 2 inpuys should have a value or be null together! Not one of each. Refactor later*/
-    if (values.candidateLimit === 0) {
-      values.candidateLimit = null
+    if (
+      values.qualificationLeaderboard!.selectionCount == 0 ||
+      values.qualificationLeaderboard!.formula.text.length == 0
+    ) {
+      values.qualificationLeaderboard = null
     }
-    if (values.formula?.text.trim().length === 0) {
-      values.formula = null
-    }
-
     const isSuccess = await editSegment(values)
     if (isSuccess) {
       form.reset()
@@ -128,15 +129,15 @@ function RouteComponent() {
     />
   )
 
-  const CandidateLimitFormField = (
+  const SelectionCountFormField = (
     <FormField
       control={form.control}
-      name="candidateLimit"
+      name="qualificationLeaderboard.selectionCount"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Candidate Limit</FormLabel>
+          <FormLabel>Qualifier Count</FormLabel>
           <FormControl>
-            <Input type="number" min={1} {...field} />
+            <Input type="number" min={0} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -158,21 +159,23 @@ function RouteComponent() {
             >
               <div className="grid grid-cols-2 gap-4">
                 {NameFormField}
-                {CandidateLimitFormField}
+                {SelectionCountFormField}
               </div>
               <div className="grow">
                 <FormField
                   control={form.control}
                   /* Error message is determined from formula.text, bind <FormulaMessage/> to it */
-                  name="formula.text"
+                  name="qualificationLeaderboard.formula.text"
                   render={() => (
                     <FormItem className="flex flex-col h-full">
                       <FormLabel>Formula</FormLabel>
                       <FormMessage className="" />
                       {/* Actual formula object is still being targeted here */}
                       <FormulaInput
-                        initialFormula={segment?.formula}
-                        name="formula"
+                        initialFormula={
+                          segment?.qualificationLeaderboard?.formula
+                        }
+                        name="qualificationLeaderboard.formula"
                         control={form.control}
                       />
                     </FormItem>

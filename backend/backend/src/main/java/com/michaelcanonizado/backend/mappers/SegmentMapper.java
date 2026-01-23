@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
         uses = {
                 PhaseService.class,
                 CriterionMapper.class,
-                CandidateSegmentQualificationMapper.class
+                LeaderboardMapper.class
         }
 )
 public interface SegmentMapper {

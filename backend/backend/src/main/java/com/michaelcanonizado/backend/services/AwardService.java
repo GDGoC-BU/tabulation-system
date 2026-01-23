@@ -187,7 +187,7 @@ public class AwardService {
         /* This will throw an exception if the formula tree is invalid
         * (Formula should already be validated on creation) */
         TypeContext typeContext = formulaContextFactory.createTypeContext();
-        formulaTree.getFormulaNode().getType(typeContext);
+        formulaTree.getRootNode().getType(typeContext);
 
         List<UUID> criterionIdsInFormula = new ArrayList<>(formulaTree.getCriterionIdsInFormula());
         MathContext mathContext = new MathContext(10);
@@ -344,7 +344,7 @@ public class AwardService {
             );
 
             /* Evaluate the formula */
-            BigDecimal result = ((NumberValue) formulaTree.getFormulaNode().evaluate(evaluationContext)).value();
+            BigDecimal result = ((NumberValue) formulaTree.getRootNode().evaluate(evaluationContext)).value();
 
             /* Set candidate's award leaderboard score value */
             AwardLeaderboard candidateLeaderboardRow = awardLeaderboardMap.get(candidate.getId());

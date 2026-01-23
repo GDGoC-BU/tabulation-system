@@ -1,0 +1,71 @@
+package com.michaelcanonizado.backend.models;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+/* To satisfy mapstruct generator. NoArgsConstructor is required by JPA, but
+entities should be set to protected to avoid invalid creation of classes. */
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@Getter
+@Setter
+public class Leaderboard {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
+    private UUID id;
+
+    @Embedded
+    private Formula formula;
+
+    @Column(nullable = false)
+    private int selectionCount;
+
+    @OneToMany(
+            mappedBy = "leaderboard",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true
+    )
+    private List<LeaderboardEntry> entries = new ArrayList<>();
+
+    @Column(nullable = true)
+    private LocalDateTime lastCalculatedAt = null;
+
+    public Leaderboard(Formula formula, int selectionCount) {
+        this.formula = formula;
+        this.selectionCount = selectionCount;
+    }
+
+    public List<Candidate> getSelectedCandidates() {
+        return entries
+                .stream()
+                .filter(LeaderboardEntry::isSelected)
+                .map(LeaderboardEntry::getCandidate)
+                .toList();
+    }
+
+    public void addEntry(LeaderboardEntry entry) {
+        entries.add(entry);
+        entry.setLeaderboard(this);
+    }
+
+    public void removeEntry(LeaderboardEntry entry) {
+        if (!entries.contains(entry)) return;
+        entries.remove(entry);
+        entry.setLeaderboard(null);
+    }
+
+    public boolean isCalculated() {
+        return lastCalculatedAt != null;
+    }
+}

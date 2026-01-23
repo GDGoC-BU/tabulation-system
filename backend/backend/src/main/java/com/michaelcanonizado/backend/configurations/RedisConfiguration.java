@@ -19,11 +19,12 @@ import java.time.Duration;
 @Configuration(proxyBeanMethods = false)
 public class RedisConfiguration {
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
         /* List of allowed classes to be stored in cache */
         BasicPolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType("com.michaelcanonizado.backend.dtos")
                 .allowIfSubType("com.michaelcanonizado.backend.models")
+                .allowIfSubType("com.fasterxml.jackson.databind.node")
                 .allowIfSubType("java.time")
                 .allowIfSubType("java.util")
                 .build();

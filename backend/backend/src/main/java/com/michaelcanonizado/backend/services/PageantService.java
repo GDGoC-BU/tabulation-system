@@ -11,7 +11,6 @@ import com.michaelcanonizado.backend.exceptions.customs.PageantAccessDeniedExcep
 import com.michaelcanonizado.backend.mappers.PageantMapper;
 import com.michaelcanonizado.backend.models.*;
 import com.michaelcanonizado.backend.repositories.*;
-import com.michaelcanonizado.backend.specifications.CandidateSegmentQualificationSpecification;
 import com.michaelcanonizado.backend.specifications.ScoreSpecification;
 import com.michaelcanonizado.backend.utilities.CacheKeyBuilder;
 import com.michaelcanonizado.backend.utilities.CacheNameConstants;
@@ -38,9 +37,6 @@ public class PageantService {
     private SegmentRepository segmentRepository;
 
     @Autowired
-    private CandidateSegmentQualificationRepository csqRepository;
-
-    @Autowired
     private AwardRepository awardRepository;
 
     @Autowired
@@ -57,6 +53,9 @@ public class PageantService {
 
     @Autowired
     private CacheKeyBuilder cacheKeyBuilder;
+
+    @Autowired
+    private SegmentService segmentService;
 
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         Pageant savedPageant = pageantRepository.save(mapper.toEntity(pageantCreateDTO));
@@ -97,6 +96,10 @@ public class PageantService {
 
         pageant.setStatus(PageantStatus.ONGOING);
         pageant.setStartedAt(LocalDateTime.now());
+
+        /* Call initializers */
+        segmentService.initializeSegment(id);
+
         Pageant savedPageant = pageantRepository.save(pageant);
         PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
 
@@ -373,16 +376,7 @@ public class PageantService {
         segmentRepository.saveAll(segments);
         phaseRepository.saveAll(phases);
 
-        /* Reset Candidate-Segment Qualifications */
-        List<CandidateSegmentQualification> candidateSegmentQualifications = csqRepository.findAll(
-                Specification.allOf(CandidateSegmentQualificationSpecification.hasPageant(id))
-        );
-        candidateSegmentQualifications.forEach((csq) -> {
-            csq.setQualified(true);
-            csq.setScore(0.0);
-            csq.setCriteriaBreakdown(null);
-        });
-        csqRepository.saveAll(candidateSegmentQualifications);
+        /* RESET LEADERBOARDS */
 
         /* Reset Pageant status */
         pageant.setStatus(PageantStatus.PREPARATION);

@@ -1,17 +1,14 @@
 package com.michaelcanonizado.backend.dtos.segment;
 
-import com.michaelcanonizado.backend.models.Formula;
-import jakarta.validation.constraints.Min;
+import com.michaelcanonizado.backend.dtos.leaderboard.LeaderboardUpdateDTO;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public record SegmentUpdateDTO(
         @NotBlank(message = "required")
         String name,
 
-        @Min(value = 1, message = ">= 1")
-        Integer candidateLimit,
-
-        Formula formula
+        @Valid
+        LeaderboardUpdateDTO qualificationLeaderboard
 ) {
 }

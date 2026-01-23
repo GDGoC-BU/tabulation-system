@@ -12,40 +12,29 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(
-        uniqueConstraints = @UniqueConstraint(
-                columnNames = {
-                        "candidate_id",
-                        "segment_id"
-                }
-        )
-)
 @Getter
 @Setter
-public class CandidateSegmentQualification {
+public class LeaderboardEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @Column(nullable = true)
-    @Check(constraints = "rank IS NULL OR rank >= 1")
-    private Integer rank;
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            optional = false
+    )
+    @JoinColumn(name = "leaderboard_id", nullable = false)
+    private Leaderboard leaderboard;
 
-    @Column(nullable = false)
-    private boolean isQualified = true;
-
-    @Column(nullable = false)
-    private boolean isTied = false;
-
-    @JsonBackReference
     @ManyToOne(
             optional = false,
             fetch = FetchType.LAZY
@@ -53,24 +42,43 @@ public class CandidateSegmentQualification {
     @JoinColumn(name = "candidate_id", nullable = false)
     private Candidate candidate;
 
-    @JsonBackReference
-    @ManyToOne(
-            optional = false,
-            fetch = FetchType.LAZY
-    )
-    @JoinColumn(name = "segment_id", nullable = false)
-    private Segment segment;
+    @Column(nullable = true)
+    @Check(constraints = "rank IS NULL OR rank >= 1")
+    private Integer rank;
+
+    @Column(nullable = false, precision = 20, scale = 10)
+    private BigDecimal score = BigDecimal.ZERO;
 
     @Column(nullable = false)
-    private Double score = 0.0;
+    boolean overridden = false;
+
+    @Column(nullable = true, columnDefinition = "TEXT")
+    String overrideReason;
+
+    @Column(nullable = false)
+    private boolean tied = false;
+
+    @Column(nullable = false)
+    private boolean selected = true;
 
     @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<CriteriaBreakdown> criteriaBreakdown = new ArrayList<>();
 
-    public CandidateSegmentQualification(Segment segment, Candidate candidate) {
-        this.segment = segment;
+    public LeaderboardEntry(Candidate candidate) {
         this.candidate = candidate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LeaderboardEntry other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
