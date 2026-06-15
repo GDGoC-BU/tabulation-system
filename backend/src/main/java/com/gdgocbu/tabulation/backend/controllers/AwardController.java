@@ -1,7 +1,6 @@
 package com.gdgocbu.tabulation.backend.controllers;
 
 import com.gdgocbu.tabulation.backend.dtos.award.AwardDetailedDTO;
-import com.gdgocbu.tabulation.backend.dtos.awardLeaderboard.AwardLeaderboardSummaryDTO;
 import com.gdgocbu.tabulation.backend.dtos.award.AwardCreateDTO;
 import com.gdgocbu.tabulation.backend.dtos.award.AwardSummaryDTO;
 import com.gdgocbu.tabulation.backend.dtos.award.AwardUpdateDTO;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping("api/v1")
 public class AwardController {
     @Autowired

@@ -4,19 +4,14 @@ import com.gdgocbu.tabulation.backend.dtos.account.AccountCreateDTO;
 import com.gdgocbu.tabulation.backend.dtos.account.AccountLoginDTO;
 import com.gdgocbu.tabulation.backend.dtos.account.AccountSummaryDTO;
 import com.gdgocbu.tabulation.backend.dtos.judge.JudgeCreateDTO;
-import com.gdgocbu.tabulation.backend.models.Account;
 import com.gdgocbu.tabulation.backend.services.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("api/v1")
 public class AccountController {
     @Autowired
