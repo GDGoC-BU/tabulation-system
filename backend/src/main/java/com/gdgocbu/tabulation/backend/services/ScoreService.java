@@ -80,13 +80,28 @@ public class ScoreService {
 
     @Transactional
     public void initializeScores(UUID pageantId) {
+        /* Delete all Scores in the pageant before generating to prevent duplicates */
+        scoreRepository.deleteByPageantId(pageantId);
+
+        /* THROW PROPER CUSTOM ERROR IN THE isEmpty CHECKS */
         List<Candidate> candidates = candidateRepository.findAllByPageant_Id(pageantId);
+        if (candidates.isEmpty()) {
+            throw new IllegalStateException("No candidates found for pageantId: " + pageantId);
+        }
+
         List<Judge> judges = judgeRepository.findAllByPageant_Id(pageantId);
+        if (judges.isEmpty()) {
+            throw new IllegalStateException("No judges found for pageantId: " + pageantId);
+        }
+
         List<Criterion> criteria = criterionRepository.findAll(
                 Specification.allOf(
                         CriterionSpecification.hasPageant(pageantId)
                 )
         );
+        if (criteria.isEmpty()) {
+            throw new IllegalStateException("No criteria found for pageantId: " + pageantId);
+        }
 
         List<Score> newScores = new ArrayList<>();
 
