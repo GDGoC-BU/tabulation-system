@@ -2,7 +2,6 @@ package com.gdgocbu.tabulation.backend.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.gdgocbu.tabulation.backend.annotations.RequirePageantStatus;
 import com.gdgocbu.tabulation.backend.dtos.leaderboard.LeaderboardDetailedDTO;
 import com.gdgocbu.tabulation.backend.dtos.segment.*;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -398,7 +396,7 @@ public class SegmentService {
     }
 
     @Transactional
-    public void initializeSegment(UUID pageantId) {
+    public void initializeSegments(UUID pageantId) {
         List<Segment> segments = segmentRepository.findAll(
                 Specification.allOf(
                         SegmentSpecification.hasPageant(pageantId)

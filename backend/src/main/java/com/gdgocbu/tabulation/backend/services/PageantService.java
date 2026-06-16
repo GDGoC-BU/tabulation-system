@@ -98,7 +98,7 @@ public class PageantService {
         pageant.setStartedAt(LocalDateTime.now());
 
         /* Call initializers */
-        segmentService.initializeSegment(id);
+        segmentService.initializeSegments(id);
 
         Pageant savedPageant = pageantRepository.save(pageant);
         PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
