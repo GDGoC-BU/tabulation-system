@@ -57,6 +57,9 @@ public class PageantService {
     @Autowired
     private SegmentService segmentService;
 
+    @Autowired
+    private ScoreService scoreService;
+
     public PageantSummaryDTO addPageant(PageantCreateDTO pageantCreateDTO) {
         Pageant savedPageant = pageantRepository.save(mapper.toEntity(pageantCreateDTO));
         PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);
@@ -99,6 +102,7 @@ public class PageantService {
 
         /* Call initializers */
         segmentService.initializeSegments(id);
+        scoreService.initializeScores(id);
 
         Pageant savedPageant = pageantRepository.save(pageant);
         PageantSummaryDTO responseDTO = mapper.toSummaryDTO(savedPageant);

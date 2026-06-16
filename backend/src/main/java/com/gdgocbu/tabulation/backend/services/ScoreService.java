@@ -8,14 +8,15 @@ import com.gdgocbu.tabulation.backend.exceptions.common.ErrorCode;
 import com.gdgocbu.tabulation.backend.exceptions.customs.EntityNotFoundException;
 import com.gdgocbu.tabulation.backend.mappers.ScoreMapper;
 import com.gdgocbu.tabulation.backend.models.*;
-import com.gdgocbu.tabulation.backend.repositories.PageantRepository;
-import com.gdgocbu.tabulation.backend.repositories.ScoreRepository;
+import com.gdgocbu.tabulation.backend.repositories.*;
+import com.gdgocbu.tabulation.backend.specifications.CriterionSpecification;
 import com.gdgocbu.tabulation.backend.specifications.ScoreSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,13 +29,21 @@ public class ScoreService {
     private PageantRepository pageantRepository;
 
     @Autowired
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private JudgeRepository judgeRepository;
+
+    @Autowired
+    private CriterionRepository criterionRepository;
+
+    @Autowired
     private ScoreMapper mapper;
 
     @Autowired
     private PageantContext pageantContext;
 
     @RequirePageantStatus({
-            PageantStatus.PREPARATION,
             PageantStatus.ONGOING,
             PageantStatus.FINALIZING,
             PageantStatus.CLOSED
@@ -67,5 +76,36 @@ public class ScoreService {
 
         mapper.updateEntityFromDTO(score, scoreUpdateDTO);
         return mapper.toDetailedDTO(scoreRepository.save(score));
+    }
+
+    @Transactional
+    public void initializeScores(UUID pageantId) {
+        List<Candidate> candidates = candidateRepository.findAllByPageant_Id(pageantId);
+        List<Judge> judges = judgeRepository.findAllByPageant_Id(pageantId);
+        List<Criterion> criteria = criterionRepository.findAll(
+                Specification.allOf(
+                        CriterionSpecification.hasPageant(pageantId)
+                )
+        );
+
+        List<Score> newScores = new ArrayList<>();
+
+        candidates.forEach(candidate -> {
+            criteria.forEach(criterion -> {
+                judges.forEach(judge -> {
+                    newScores.add(
+                            new Score(
+                                    0,
+                                    judge,
+                                    candidate,
+                                    criterion
+                            )
+                    );
+                });
+            });
+        });
+
+        /* Batch save to minimize insert queries */
+        scoreRepository.saveAll(newScores);
     }
 }

@@ -73,20 +73,9 @@ public class CandidateService {
 
         Candidate savedCandidate = candidateRepository.save(candidate);
 
-        /* Pre-generate the scores for the new candidate */
-        List<Judge> judges = judgeRepository.findAll();
-        List<Criterion> criteria = criterionRepository.findAll();
-        List<Score> newScores = new ArrayList<>();
-        judges.forEach(judge -> {
-            criteria.forEach(criterion -> {
-                newScores.add(new Score(0, judge, savedCandidate, criterion));
-            });
-        });
-        /* Batch save to minimize insert queries */
-        scoreRepository.saveAll(newScores);
-
         /* Get available awards and pre-generate
            candidate rows in the award's leaderboard */
+        /* REMOVE GENERATION SHOULD HAPPEN ON PAGEANT PREPARATION -> ONGOING STAGE */
         List<Award> awards = awardRepository.findAllByPageant_Id(selectedPageantId);
         List<AwardLeaderboard> awardLeaderboards = new ArrayList<>();
         awards.forEach(award -> {

@@ -63,21 +63,7 @@ public class CriterionService {
         );
 
         Criterion criterion = new Criterion(name, maxScore, segment);
-        Criterion savedCriterion = criterionRepository.save(criterion);
-
-        /* Pre-generate the scores for the new criterion */
-        List<Candidate> candidates = candidateRepository.findAll();
-        List<Judge> judges = judgeRepository.findAll();
-        List<Score> newScores = new ArrayList<>();
-        candidates.forEach(candidate -> {
-            judges.forEach(judge -> {
-                newScores.add(new Score(0, judge, candidate, savedCriterion));
-            });
-        });
-        /* Batch save to minimize insert queries */
-        scoreRepository.saveAll(newScores);
-
-        return mapper.toSummaryDTO(savedCriterion);
+        return mapper.toSummaryDTO(criterionRepository.save(criterion));
     }
 
     @RequirePageantStatus({
