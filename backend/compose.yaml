@@ -1,4 +1,13 @@
 services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "7777"
+      POSTGRES_DB: gdgocbu_tabulation
+    ports:
+      - "5433:5432"
+
   redis:
     image: redis:8.2.2
     ports:
