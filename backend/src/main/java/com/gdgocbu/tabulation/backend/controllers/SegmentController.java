@@ -51,6 +51,14 @@ public class SegmentController {
         return new ResponseEntity<>(leaderboard, HttpStatus.OK);
     }
 
+    @PutMapping("/segments/{segmentId}/qualificationLeaderboard/entries/{entryId}")
+    public ResponseEntity<String> overrideQualificationLeaderboardEntry(
+            @PathVariable UUID segmentId,
+            @PathVariable UUID entryId
+    ) {
+        return new ResponseEntity<String>("", HttpStatus.OK);
+    }
+
     @GetMapping("/segments/{id}")
     public ResponseEntity<SegmentDetailedDTO> getSegment(@PathVariable UUID id) {
         SegmentDetailedDTO segment = service.getSegment(id);
