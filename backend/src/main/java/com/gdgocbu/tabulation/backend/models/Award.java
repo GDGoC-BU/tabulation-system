@@ -26,29 +26,14 @@ public class Award {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private int candidateLimit;
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(
-                    name = "text",
-                    column = @Column(
-                            name = "text",
-                            columnDefinition = "TEXT",
-                            nullable = false
-                    )
-            ),
-            @AttributeOverride(
-                    name = "workspace",
-                    column = @Column(
-                            name = "workspace",
-                            columnDefinition = "jsonb",
-                            nullable = false
-                    )
-            )
-    })
-    private Formula formula;
+    @OneToOne(
+            optional = true,
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "leaderboard_id")
+    private Leaderboard leaderboard;
 
     @JsonBackReference
     @ManyToOne(
@@ -58,27 +43,8 @@ public class Award {
     @JoinColumn(name = "pageant_id", nullable = false)
     private Pageant pageant;
 
-    @OneToMany(
-            mappedBy = "award",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<AwardLeaderboard> leaderboard = new ArrayList<>();
-
-    public Award(String name, int candidateLimit, Formula formula, Pageant pageant) {
+    public Award(String name, Pageant pageant) {
         this.name = name;
-        this.candidateLimit = candidateLimit;
-        this.formula = formula;
         this.pageant = pageant;
-    }
-
-    public void addAwardLeaderboard(AwardLeaderboard awardLeaderboard) {
-        leaderboard.add(awardLeaderboard);
-        awardLeaderboard.setAward(this);
-    }
-    public void removeAwardLeaderboard(AwardLeaderboard awardLeaderboard) {
-        leaderboard.remove(awardLeaderboard);
-        awardLeaderboard.setAward(null);
     }
 }
