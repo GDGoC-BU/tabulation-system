@@ -42,12 +42,6 @@ public class CandidateService {
     private PageantRepository pageantRepository;
 
     @Autowired
-    private AwardRepository awardRepository;
-
-    @Autowired
-    private AwardLeaderboardRepository awardLeaderboardRepository;
-
-    @Autowired
     private CandidateMapper mapper;
 
     @Autowired
@@ -72,23 +66,6 @@ public class CandidateService {
         candidate.setPageant(pageant);
 
         Candidate savedCandidate = candidateRepository.save(candidate);
-
-        /* Get available awards and pre-generate
-           candidate rows in the award's leaderboard */
-        /* REMOVE GENERATION SHOULD HAPPEN ON PAGEANT PREPARATION -> ONGOING STAGE */
-        List<Award> awards = awardRepository.findAllByPageant_Id(selectedPageantId);
-        List<AwardLeaderboard> awardLeaderboards = new ArrayList<>();
-        awards.forEach(award -> {
-            awardLeaderboards.add(
-                    new AwardLeaderboard(
-                            BigDecimal.ZERO,
-                            savedCandidate,
-                            award
-                    )
-            );
-        });
-        /* Batch save to minimize insert queries */
-        awardLeaderboardRepository.saveAll(awardLeaderboards);
 
         /* Save candidate to database */
         return mapper.toSummaryDTO(savedCandidate);

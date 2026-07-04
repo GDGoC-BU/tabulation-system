@@ -40,9 +40,6 @@ public class PageantService {
     private AwardRepository awardRepository;
 
     @Autowired
-    private AwardLeaderboardRepository awardLeaderboardRepository;
-
-    @Autowired
     private ScoreRepository scoreRepository;
 
     @Autowired
@@ -350,16 +347,6 @@ public class PageantService {
 
         /* Reset the Leaderboard for each of its Awards */
         List<Award> awards =  awardRepository.findAllByPageant_Id(id);
-        List<AwardLeaderboard> leaderboardsForAllAwards = awards
-                .stream()
-                .flatMap(award -> award.getLeaderboard().stream())
-                .toList();
-
-        leaderboardsForAllAwards.forEach(leaderboard -> {
-            leaderboard.setScore(BigDecimal.ZERO);
-            leaderboard.setCriteriaBreakdown(null);
-        });
-        awardLeaderboardRepository.saveAll(leaderboardsForAllAwards);
 
         /* Reset its Scores */
         List<Score> scores = scoreRepository.findAll(

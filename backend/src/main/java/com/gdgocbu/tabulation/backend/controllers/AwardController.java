@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,10 +26,10 @@ public class AwardController {
         return new ResponseEntity<>(award, HttpStatus.CREATED);
     }
     
-    @PostMapping("/awards/{id}/calculate")
-    public ResponseEntity<AwardDetailedDTO> calculateAwardResult(@PathVariable UUID id) {
-        AwardDetailedDTO award = service.calculateAwardResult(id);
-        return new ResponseEntity<>(award, HttpStatus.OK);
+    @PostMapping("/awards/{id}/leaderboard/calculate")
+    public ResponseEntity<Void> calculateLeaderboard(@PathVariable UUID id) {
+        service.calculateLeaderboard(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/awards/{id}")
